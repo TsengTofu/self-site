@@ -1,0 +1,353 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-noto-sans-tc), system-ui, sans-serif;
+  --font-hand: var(--font-nanum-pen), "Nanum Pen Script", cursive;
+}
+
+.font-hand {
+  font-family: var(--font-hand);
+}
+
+/* ---------- 圖片場景的互動熱區 ---------- */
+.photo-hotspot {
+  fill: transparent;
+  stroke: transparent;
+  cursor: pointer;
+  transition:
+    stroke 0.25s ease,
+    filter 0.25s ease;
+}
+
+.photo-hotspot:hover,
+.photo-hotspot:focus-visible {
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 4;
+  stroke-dasharray: 4 9;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 12px rgba(255, 235, 190, 0.85));
+  outline: none;
+}
+
+/* 點到還沒實作的物件時的搖晃 */
+@keyframes item-wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+
+.item-wiggle {
+  animation: item-wiggle 0.4s ease-in-out;
+}
+
+/* ---------- 觸發點圖層插槽(element-layers) ---------- */
+.element-layer {
+  transition: filter 0.25s ease;
+}
+.element-layer-hover {
+  filter: brightness(1.12) drop-shadow(0 0 14px rgba(255, 235, 190, 0.8));
+}
+
+/* ---------- 分層場景的活元素(scene-overlays) ---------- */
+/* 海鷗:大部分時間在畫面外,週期性滑過窗外天空 */
+@keyframes ov-seagull-cross {
+  0% {
+    transform: translateX(950px);
+    opacity: 0;
+  }
+  4% {
+    opacity: 0.9;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  24% {
+    transform: translateX(1740px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(1740px);
+    opacity: 0;
+  }
+}
+.ov-seagull {
+  transform-box: fill-box;
+  animation: ov-seagull-cross 22s linear infinite;
+}
+@keyframes ov-seagull-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.ov-seagull-bob {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ov-seagull-bob 2.6s ease-in-out infinite;
+}
+
+/* 海面波光:加法式明滅 */
+@keyframes ov-glint {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+.ov-glint {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ov-glint 3.6s ease-in-out infinite;
+}
+
+/* 陽光浮塵:緩緩上飄後淡出 */
+@keyframes ov-mote {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  30% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+}
+.ov-mote {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ov-mote 9s ease-in-out infinite;
+}
+
+/* ---------- 海景 overlay ---------- */
+@keyframes ov-cloud-drift {
+  from {
+    transform: translateX(-260px);
+  }
+  to {
+    transform: translateX(1900px);
+  }
+}
+.ov-cloud {
+  animation: ov-cloud-drift 60s linear infinite;
+}
+@keyframes ov-wave-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-160px);
+  }
+}
+.ov-wave {
+  animation: ov-wave-slide 7s linear infinite;
+}
+@keyframes ov-boat-sail {
+  0% {
+    transform: translate(340px, 470px) rotate(-1.5deg);
+  }
+  50% {
+    transform: translate(900px, 458px) rotate(1.5deg);
+  }
+  100% {
+    transform: translate(1320px, 470px) rotate(-1.5deg);
+  }
+}
+.ov-boat {
+  animation: ov-boat-sail 44s ease-in-out infinite;
+}
+@keyframes ov-ripple {
+  from {
+    r: 8;
+    opacity: 0.8;
+  }
+  to {
+    r: 60;
+    opacity: 0;
+  }
+}
+.ov-ripple {
+  animation: ov-ripple 1.4s ease-out forwards;
+}
+
+/* ---------- 來電中 ---------- */
+/* 電話上擴散的聲波圈 */
+@keyframes ring-pulse {
+  from {
+    r: 46;
+    opacity: 0.9;
+  }
+  to {
+    r: 150;
+    opacity: 0;
+  }
+}
+.ring-pulse {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 6;
+  filter: drop-shadow(0 0 10px rgba(255, 235, 190, 0.9));
+  animation: ring-pulse 1.3s ease-out infinite;
+}
+/* 響鈴小鈴鐺:左右搖 */
+@keyframes ring-bell-shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-14deg);
+  }
+  40% {
+    transform: rotate(12deg);
+  }
+  60% {
+    transform: rotate(-8deg);
+  }
+  80% {
+    transform: rotate(5deg);
+  }
+}
+.ring-bell {
+  transform-box: fill-box;
+  transform-origin: 50% 20%;
+  animation: ring-bell-shake 0.9s ease-in-out infinite;
+}
+
+/* ---------- 來電畫面(手機內) ---------- */
+/* 頭像呼吸圈 */
+@keyframes call-avatar-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(233, 180, 76, 0.55);
+  }
+  60% {
+    box-shadow: 0 0 0 22px rgba(233, 180, 76, 0);
+  }
+}
+.call-avatar {
+  animation: call-avatar-pulse 1.8s ease-out infinite;
+}
+/* 接聽鍵輕輕跳 */
+@keyframes call-answer-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.call-answer {
+  animation: call-answer-bounce 1.1s ease-in-out infinite;
+}
+
+/* ---------- 躲貓貓 ---------- */
+/* 沒找到時:偶爾耳朵/頭抽動一下當提示 */
+@keyframes cat-twitch {
+  0%,
+  92%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  94% {
+    transform: translateY(-2px) rotate(-2deg);
+  }
+  97% {
+    transform: translateY(-1px) rotate(2deg);
+  }
+}
+.cat-peek {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: cat-twitch 5s ease-in-out infinite;
+}
+/* 找到時:跳一下 */
+@keyframes cat-pop {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-14px) scale(1.08);
+  }
+  70% {
+    transform: translateY(2px) scale(0.98);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+.cat-found {
+  animation: cat-pop 0.6s ease-out;
+}
+
+/* ---------- 通用小動畫 ---------- */
+/* 黑膠旋轉 */
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin-slow 3.2s linear infinite;
+}
+
+/* 等化器跳動 */
+@keyframes eq-bounce {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.eq-bar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: eq-bounce 0.9s ease-in-out infinite;
+}
+
+/* 進場浮現(overlay 內容與標題,配 animation-delay 做 stagger) */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise-in {
+  animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* 星星閃爍 */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.twinkle {
+  animation: twinkle 2.6s ease-in-out infinite;
+}

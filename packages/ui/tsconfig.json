@@ -1,0 +1,10 @@
+{
+  "extends": "@self-site/typescript-config/react-library.json",
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "noEmit": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}
