@@ -17,34 +17,32 @@ const DOCK_ORDER: ItemId[] = [
 
 interface MobileDockProps {
   onItemClick: (id: ItemId, rect: DOMRect) => void;
-  /** 🧪 MOCK(?navv=…):附加在 dock 尾端的內容(「⋯」鈕或控制項),選定方案後移除此 prop */
-  trailing?: React.ReactNode;
 }
 
-/** 手機版底部 dock:小螢幕上場景會被裁切,保證所有物件都點得到。 */
-export function MobileDock({ onItemClick, trailing }: MobileDockProps) {
+/** 手機版底部 dock:小螢幕上場景會被裁切,保證所有物件都點得到
+ *  只放 icon 不放文字(名稱走 aria-label),所有物件平分寬度所以不用左右捲 */
+export function MobileDock({ onItemClick }: MobileDockProps) {
   return (
     <nav
       aria-label="桌上的物件"
       className="fixed inset-x-0 bottom-0 z-30 border-t border-ink-soft/15 bg-cream/92 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
     >
-      <ul className="flex gap-1 overflow-x-auto px-3 py-2 [scrollbar-width:none]">
+      <ul className="flex items-center gap-0.5 px-2 py-1.5">
         {DOCK_ORDER.map((id) => {
           const meta = ITEMS[id];
           return (
-            <li key={id} className="shrink-0">
+            <li key={id} className="min-w-0 flex-1">
               <button
                 type="button"
+                aria-label={meta.label}
                 onClick={(e) => onItemClick(id, e.currentTarget.getBoundingClientRect())}
-                className="flex w-16 flex-col items-center gap-1 rounded-xl px-1 py-1.5 text-[#5a4a3c] transition active:scale-90 active:bg-ink-soft/10"
+                className="grid h-11 w-full place-items-center rounded-xl text-[#5a4a3c] transition active:scale-90 active:bg-ink-soft/10"
               >
-                <ItemIcon id={id} className="size-6" />
-                <span className="text-[10px] text-ink-dim">{meta.label}</span>
+                <ItemIcon id={id} className="size-7" />
               </button>
             </li>
           );
         })}
-        {trailing && <li className="flex shrink-0 items-center">{trailing}</li>}
       </ul>
     </nav>
   );
