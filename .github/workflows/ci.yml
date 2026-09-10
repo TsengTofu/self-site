@@ -1,0 +1,38 @@
+# types / lint / build 三道關卡:push 到 main 與每一個 PR 都跑
+# (PR 不限 base 分支,分階段堆疊的 PR 才每一個都有 CI 結果可看)
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        # 版本只留 package.json 的 packageManager 一處
+        # 這裡再寫 version 會跟它撞,action 直接 throw
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check types
+        run: pnpm check-types
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build

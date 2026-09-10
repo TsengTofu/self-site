@@ -27,3 +27,8 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude code：這台機器的本機設定（launch.json 寫死了絕對路徑；
+# settings.local.json 依官方慣例本來就不進版控）
+.claude/launch.json
+.claude/settings.local.json
