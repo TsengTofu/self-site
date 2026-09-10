@@ -28,8 +28,10 @@ export const profile = {
     "Claude Code",
     "MCP",
   ],
+  // id 給履歷頁的展演設定當 key(不靠陣列位置對齊,插入一段經歷也不會錯位)
   experiences: [
     {
+      id: "current",
       company: "現職",
       role: "前端工程師(重構)",
       period: "2025/11 — 現在",
@@ -42,6 +44,7 @@ export const profile = {
       ],
     },
     {
+      id: "commeet",
       company: "COMMEET 擁樂數據服務",
       role: "Frontend Engineer",
       period: "約 6 年",
@@ -53,6 +56,7 @@ export const profile = {
       ],
     },
     {
+      id: "design",
       company: "設計師時期(Maxidea 等)",
       role: "Visual / Web Designer",
       period: "約 3 年",
@@ -62,6 +66,7 @@ export const profile = {
       ],
     },
     {
+      id: "appworks",
       company: "AppWorks School",
       role: "Front-End Trainee",
       period: "6 個月",
