@@ -5,8 +5,28 @@
   --font-hand: var(--font-nanum-pen), "Nanum Pen Script", cursive;
 }
 
+@theme {
+  /* ---------- 品牌色票(取代散落各處的 hex,bg-panel / text-ink 等 utility) ---------- */
+  --color-panel: #1c1d26; /* 深色面板(overlay / player 卡片底) */
+  --color-cream: #faf4ea; /* 奶油底(badge / dock / 錯誤頁卡片) */
+  --color-cream-soft: #f5ead9;
+  --color-cream-dim: #efe3d3; /* 場景捲動區底色 */
+  --color-accent: #7c9ef8; /* 主色藍 */
+  --color-accent-soft: #e8a0bf; /* 主色粉 */
+  --color-ink: #4a3c30;
+  --color-ink-soft: #6b5647;
+  --color-ink-dim: #8a7561;
+  --color-night: #1b2230; /* body 底 */
+}
+
 .font-hand {
   font-family: var(--font-hand);
+}
+
+/* 場景橫捲時的垂直拖曳不該觸發瀏覽器 pull-to-refresh / 回彈 */
+html,
+body {
+  overscroll-behavior: none;
 }
 
 /* ---------- 圖片場景的互動熱區 ---------- */
@@ -14,18 +34,11 @@
   fill: transparent;
   stroke: transparent;
   cursor: pointer;
-  transition:
-    stroke 0.25s ease,
-    filter 0.25s ease;
+  transition: stroke 0.3s ease;
 }
 
-.photo-hotspot:hover,
-.photo-hotspot:focus-visible {
-  stroke: rgba(255, 255, 255, 0.9);
-  stroke-width: 4;
-  stroke-dasharray: 4 9;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 12px rgba(255, 235, 190, 0.85));
+/* focus 指示改由熱區圓圈提示(beacon)亮起承擔,這裡不用瀏覽器預設 outline */
+.photo-hotspot:focus {
   outline: none;
 }
 
@@ -47,6 +60,65 @@
   animation: item-wiggle 0.4s ease-in-out;
 }
 
+/* ---------- 熱區圓圈提示(beacon):平常若隱若現,hover/focus/首訪提示亮起 ---------- */
+.hotspot-beacon {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  animation: beacon-breathe 3.2s ease-in-out infinite;
+}
+.beacon-dot {
+  fill: #fff3d6;
+}
+.beacon-ring {
+  fill: none;
+  stroke: #fff3d6;
+  stroke-width: 2.5;
+  opacity: 0.7;
+}
+@keyframes beacon-breathe {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+.hotspot-beacon.beacon-active,
+.hotspot-beacon.beacon-hint {
+  animation: none;
+  opacity: 1;
+}
+.beacon-active .beacon-dot,
+.beacon-hint .beacon-dot {
+  filter: drop-shadow(0 0 6px rgba(255, 220, 160, 0.9));
+}
+@keyframes beacon-ripple {
+  from {
+    r: 8;
+    opacity: 0.9;
+  }
+  to {
+    r: 22;
+    opacity: 0;
+  }
+}
+.beacon-active .beacon-ring,
+.beacon-hint .beacon-ring {
+  animation: beacon-ripple 1.4s ease-out infinite;
+  animation-delay: var(--beacon-delay, 0s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hotspot-beacon {
+    animation: none;
+  }
+  .beacon-active .beacon-ring,
+  .beacon-hint .beacon-ring {
+    animation: none;
+  }
+}
+
 /* ---------- 觸發點圖層插槽(element-layers) ---------- */
 .element-layer {
   transition: filter 0.25s ease;
@@ -59,7 +131,7 @@
 /* 海鷗:大部分時間在畫面外,週期性滑過窗外天空 */
 @keyframes ov-seagull-cross {
   0% {
-    transform: translateX(950px);
+    transform: translateX(680px);
     opacity: 0;
   }
   4% {
@@ -69,17 +141,17 @@
     opacity: 0.9;
   }
   24% {
-    transform: translateX(1740px);
+    transform: translateX(1120px);
     opacity: 0;
   }
   100% {
-    transform: translateX(1740px);
+    transform: translateX(1120px);
     opacity: 0;
   }
 }
 .ov-seagull {
   transform-box: fill-box;
-  animation: ov-seagull-cross 22s linear infinite;
+  animation: ov-seagull-cross 32s linear infinite;
 }
 @keyframes ov-seagull-bob {
   0%,
@@ -87,31 +159,13 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-7px);
   }
 }
 .ov-seagull-bob {
   transform-box: fill-box;
   transform-origin: center;
-  animation: ov-seagull-bob 2.6s ease-in-out infinite;
-}
-
-/* 海面波光:加法式明滅 */
-@keyframes ov-glint {
-  0%,
-  100% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  50% {
-    opacity: 0.85;
-    transform: scale(1);
-  }
-}
-.ov-glint {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: ov-glint 3.6s ease-in-out infinite;
+  animation: ov-seagull-bob 3.2s ease-in-out infinite;
 }
 
 /* 陽光浮塵:緩緩上飄後淡出 */
@@ -189,18 +243,18 @@
 /* 電話上擴散的聲波圈 */
 @keyframes ring-pulse {
   from {
-    r: 46;
+    r: 28;
     opacity: 0.9;
   }
   to {
-    r: 150;
+    r: 90;
     opacity: 0;
   }
 }
 .ring-pulse {
   fill: none;
   stroke: #fff;
-  stroke-width: 6;
+  stroke-width: 3.5;
   filter: drop-shadow(0 0 10px rgba(255, 235, 190, 0.9));
   animation: ring-pulse 1.3s ease-out infinite;
 }
@@ -296,6 +350,49 @@
   animation: cat-pop 0.6s ease-out;
 }
 
+/* 元素被點到:快速彈一下(從底部長出的感覺,不搶戲) */
+@keyframes element-tap {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.985);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.element-tap {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: element-tap 0.35s ease-out;
+}
+
+/* ---------- 時段滑桿(nav/phase-slider)---------- */
+.phase-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--color-cream);
+  border: 2px solid var(--color-ink-soft);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+}
+.phase-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--color-cream);
+  border: 2px solid var(--color-ink-soft);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+}
+
 /* ---------- 通用小動畫 ---------- */
 /* 黑膠旋轉 */
 @keyframes spin-slow {
@@ -350,4 +447,17 @@
 }
 .twinkle {
   animation: twinkle 2.6s ease-in-out infinite;
+}
+
+/* ---------- 無障礙:減少動態 ---------- */
+/* 系統開了「減少動態」時,所有 CSS 動畫/轉場都幾乎瞬間完成(不是關掉,是壓到極短,
+   避免 animation-fill-mode / transitionend 監聽器因為動畫被整個拿掉而收不到事件)。 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

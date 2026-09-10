@@ -10,6 +10,9 @@ export type PresenceMode = "auto" | "online" | "away";
 export type DayPhase = "dawn" | "day" | "sunset" | "night";
 export type PhaseMode = "auto" | DayPhase;
 
+/** 電話響鈴的來源:一般的來電彩蛋,或 use-alarm-scheduler 觸發的鬧鐘 */
+export type RingSource = "call" | "alarm";
+
 interface Reaction {
   itemId: ItemId;
   nonce: number; // 每次點擊遞增,讓同一個物件能重複觸發 toast
@@ -41,6 +44,8 @@ interface SceneState {
   /** 來電彩蛋:開關 + 目前是否正在響鈴 */
   phoneRingEnabled: boolean;
   phoneRinging: boolean;
+  /** 這次響鈴是一般來電還是鬧鐘觸發(決定點手機後進哪個畫面) */
+  ringSource: RingSource;
 
   openItem: (id: ItemId, rect?: DOMRect, opts?: { phoneApp?: PhoneApp }) => void;
   openOverlay: (kind: OverlayKind, rect?: DOMRect) => void;
@@ -60,6 +65,7 @@ interface SceneState {
   setPhaseMode: (mode: PhaseMode) => void;
   setPhoneRingEnabled: (enabled: boolean) => void;
   setPhoneRinging: (ringing: boolean) => void;
+  setRingSource: (source: RingSource) => void;
 }
 
 /** 目前是否「在座/上線」:手動模式優先,auto 跟著場景循環 */
@@ -79,6 +85,7 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   phaseMode: "auto",
   phoneRingEnabled: false,
   phoneRinging: false,
+  ringSource: "call",
 
   openItem: (id, rect, opts) => {
     const target = ITEM_OVERLAY[id];
@@ -111,5 +118,8 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   setPhaseMode: (mode) => set({ phaseMode: mode }),
   setPhoneRingEnabled: (enabled) =>
     set((s) => ({ phoneRingEnabled: enabled, phoneRinging: enabled ? s.phoneRinging : false })),
-  setPhoneRinging: (ringing) => set({ phoneRinging: ringing }),
+  // 響鈴結束(接聽/掛斷/逾時)一律把來源重置回 call,下一次自然來電才不會誤判成鬧鐘
+  setPhoneRinging: (ringing) =>
+    set((s) => ({ phoneRinging: ringing, ringSource: ringing ? s.ringSource : "call" })),
+  setRingSource: (source) => set({ ringSource: source }),
 }));

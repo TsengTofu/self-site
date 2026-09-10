@@ -14,7 +14,7 @@ export function SkateboardOverlay() {
 
   return (
     <OverlayShell label="滑板" onClose={closeOverlay} className="w-full max-w-md">
-      <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-[#1c1d26] p-8 text-center shadow-2xl">
+      <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-panel p-8 text-center shadow-2xl">
         <span className="inline-block text-6xl transition hover:rotate-[-16deg]">🛹</span>
         <h2 className="text-lg font-bold text-white">這格還空著</h2>
         <p className="text-sm leading-relaxed text-white/60">
@@ -27,7 +27,7 @@ export function SkateboardOverlay() {
             href={IDEA_MAIL}
             target="_blank"
             rel="noreferrer"
-            className="rounded-full bg-gradient-to-r from-[#7c9ef8] to-[#e8a0bf] px-5 py-2 text-sm font-bold text-white transition hover:brightness-110"
+            className="rounded-full bg-gradient-to-r from-accent to-accent-soft px-5 py-2 text-sm font-bold text-white transition hover:brightness-110"
           >
             跟我說你的點子
           </a>

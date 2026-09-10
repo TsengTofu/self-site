@@ -15,7 +15,25 @@ export interface Song {
 }
 
 export const songs: Song[] = [
-  { id: "serenade", title: "Serenade", artist: "BOYNEXTDOOR", youtubeVideoId: "", coverColor: "#f2c14e" },
-  { id: "song-2", title: "第二首歌", artist: "某個歌手", youtubeVideoId: "", coverColor: "#e8a0bf" },
-  { id: "song-3", title: "第三首歌", artist: "某個歌手", youtubeVideoId: "", coverColor: "#7c9ef8" },
+  {
+    id: "serenade",
+    title: "Serenade",
+    artist: "BOYNEXTDOOR",
+    youtubeVideoId: "",
+    coverColor: "#f2c14e",
+  },
+  {
+    id: "song-2",
+    title: "第二首歌",
+    artist: "某個歌手",
+    youtubeVideoId: "",
+    coverColor: "#e8a0bf",
+  },
+  {
+    id: "song-3",
+    title: "第三首歌",
+    artist: "某個歌手",
+    youtubeVideoId: "",
+    coverColor: "#7c9ef8",
+  },
 ];

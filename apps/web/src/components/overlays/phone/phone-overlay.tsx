@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { User, Mail, AlarmClock, type LucideIcon } from "lucide-react";
 import { useSceneStore, type PhoneApp } from "@/stores/scene-store";
 import { OverlayShell } from "@/components/overlays/overlay-shell";
 import { ProfileApp } from "./profile-app";
@@ -8,10 +9,10 @@ import { ContactApp } from "./contact-app";
 import { AlarmApp } from "./alarm-app";
 import { IncomingCallApp } from "./incoming-call-app";
 
-const APPS: { id: PhoneApp; label: string; icon: string; bg: string }[] = [
-  { id: "profile", label: "Profile", icon: "👤", bg: "from-[#7c9ef8] to-[#5b7ea8]" },
-  { id: "contact", label: "Mail", icon: "💌", bg: "from-[#e8a0bf] to-[#b06a92]" },
-  { id: "alarm", label: "Alarm", icon: "⏰", bg: "from-[#e9b44c] to-[#c98a2e]" },
+const APPS: { id: PhoneApp; label: string; Icon: LucideIcon; bg: string }[] = [
+  { id: "profile", label: "Profile", Icon: User, bg: "from-accent to-[#5b7ea8]" },
+  { id: "contact", label: "Mail", Icon: Mail, bg: "from-accent-soft to-[#b06a92]" },
+  { id: "alarm", label: "Alarm", Icon: AlarmClock, bg: "from-[#e9b44c] to-[#c98a2e]" },
 ];
 
 function useClock() {
@@ -25,7 +26,10 @@ function useClock() {
 
 /** 點手機後飛到畫面中央的手機。點兩下場景中的手機會直接進鬧鐘。 */
 export function PhoneOverlay() {
-  const { phoneApp, setPhoneApp, closeOverlay } = useSceneStore();
+  // 只訂閱用到的三個欄位,不讓響鈴/在座狀態變動整支重繪
+  const phoneApp = useSceneStore((s) => s.phoneApp);
+  const setPhoneApp = useSceneStore((s) => s.setPhoneApp);
+  const closeOverlay = useSceneStore((s) => s.closeOverlay);
   const clock = useClock();
 
   return (
@@ -53,9 +57,9 @@ export function PhoneOverlay() {
                     className="flex flex-col items-center gap-1.5"
                   >
                     <span
-                      className={`grid size-16 place-items-center rounded-2xl bg-gradient-to-br text-2xl shadow-lg transition hover:scale-105 active:scale-95 ${app.bg}`}
+                      className={`grid size-16 place-items-center rounded-2xl bg-gradient-to-br shadow-lg transition hover:scale-105 active:scale-95 ${app.bg}`}
                     >
-                      {app.icon}
+                      <app.Icon className="size-7 text-white" />
                     </span>
                     <span className="text-[10px] text-white/70">{app.label}</span>
                   </button>
