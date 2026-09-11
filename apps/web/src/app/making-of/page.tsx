@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MakingOfView } from "@/components/making-of/making-of-view";
+import { shareMeta } from "@/lib/site";
 
 const TITLE = "視覺風格製作歷程 — Tofu Tseng";
 const DESCRIPTION =
@@ -9,20 +10,7 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: "/making-of" },
-  // openGraph 不會跟 layout 深合併，整個物件會被覆蓋，所以 images 要重列
-  openGraph: {
-    title: TITLE,
-    description: DESCRIPTION,
-    images: ["/og.jpg"],
-    locale: "zh_TW",
-    type: "article",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: TITLE,
-    description: DESCRIPTION,
-    images: ["/og.jpg"],
-  },
+  ...shareMeta(TITLE, DESCRIPTION, "article"),
 };
 
 /** 視覺風格製作歷程：記錄這個網站的插畫場景從無到有的過程。 */
