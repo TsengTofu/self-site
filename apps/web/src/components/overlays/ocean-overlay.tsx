@@ -1,18 +1,43 @@
 "use client";
 
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useRef, useState, type MouseEvent } from "react";
 import { useSceneStore } from "@/stores/scene-store";
 import { useEffectivePhase, type DayPhase } from "@/hooks/use-time-of-day";
+import { useModalFocus } from "@self-site/ui/use-modal-focus";
 
 /** 各時段的海與天配色(沿用場景的色票) */
 const SEA_PALETTE: Record<
   DayPhase,
   { skyTop: string; skyBot: string; seaTop: string; seaBot: string; hills: string }
 > = {
-  dawn: { skyTop: "#e9c3d6", skyBot: "#f7dcc4", seaTop: "#7f9ec4", seaBot: "#a8c3d8", hills: "#8a93b5" },
-  day: { skyTop: "#aad6ea", skyBot: "#e2f2f7", seaTop: "#63aec7", seaBot: "#8fd0da", hills: "#6f9e86" },
-  sunset: { skyTop: "#f7b267", skyBot: "#f28f5f", seaTop: "#e08a63", seaBot: "#a06f86", hills: "#8a5f6f" },
-  night: { skyTop: "#23304f", skyBot: "#151d33", seaTop: "#24405a", seaBot: "#16283a", hills: "#1c2a3f" },
+  dawn: {
+    skyTop: "#e9c3d6",
+    skyBot: "#f7dcc4",
+    seaTop: "#7f9ec4",
+    seaBot: "#a8c3d8",
+    hills: "#8a93b5",
+  },
+  day: {
+    skyTop: "#aad6ea",
+    skyBot: "#e2f2f7",
+    seaTop: "#63aec7",
+    seaBot: "#8fd0da",
+    hills: "#6f9e86",
+  },
+  sunset: {
+    skyTop: "#f7b267",
+    skyBot: "#f28f5f",
+    seaTop: "#e08a63",
+    seaBot: "#a06f86",
+    hills: "#8a5f6f",
+  },
+  night: {
+    skyTop: "#23304f",
+    skyBot: "#151d33",
+    seaTop: "#24405a",
+    seaBot: "#16283a",
+    hills: "#1c2a3f",
+  },
 };
 
 interface Ripple {
@@ -32,14 +57,9 @@ export function OceanOverlay() {
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const nextId = useRef(0);
   const svgRef = useRef<SVGSVGElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeOverlay();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [closeOverlay]);
+  useModalFocus(true, rootRef, closeOverlay);
 
   const addRipple = (e: MouseEvent<SVGSVGElement>) => {
     const svg = svgRef.current;
@@ -57,6 +77,7 @@ export function OceanOverlay() {
 
   return (
     <div
+      ref={rootRef}
       role="dialog"
       aria-modal="true"
       aria-label="海景"
@@ -90,10 +111,24 @@ export function OceanOverlay() {
             <circle cx="1205" cy="135" r="44" fill={c.skyTop} opacity="0.8" />
             {(
               [
-                [180, 110], [320, 200], [520, 90], [760, 160], [980, 120], [1420, 240], [1500, 90],
+                [180, 110],
+                [320, 200],
+                [520, 90],
+                [760, 160],
+                [980, 120],
+                [1420, 240],
+                [1500, 90],
               ] as const
             ).map(([x, y], i) => (
-              <circle key={`${x}-${y}`} className="twinkle" cx={x} cy={y} r="2.6" fill="#fff" style={{ animationDelay: `${i * 0.4}s` }} />
+              <circle
+                key={`${x}-${y}`}
+                className="twinkle"
+                cx={x}
+                cy={y}
+                r="2.6"
+                fill="#fff"
+                style={{ animationDelay: `${i * 0.4}s` }}
+              />
             ))}
           </>
         ) : (
@@ -121,7 +156,11 @@ export function OceanOverlay() {
           ))}
 
         {/* 遠山 */}
-        <path d="M0 430 Q260 350 520 410 Q760 460 1040 400 Q1320 350 1600 420 L1600 460 L0 460 Z" fill={c.hills} opacity="0.85" />
+        <path
+          d="M0 430 Q260 350 520 410 Q760 460 1040 400 Q1320 350 1600 420 L1600 460 L0 460 Z"
+          fill={c.hills}
+          opacity="0.85"
+        />
 
         {/* 海 */}
         <rect x="0" y="430" width="1600" height="470" fill="url(#ov-sea)" />
@@ -144,7 +183,12 @@ export function OceanOverlay() {
         {/* 帆船緩緩航行 */}
         <g className="ov-boat">
           <g transform="translate(0 470)">
-            <path d="M-26 0 L26 0 L18 20 L-18 20 Z" fill="#f3ead8" stroke="#6b5647" strokeWidth="2.5" />
+            <path
+              d="M-26 0 L26 0 L18 20 L-18 20 Z"
+              fill="#f3ead8"
+              stroke="#6b5647"
+              strokeWidth="2.5"
+            />
             <path d="M0 -46 L0 -2 L-22 -6 Z" fill="#faf4ea" stroke="#6b5647" strokeWidth="2" />
             <path d="M2 -44 L20 -6 L2 -4 Z" fill="#e0e6ea" stroke="#6b5647" strokeWidth="2" />
             <line x1="0" y1="-48" x2="0" y2="2" stroke="#6b5647" strokeWidth="2.5" />
@@ -154,8 +198,25 @@ export function OceanOverlay() {
         {/* 點擊漣漪 */}
         {ripples.map((rp) => (
           <g key={rp.id}>
-            <circle className="ov-ripple" cx={rp.x} cy={rp.y} r="8" fill="none" stroke="#fff" strokeWidth="3" />
-            <circle className="ov-ripple" cx={rp.x} cy={rp.y} r="8" fill="none" stroke="#fff" strokeWidth="2" style={{ animationDelay: "0.18s" }} />
+            <circle
+              className="ov-ripple"
+              cx={rp.x}
+              cy={rp.y}
+              r="8"
+              fill="none"
+              stroke="#fff"
+              strokeWidth="3"
+            />
+            <circle
+              className="ov-ripple"
+              cx={rp.x}
+              cy={rp.y}
+              r="8"
+              fill="none"
+              stroke="#fff"
+              strokeWidth="2"
+              style={{ animationDelay: "0.18s" }}
+            />
           </g>
         ))}
       </svg>

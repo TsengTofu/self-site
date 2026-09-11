@@ -1,13 +1,20 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { profile } from "@/data/profile";
 
-/** 手機裡的 Profile App — 簡易履歷。內容來源:src/data/profile.ts */
+/** Profile app 只放精選幾顆技能,完整清單留給履歷頁 */
+const FEATURED_SKILLS = profile.skills.slice(0, 6);
+
+/**
+ * 手機裡的 Profile App — 摘要版:頭像/名字/title/tagline/精選技能 + 「完整履歷 →」。
+ * 完整職涯時間軸搬去獨立頁面 /resume 發揚光大。內容來源:src/data/profile.ts
+ */
 export function ProfileApp() {
   return (
     <div className="flex flex-col gap-5 p-5 text-white">
       <header className="flex items-center gap-4">
-        <div className="grid size-16 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#7c9ef8] to-[#e8a0bf] text-2xl font-bold">
+        <div className="grid size-16 shrink-0 place-items-center rounded-full bg-gradient-to-br from-accent to-accent-soft text-2xl font-bold">
           {profile.name.slice(0, 1)}
         </div>
         <div>
@@ -15,7 +22,7 @@ export function ProfileApp() {
             {profile.name}
             <span className="font-hand ml-2 text-lg text-white/60">{profile.koreanName}</span>
           </h2>
-          <p className="text-sm text-[#7c9ef8]">{profile.title}</p>
+          <p className="text-sm text-accent">{profile.title}</p>
           <p className="text-xs text-white/50">{profile.location}</p>
         </div>
       </header>
@@ -25,9 +32,9 @@ export function ProfileApp() {
       </p>
 
       <section>
-        <h3 className="mb-2 text-xs font-bold tracking-widest text-white/40">SKILLS</h3>
+        <h3 className="mb-2 text-xs font-bold tracking-widest text-white/60">SKILLS</h3>
         <ul className="flex flex-wrap gap-1.5">
-          {profile.skills.map((skill) => (
+          {FEATURED_SKILLS.map((skill) => (
             <li
               key={skill}
               className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-xs text-white/85"
@@ -38,26 +45,16 @@ export function ProfileApp() {
         </ul>
       </section>
 
-      <section>
-        <h3 className="mb-3 text-xs font-bold tracking-widest text-white/40">EXPERIENCE</h3>
-        <ol className="flex flex-col gap-4 border-l border-white/15 pl-4">
-          {profile.experiences.map((exp) => (
-            <li key={exp.company} className="relative">
-              <span className="absolute -left-[21.5px] top-1.5 size-2.5 rounded-full bg-[#e8a0bf]" />
-              <p className="text-sm font-bold">
-                {exp.company}
-                <span className="ml-2 font-normal text-white/60">{exp.role}</span>
-              </p>
-              <p className="mb-1 text-xs text-white/40">{exp.period}</p>
-              <ul className="flex list-disc flex-col gap-1 pl-4 text-xs leading-relaxed text-white/75">
-                {exp.highlights.map((h) => (
-                  <li key={h}>{h}</li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ol>
-      </section>
+      {/* 完整履歷:導去獨立的互動式時間軸頁面 */}
+      <a
+        href="/resume"
+        target="_blank"
+        rel="noreferrer"
+        className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-accent to-accent-soft py-3 text-sm font-bold text-white shadow-lg transition hover:brightness-110"
+      >
+        完整履歷
+        <ArrowRight className="size-4" />
+      </a>
 
       <section className="flex gap-2">
         {profile.links.map((link) => (

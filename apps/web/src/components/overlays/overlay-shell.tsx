@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Overlay } from "@self-site/ui/overlay";
 import { useSceneStore } from "@/stores/scene-store";
+import { prefersReducedMotion } from "@/lib/motion";
 
 interface OverlayShellProps {
   label: string;
@@ -26,6 +27,8 @@ export function OverlayShell({ label, onClose, children, className }: OverlayShe
       const panel = wrapRef.current?.querySelector("[data-overlay-panel]");
       const backdrop = wrapRef.current?.querySelector("[data-overlay-backdrop]");
       if (!panel) return;
+      // 減少動態:直接出現,不做進場動畫
+      if (prefersReducedMotion()) return;
 
       if (backdrop) {
         gsap.from(backdrop, { opacity: 0, duration: 0.35, ease: "power2.out" });

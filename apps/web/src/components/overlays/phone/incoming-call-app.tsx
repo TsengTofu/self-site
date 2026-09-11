@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Phone, PhoneOff } from "lucide-react";
 import { useSceneStore } from "@/stores/scene-store";
 import { ContactApp } from "./contact-app";
 
@@ -25,7 +26,7 @@ export function IncomingCallApp() {
     <div className="flex h-full flex-col items-center justify-between p-6 pb-10 pt-12 text-white">
       {/* 來電者 */}
       <div className="flex flex-col items-center gap-4">
-        <span className="call-avatar grid size-24 place-items-center rounded-full bg-gradient-to-br from-[#e9b44c] to-[#e8a0bf] text-4xl shadow-lg">
+        <span className="call-avatar grid size-24 place-items-center rounded-full bg-gradient-to-br from-[#e9b44c] to-accent-soft text-4xl shadow-lg">
           🧋
         </span>
         <div className="text-center">
@@ -47,9 +48,9 @@ export function IncomingCallApp() {
             type="button"
             onClick={closeOverlay}
             aria-label="掛斷"
-            className="grid size-16 place-items-center rounded-full bg-[#e5484d] text-2xl shadow-lg transition hover:brightness-110 active:scale-95"
+            className="grid size-16 place-items-center rounded-full bg-[#e5484d] shadow-lg transition hover:brightness-110 active:scale-95"
           >
-            <span className="inline-block rotate-[135deg]">📞</span>
+            <PhoneOff className="size-6 text-white" />
           </button>
           <span className="text-[10px] text-white/50">掛斷</span>
         </div>
@@ -58,9 +59,9 @@ export function IncomingCallApp() {
             type="button"
             onClick={() => setAnswered(true)}
             aria-label="接聽"
-            className="call-answer grid size-16 place-items-center rounded-full bg-[#30a46c] text-2xl shadow-lg transition hover:brightness-110 active:scale-95"
+            className="call-answer grid size-16 place-items-center rounded-full bg-[#30a46c] shadow-lg transition hover:brightness-110 active:scale-95"
           >
-            📞
+            <Phone className="size-6 text-white" />
           </button>
           <span className="text-[10px] text-white/50">接聽</span>
         </div>

@@ -3,8 +3,11 @@ import type { ItemId } from "@/lib/items";
 /**
  * 物件的 monoline 線條 icon(24×24,stroke 繼承 currentColor),
  * 圓角筆觸呼應插畫的手繪描邊風。給底部 dock 等 UI 使用。
+ *
+ * Partial:只畫有進 dock / 導覽的物件(album、doll、bubbleTea 這類只在場景裡的沒有),
+ * 缺項時 ItemIcon 回傳 null。
  */
-const PATHS: Record<ItemId, React.ReactNode> = {
+const PATHS: Partial<Record<ItemId, React.ReactNode>> = {
   phone: (
     <>
       <rect x="7" y="3" width="10" height="18" rx="2.5" />
@@ -25,13 +28,6 @@ const PATHS: Record<ItemId, React.ReactNode> = {
       <rect x="16" y="13.5" width="4" height="6.5" rx="2" />
     </>
   ),
-  musicPlayer: (
-    <>
-      <rect x="4" y="7" width="16" height="12" rx="2.5" />
-      <circle cx="14.5" cy="13" r="3" />
-      <path d="M7 10.5h2M7 13h2" opacity="0.7" />
-    </>
-  ),
   backpack: (
     <>
       <path d="M7 9a5 5 0 0 1 10 0v10a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 19V9Z" />
@@ -45,32 +41,11 @@ const PATHS: Record<ItemId, React.ReactNode> = {
       <path d="M6 4.5v15.5M9.5 9h5M9.5 12h3.5" />
     </>
   ),
-  album: (
-    <>
-      <circle cx="12" cy="12" r="8.5" />
-      <circle cx="12" cy="12" r="2.6" />
-      <path d="M12 6.2a5.8 5.8 0 0 1 4.1 1.7" opacity="0.6" />
-    </>
-  ),
   skateboard: (
     <>
       <path d="M4 12.5c1.2 1.6 3 2.5 5 2.5h6c2 0 3.8-.9 5-2.5" />
       <circle cx="8.5" cy="18" r="1.8" />
       <circle cx="15.5" cy="18" r="1.8" />
-    </>
-  ),
-  doll: (
-    <>
-      <path d="M5 14a7 7 0 0 1 14 0" />
-      <path d="M5 14c-1.2.4-2 .9-2 1.6 0 1.1 4 2.4 9 2.4s9-1.3 9-2.4c0-.7-.8-1.2-2-1.6" />
-      <path d="M12 7V5.5" />
-    </>
-  ),
-  bubbleTea: (
-    <>
-      <path d="M6 9h10v8a3.5 3.5 0 0 1-3.5 3.5h-3A3.5 3.5 0 0 1 6 17V9Z" />
-      <path d="M16 11h2a2.5 2.5 0 0 1 0 5h-2" />
-      <path d="M9 5.5c0-1 1-1 1-2M12.5 5.5c0-1 1-1 1-2" opacity="0.7" />
     </>
   ),
   bookStack: (
@@ -100,6 +75,8 @@ interface ItemIconProps {
 }
 
 export function ItemIcon({ id, className }: ItemIconProps) {
+  const path = PATHS[id];
+  if (!path) return null;
   return (
     <svg
       viewBox="0 0 24 24"
@@ -111,7 +88,7 @@ export function ItemIcon({ id, className }: ItemIconProps) {
       className={className}
       aria-hidden
     >
-      {PATHS[id]}
+      {path}
     </svg>
   );
 }

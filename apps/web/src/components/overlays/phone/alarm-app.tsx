@@ -27,7 +27,7 @@ export function AlarmApp() {
           type="button"
           aria-label="新增鬧鐘"
           onClick={() => setAdding((v) => !v)}
-          className="grid size-8 place-items-center rounded-full bg-[#7c9ef8] text-lg font-bold transition hover:brightness-110"
+          className="grid size-8 place-items-center rounded-full bg-accent text-lg font-bold transition hover:brightness-110"
         >
           {adding ? "×" : "+"}
         </button>
@@ -51,7 +51,7 @@ export function AlarmApp() {
           <button
             type="button"
             onClick={submit}
-            className="rounded-lg bg-[#7c9ef8] py-2 text-sm font-bold transition hover:brightness-110"
+            className="rounded-lg bg-accent py-2 text-sm font-bold transition hover:brightness-110"
           >
             加入
           </button>
@@ -64,7 +64,7 @@ export function AlarmApp() {
             key={alarm.id}
             className="group flex items-center justify-between rounded-2xl bg-white/5 px-4 py-3"
           >
-            <div className={alarm.enabled ? "" : "opacity-40"}>
+            <div style={{ opacity: alarm.enabled ? 1 : 0.4 }}>
               <p className="text-2xl font-bold tabular-nums">{alarm.time}</p>
               <p className="text-xs text-white/60">{alarm.label}</p>
             </div>
@@ -73,7 +73,7 @@ export function AlarmApp() {
                 type="button"
                 aria-label={`刪除 ${alarm.label}`}
                 onClick={() => removeAlarm(alarm.id)}
-                className="text-xs text-white/25 opacity-0 transition group-hover:opacity-100 hover:text-red-400"
+                className="text-xs text-white/25 opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100 hover:text-red-400 focus-visible:opacity-100"
               >
                 刪除
               </button>
@@ -83,14 +83,12 @@ export function AlarmApp() {
                 aria-checked={alarm.enabled}
                 aria-label={`${alarm.label} 開關`}
                 onClick={() => toggleAlarm(alarm.id)}
-                className={`h-7 w-12 rounded-full p-1 transition ${
-                  alarm.enabled ? "bg-[#28c840]" : "bg-white/15"
-                }`}
+                className="h-7 w-12 rounded-full p-1 transition"
+                style={{ backgroundColor: alarm.enabled ? "#28c840" : "rgba(255,255,255,.15)" }}
               >
                 <span
-                  className={`block size-5 rounded-full bg-white transition ${
-                    alarm.enabled ? "translate-x-5" : ""
-                  }`}
+                  className="block size-5 rounded-full bg-white transition"
+                  style={{ transform: alarm.enabled ? "translateX(1.25rem)" : "none" }}
                 />
               </button>
             </div>
@@ -98,8 +96,8 @@ export function AlarmApp() {
         ))}
       </ul>
 
-      <p className="mt-auto pt-4 text-center text-[10px] leading-relaxed text-white/30">
-        ⏰ 排程與提醒邏輯預留在 <code className="text-white/50">hooks/use-alarm.ts</code>
+      <p className="mt-auto pt-4 text-center text-[10px] leading-relaxed text-white/60">
+        ⏰ 鬧鐘只在這個房間裡響,放心設
       </p>
     </div>
   );

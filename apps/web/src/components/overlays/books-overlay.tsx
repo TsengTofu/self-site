@@ -11,7 +11,7 @@ export function BooksOverlay() {
 
   return (
     <OverlayShell label="書單" onClose={closeOverlay} className="w-full max-w-2xl">
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#1c1d26] shadow-2xl">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-panel shadow-2xl">
         <header className="flex items-center gap-3 border-b border-white/10 p-4">
           <span className="text-2xl">🎒</span>
           <div className="flex-1">
@@ -32,13 +32,13 @@ export function BooksOverlay() {
               </div>
               <div className="min-w-0">
                 <h3 className="text-sm font-bold text-white">{book.title}</h3>
-                <p className="mb-1.5 text-xs text-white/45">{book.author}</p>
+                <p className="mb-1.5 text-xs text-white/60">{book.author}</p>
                 <p className="text-xs leading-relaxed text-white/70">{book.note}</p>
               </div>
             </li>
           ))}
         </ul>
-        <p className="px-5 pb-4 text-center text-[11px] text-white/30">書單在 src/data/books.ts</p>
+        <p className="px-5 pb-4 text-center text-[11px] text-white/60">看完會再補上來,慢慢讀</p>
       </div>
     </OverlayShell>
   );

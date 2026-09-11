@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { CloseButton } from "@self-site/ui/close-button";
 import { songs } from "@/data/music";
 import { useSceneStore } from "@/stores/scene-store";
+import { prefersReducedMotion } from "@/lib/motion";
+import { useModalFocus } from "@self-site/ui/use-modal-focus";
+import { VinylDisc } from "@/components/vinyl-disc";
+import { EqBars } from "@/components/eq-bars";
 
 /**
  * 整合式音樂播放器 —— 取代舊的兩套獨立功能:歌單 overlay + 左下角背景音樂小播放器。
@@ -43,20 +47,14 @@ export function MusicPlayer() {
     }
   };
 
-  // Esc 只在展開時生效
-  useEffect(() => {
-    if (!expanded) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") dismiss();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded, currentSongId]);
+  // 展開時才啟用焦點圈:Tab 循環、Esc 呼叫 dismiss(語意不變:有歌播放中 → 收合,沒歌 → 關閉)
+  useModalFocus(expanded, panelRef, dismiss);
 
   // 只動 transform/opacity,展開/收合各自的進場動畫
   useGSAP(
     () => {
+      // 減少動態:直接出現,不做進場動畫
+      if (prefersReducedMotion()) return;
       if (expanded) {
         const backdrop = rootRef.current?.querySelector("[data-player-backdrop]");
         if (backdrop) {
@@ -119,25 +117,14 @@ export function MusicPlayer() {
         ref={panelRef}
         className={
           expanded
-            ? "relative z-10 w-full max-w-2xl overflow-hidden rounded-2xl border border-white/10 bg-[#1c1d26] shadow-2xl"
-            : "flex items-center gap-3 rounded-2xl border border-white/10 bg-[#1c1d26]/90 p-3 pr-4 shadow-2xl backdrop-blur"
+            ? "relative z-10 w-full max-w-2xl overflow-hidden rounded-2xl border border-white/10 bg-panel shadow-2xl"
+            : "flex items-center gap-3 rounded-2xl border border-white/10 bg-panel/90 p-3 pr-4 shadow-2xl backdrop-blur"
         }
       >
         {/* slot 1:header(只在展開時顯示) */}
         {expanded && (
           <header className="flex items-center gap-3 border-b border-white/10 p-4">
-            <span
-              className={`grid size-11 shrink-0 animate-spin-slow place-items-center rounded-full text-xl ${
-                song ? "" : "bg-gradient-to-br from-[#e8a0bf] to-[#7c9ef8]"
-              }`}
-              style={
-                song
-                  ? { background: `radial-gradient(circle, ${song.coverColor} 28%, #20242f 30%)` }
-                  : undefined
-              }
-            >
-              {song ? <span className="size-2.5 rounded-full bg-[#20242f]" /> : "🎧"}
-            </span>
+            <VinylDisc coverColor={song?.coverColor ?? null} size={11} />
             <div className="flex-1">
               <h2 className="font-bold text-white">我最近在聽</h2>
               <p className="text-xs text-white/50">戴上耳機,聽聽我的世界</p>
@@ -166,16 +153,16 @@ export function MusicPlayer() {
             <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
               <span className="text-4xl">🎵</span>
               <p className="text-sm text-white/80">還沒選歌</p>
-              <p className="text-xs text-white/45">在下面的清單挑一首吧</p>
+              <p className="text-xs text-white/60">在下面的清單挑一首吧</p>
             </div>
           ) : !song.youtubeVideoId ? (
             <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
               <span className="text-4xl">🎵</span>
-              <p className="text-sm text-white/80">示範模式</p>
-              <p className="max-w-sm text-xs leading-relaxed text-white/45">
-                到 <code className="rounded bg-white/10 px-1.5 py-0.5">src/data/music.ts</code> 幫「{song.title}
-                」填上 YouTube 影片 ID(網址 <code className="rounded bg-white/10 px-1">v=</code> 後面那串),
-                這裡就會變成真正的播放器。
+              <p className="text-sm text-white/80">這首歌還沒接上音源</p>
+              <p className="max-w-sm text-xs leading-relaxed text-white/60">
+                (站長備忘:到{" "}
+                <code className="rounded bg-white/10 px-1.5 py-0.5">src/data/music.ts</code> 填
+                videoId)
               </p>
             </div>
           ) : (
@@ -213,17 +200,7 @@ export function MusicPlayer() {
                       <p className="truncate text-sm font-medium text-white">{s.title}</p>
                       <p className="truncate text-xs text-white/50">{s.artist}</p>
                     </div>
-                    {playing && (
-                      <span className="flex items-end gap-0.5" aria-hidden>
-                        {[0, 0.25, 0.5].map((delay) => (
-                          <span
-                            key={delay}
-                            className="eq-bar w-1 rounded-full bg-[#e8a0bf]"
-                            style={{ height: 14, animationDelay: `${delay}s` }}
-                          />
-                        ))}
-                      </span>
-                    )}
+                    {playing && <EqBars />}
                   </button>
                 </li>
               );
@@ -239,35 +216,20 @@ export function MusicPlayer() {
               onClick={(e) => expandPlayer(e.currentTarget.getBoundingClientRect())}
               className="flex min-w-0 flex-1 items-center gap-3 text-left"
             >
-              <span
-                className={`grid size-12 shrink-0 animate-spin-slow place-items-center rounded-full text-lg shadow-inner ${
-                  song ? "" : "bg-gradient-to-br from-[#e8a0bf] to-[#7c9ef8]"
-                }`}
-                style={
-                  song
-                    ? { background: `radial-gradient(circle, ${song.coverColor} 28%, #20242f 30%)` }
-                    : undefined
-                }
-              >
-                <span className="size-2.5 rounded-full bg-[#20242f]" />
-              </span>
+              <VinylDisc coverColor={song?.coverColor ?? null} size={12} />
               <div className="min-w-0">
                 <p className="truncate text-sm font-bold text-white">{song?.title ?? "還沒選歌"}</p>
-                <p className="truncate text-xs text-white/50">{song?.artist ?? "點耳機或音響挑一首"}</p>
+                <p className="truncate text-xs text-white/50">
+                  {song?.artist ?? "點耳機或音響挑一首"}
+                </p>
                 {song && !song.youtubeVideoId && (
-                  <p className="text-[10px] text-white/30">示範模式 — 到 data/music.ts 填 videoId</p>
+                  <p className="text-[10px] text-white/60">還沒接上音源(站長備忘:填 videoId)</p>
                 )}
               </div>
             </button>
             {song && (
-              <span className="flex items-end gap-0.5 pb-0.5" aria-hidden>
-                {[0, 0.25, 0.5].map((delay) => (
-                  <span
-                    key={delay}
-                    className="eq-bar w-1 rounded-full bg-[#e8a0bf]"
-                    style={{ height: 14, animationDelay: `${delay}s` }}
-                  />
-                ))}
+              <span className="pb-0.5">
+                <EqBars />
               </span>
             )}
             <button
