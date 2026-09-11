@@ -8,6 +8,7 @@ import { quotes } from "@/data/quotes";
 import { useSceneStore } from "@/stores/scene-store";
 import { OverlayShell } from "./overlay-shell";
 import { CloseButton } from "@self-site/ui/close-button";
+import { prefersReducedMotion } from "@/lib/motion";
 
 gsap.registerPlugin(TextPlugin);
 
@@ -19,14 +20,20 @@ export function NotebookOverlay() {
 
   useGSAP(
     () => {
+      const reduced = prefersReducedMotion();
       const tl = gsap.timeline({ repeat: -1, delay: 0.7 });
       quotes.forEach((quote) => {
-        tl.to(lineRef.current, {
-          text: quote,
-          duration: Math.max(1.6, quote.length * 0.09),
-          ease: "none",
-        })
-          .to({}, { duration: 2.2 }) // 停留閱讀
+        // 減少動態:直接顯示全文,不逐字打出來
+        if (reduced) {
+          tl.set(lineRef.current, { text: quote });
+        } else {
+          tl.to(lineRef.current, {
+            text: quote,
+            duration: Math.max(1.6, quote.length * 0.09),
+            ease: "none",
+          });
+        }
+        tl.to({}, { duration: 2.2 }) // 停留閱讀
           .to(lineRef.current, { opacity: 0, duration: 0.4 })
           .set(lineRef.current, { text: "" })
           .set(lineRef.current, { opacity: 1 });
@@ -48,7 +55,10 @@ export function NotebookOverlay() {
         >
           <div className="mb-4 flex items-center justify-between">
             <p className="font-hand text-2xl text-[#8a5a3b]">노트 · 我的筆記本</p>
-            <CloseButton onClick={closeOverlay} className="!bg-black/10 !text-black/50 hover:!bg-black/20" />
+            <CloseButton
+              onClick={closeOverlay}
+              className="!bg-black/10 !text-black/50 hover:!bg-black/20"
+            />
           </div>
           <p
             ref={lineRef}
@@ -59,7 +69,7 @@ export function NotebookOverlay() {
         {/* 側邊裝訂 */}
         <div className="absolute inset-y-0 left-0 flex w-5 flex-col justify-evenly bg-[#c9885a]">
           {Array.from({ length: 8 }).map((_, i) => (
-            <span key={i} className="mx-auto size-2 rounded-full bg-[#1c1d26]/60" />
+            <span key={i} className="mx-auto size-2 rounded-full bg-panel/60" />
           ))}
         </div>
       </div>

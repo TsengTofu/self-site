@@ -13,7 +13,7 @@ export interface WindowFrameProps {
 export function WindowFrame({ title, children, onClose, className }: WindowFrameProps) {
   return (
     <div
-      className={`flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#1c1d26] shadow-2xl ${className ?? ""}`}
+      className={`flex flex-col overflow-hidden rounded-xl border border-white/10 bg-panel shadow-2xl ${className ?? ""}`}
     >
       <div className="flex items-center gap-2 border-b border-white/10 bg-[#26273a] px-4 py-2.5">
         <span className="flex gap-1.5">

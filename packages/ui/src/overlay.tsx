@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
+import { useModalFocus } from "./use-modal-focus";
+import { useGhostClickGuard } from "./use-ghost-click-guard";
 
 export interface OverlayProps {
   open: boolean;
@@ -14,20 +16,15 @@ export interface OverlayProps {
 
 /**
  * Fullscreen overlay shell: backdrop + centered panel.
- * Closes on backdrop click and Escape. Animation is left to callers
- * (GSAP targets the panel via data-overlay-panel).
+ * Closes on backdrop click and Escape, traps Tab inside the panel, and
+ * restores focus to the trigger element on close (see useModalFocus).
+ * Animation is left to callers (GSAP targets the panel via data-overlay-panel).
  */
 export function Overlay({ open, onClose, children, className, label }: OverlayProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const isRealClick = useGhostClickGuard(open);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  useModalFocus(open, panelRef, onClose);
 
   if (!open) return null;
 
@@ -41,7 +38,9 @@ export function Overlay({ open, onClose, children, className, label }: OverlayPr
       <div
         data-overlay-backdrop
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
+        onClick={() => {
+          if (isRealClick()) onClose();
+        }}
       />
       <div
         ref={panelRef}

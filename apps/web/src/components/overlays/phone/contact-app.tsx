@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { Mail, Copy, ExternalLink } from "lucide-react";
 import { profile } from "@/data/profile";
+import { gmailComposeUrl } from "@/lib/links";
 
-const GMAIL_COMPOSE = `https://mail.google.com/mail/?view=cm&fs=1&to=${profile.email}&su=${encodeURIComponent(
-  "嗨 Tseng,從你的桌上看到你 👋",
-)}`;
+const GMAIL_COMPOSE = gmailComposeUrl("嗨 Tseng,從你的桌上看到你 👋");
 
 interface ContactAppProps {
   headline?: string;
@@ -32,7 +32,7 @@ export function ContactApp({
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-5 p-6 text-center text-white">
-      <span className="text-5xl">💌</span>
+      <Mail className="size-12" strokeWidth={1.5} />
       <div>
         <h2 className="text-lg font-bold">{headline}</h2>
         <p className="mt-1 text-sm text-white/60">{tagline}</p>
@@ -42,20 +42,22 @@ export function ContactApp({
         href={GMAIL_COMPOSE}
         target="_blank"
         rel="noreferrer"
-        className="w-full rounded-2xl bg-gradient-to-r from-[#7c9ef8] to-[#e8a0bf] py-3 text-sm font-bold text-white shadow-lg transition hover:brightness-110"
+        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-accent to-accent-soft py-3 text-sm font-bold text-white shadow-lg transition hover:brightness-110"
       >
+        <ExternalLink className="size-4" />
         用 Gmail 寫信給我
       </a>
 
       <button
         type="button"
         onClick={copyEmail}
-        className="w-full rounded-2xl bg-white/10 py-3 text-sm font-medium transition hover:bg-white/20"
+        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white/10 py-3 text-sm font-medium transition hover:bg-white/20"
       >
-        {copied ? "已複製 ✓" : `複製 ${profile.email}`}
+        <Copy className="size-4" />
+        {copied ? "已複製" : `複製 ${profile.email}`}
       </button>
 
-      <a href={`mailto:${profile.email}`} className="text-xs text-white/40 underline">
+      <a href={`mailto:${profile.email}`} className="text-xs text-white/60 underline">
         或用預設郵件 App 開啟
       </a>
     </div>

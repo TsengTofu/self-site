@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
 import { useSceneStore, type PhaseMode, type DayPhase } from "@/stores/scene-store";
 import { useEffectivePhase } from "@/hooks/use-time-of-day";
+import { usePersistedMode } from "@/hooks/use-persisted-mode";
+import { BadgePill } from "@/components/badge-pill";
 
 const CYCLE: PhaseMode[] = ["auto", "dawn", "day", "sunset", "night"];
 
@@ -25,31 +26,26 @@ export function PhaseBadge() {
   const phase = useEffectivePhase();
   const info = PHASE_INFO[phase];
 
-  // 還原上次的手動設定
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY) as PhaseMode | null;
-    if (saved && saved !== "auto" && CYCLE.includes(saved)) {
-      useSceneStore.getState().setPhaseMode(saved);
+  const persist = usePersistedMode(STORAGE_KEY, (saved) => {
+    if (saved !== "auto" && (CYCLE as string[]).includes(saved)) {
+      setPhaseMode(saved as PhaseMode);
     }
-  }, []);
+  });
 
   const cycle = () => {
     const next = CYCLE[(CYCLE.indexOf(mode) + 1) % CYCLE.length] as PhaseMode;
     setPhaseMode(next);
-    if (next === "auto") localStorage.removeItem(STORAGE_KEY);
-    else localStorage.setItem(STORAGE_KEY, next);
+    persist(next === "auto" ? null : next);
   };
 
   return (
-    <button
-      type="button"
+    <BadgePill
       onClick={cycle}
       title="場景時段 — 點擊切換:自動(跟著你的時區)→ 清晨 → 白天 → 夕陽 → 夜晚"
-      className="fixed right-4 top-[3.6rem] z-20 flex items-center gap-2 rounded-full border border-[#6b5647]/20 bg-[#faf4ea]/90 py-1.5 pl-3 pr-3.5 text-xs font-medium text-[#4a3c30] shadow-sm backdrop-blur transition hover:shadow-md md:right-8 md:top-[4.6rem]"
     >
       <span className="text-sm leading-none">{info.icon}</span>
       {info.label}
       <span className="text-[10px] text-[#a08b74]">{mode === "auto" ? "自動" : "手動"}</span>
-    </button>
+    </BadgePill>
   );
 }

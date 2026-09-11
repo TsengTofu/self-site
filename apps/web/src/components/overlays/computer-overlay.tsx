@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useGhostClickGuard } from "@self-site/ui/use-ghost-click-guard";
 import { WindowFrame } from "@self-site/ui/window-frame";
+import { useModalFocus } from "@self-site/ui/use-modal-focus";
 import { projects, type Project } from "@/data/projects";
 import { useSceneStore } from "@/stores/scene-store";
 
@@ -14,20 +16,19 @@ export function ComputerOverlay() {
   const closeOverlay = useSceneStore((s) => s.closeOverlay);
   const ref = useRef<HTMLDivElement>(null);
   const [demo, setDemo] = useState<Project | null>(null);
+  // 幽靈點擊防護與 packages/ui Overlay 共用;這層掛載即開啟
+  const isRealClick = useGhostClickGuard(true);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      // 在 demo 裡 ESC 先回專案列表,再按一次才離開螢幕
-      setDemo((current) => {
-        if (current) return null;
-        closeOverlay();
-        return current;
-      });
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [closeOverlay]);
+  // 在 demo 裡 Esc 先回專案列表,再按一次才離開螢幕
+  const dismiss = () => {
+    if (demo) {
+      setDemo(null);
+    } else {
+      closeOverlay();
+    }
+  };
+
+  useModalFocus(true, ref, dismiss);
 
   return (
     <div
@@ -38,7 +39,7 @@ export function ComputerOverlay() {
       className="rise-in fixed inset-0 z-50 flex items-center justify-center bg-[#0b0e16]/85 p-4 md:p-10"
       style={{ animationDelay: "0.55s" }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) closeOverlay();
+        if (e.target === e.currentTarget && isRealClick()) closeOverlay();
       }}
     >
       <WindowFrame
@@ -130,8 +131,8 @@ export function ComputerOverlay() {
                 );
               })}
             </div>
-            <p className="px-5 pb-4 text-center text-[11px] text-white/30">
-              有 LIVE ▶ 標籤的專案點下去可以直接操作 — 內容在 src/data/projects.ts
+            <p className="px-5 pb-4 text-center text-[11px] text-white/60">
+              這台電腦還會繼續長出新東西 ⌨️
             </p>
           </>
         )}
