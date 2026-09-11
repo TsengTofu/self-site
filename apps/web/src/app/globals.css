@@ -188,55 +188,79 @@ body {
   animation: ov-mote 9s ease-in-out infinite;
 }
 
-/* ---------- 海景 overlay ---------- */
-@keyframes ov-cloud-drift {
+/* ---------- 海景 overlay(窗外那片海) ---------- */
+/* 整張極慢推鏡:底圖是靜態插畫,靠這層讓畫面一直在呼吸 */
+@keyframes ov-drift {
   from {
-    transform: translateX(-260px);
+    transform: scale(1.06) translate(-0.6%, 0.4%);
   }
   to {
-    transform: translateX(1900px);
+    transform: scale(1.13) translate(0.8%, -0.6%);
   }
 }
-.ov-cloud {
-  animation: ov-cloud-drift 60s linear infinite;
+.ov-drift {
+  animation: ov-drift 54s ease-in-out infinite alternate;
 }
-@keyframes ov-wave-slide {
-  from {
-    transform: translateX(0);
+/* 水面反光:原地明滅,像浪把光切碎 */
+@keyframes ov-glint {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scaleX(0.7);
   }
-  to {
-    transform: translateX(-160px);
+  45% {
+    opacity: 0.55;
+    transform: scaleX(1);
   }
 }
-.ov-wave {
-  animation: ov-wave-slide 7s linear infinite;
+.ov-glint {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ov-glint 5.5s ease-in-out infinite;
 }
-@keyframes ov-boat-sail {
+/* 海鷗:大半時間在畫面外,週期性從右往左滑過 */
+@keyframes ov-gull-cross {
   0% {
-    transform: translate(340px, 470px) rotate(-1.5deg);
+    transform: translateX(2650px);
+    opacity: 0;
   }
-  50% {
-    transform: translate(900px, 458px) rotate(1.5deg);
+  5% {
+    opacity: 1;
+  }
+  28% {
+    opacity: 1;
+  }
+  34% {
+    transform: translateX(-260px);
+    opacity: 0;
   }
   100% {
-    transform: translate(1320px, 470px) rotate(-1.5deg);
-  }
-}
-.ov-boat {
-  animation: ov-boat-sail 44s ease-in-out infinite;
-}
-@keyframes ov-ripple {
-  from {
-    r: 8;
-    opacity: 0.8;
-  }
-  to {
-    r: 60;
+    transform: translateX(-260px);
     opacity: 0;
   }
 }
-.ov-ripple {
-  animation: ov-ripple 1.4s ease-out forwards;
+.ov-gull {
+  animation: ov-gull-cross 46s linear infinite;
+}
+/* 翅膀的上下起伏共用場景那組 .ov-seagull-bob */
+/* 點擊漣漪:壓扁的橢圓,才像貼在水面上 */
+@keyframes ov-ripple-spread {
+  from {
+    rx: 14;
+    ry: 4;
+    opacity: 0.75;
+  }
+  to {
+    rx: 150;
+    ry: 40;
+    opacity: 0;
+  }
+}
+.ov-ripple-e {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 5;
+  animation: ov-ripple-spread 1.4s ease-out forwards;
 }
 
 /* ---------- 來電中 ---------- */
