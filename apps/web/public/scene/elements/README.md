@@ -12,7 +12,8 @@
 - **透明背景 PNG**。
 - **畫布比例 = 對應 rect 的比例**:渲染時用 `preserveAspectRatio="none"` 滿版貼合,
   比例不對的圖會被拉伸變形(裁掉多餘透明邊之後再對照下表)。
-- 建議輸出 **2×** 尺寸,縮放顯示時比較銳利。
+- 建議輸出 **2×** 尺寸,縮放顯示時比較銳利。源檔不到 2× 的,把檔名加進轉檔腳本的 `UPSCALE_2X`,
+  轉檔時會先放大 2 倍(輪廓收回原生銳利度,但畫面內部不會多出細節,有 2× 源檔還是比較好)。
 - 底圖尺寸 **1920 × 1080**,下表 rect 的 x / y / w / h 都是原圖像素座標
   (與 `src/components/scene/hotspots.ts` 同一套系統)。
 - 疊放順序(誰蓋住誰)在 `element-layers.tsx` 的 `LAYERS`:
@@ -38,7 +39,7 @@
 | `lamp`        | 1105, 420, 149, 225  | 夜晚自動換 `lamp-on.png`(兩檔同比例畫布)|
 | `lamp-on`     | 同上                 | 點亮版                                 |
 | `skateboard`  | 1505, 500, 191, 460  | 板尾被床蓋住;點擊熱區另外定義在 hotspots |
-| `bed`         | 890, 600, 1258, 892  | 前景層,右/下出血;**必須完全蓋住底圖烘焙床**(890,600 是可完全覆蓋的最低位置,往右/下移會露出舊床) |
+| `bed`         | 890, 600, 1258, 892  | 前景層,右/下出血;**必須完全蓋住底圖烘焙床**(890,600 是可完全覆蓋的最低位置,往右/下移會露出舊床)。源檔 1293×917 只有 1.03×,轉檔時放大成 2586×1834 |
 | `chair`       | 1008, 622, 320, 432  | 床之前、桌之後(使用者指定床要最前)      |
 
 ## 什麼時候看得到新圖
@@ -99,5 +100,5 @@ element-layers.tsx 的 `GIRL_RECTS`;開發校準可用 `?girl=cat|stretch|music`
 ## WebP 轉檔(前端讀的是 .webp)
 
 PNG 源檔在 `apps/web/assets/scene/elements/`,前端(element-layers.tsx 的 elementSrc)讀本資料夾的同名 .webp。
-**新增或覆蓋 PNG 後執行:`python3 apps/web/scripts/convert-elements.py`**(冪等,只轉比 .webp 新的;`--force` 全部重轉)。
+**新增或覆蓋 PNG 後執行:`python3 apps/web/scripts/convert-elements.py`**(冪等,只轉比 .webp 新的;`--force` 全部重轉;後面接檔名只重轉那幾張,例如 `convert-elements.py bed`)。
 page.tsx 的可用清單看的是本資料夾的 .webp 檔名,轉檔沒跑圖層就不會出現。
