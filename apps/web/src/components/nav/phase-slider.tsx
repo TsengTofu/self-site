@@ -1,15 +1,16 @@
 "use client";
 
+import { Moon, Sun, Sunrise, Sunset, type LucideIcon } from "lucide-react";
 import { useSceneStore, type PhaseMode, type DayPhase } from "@/stores/scene-store";
 import { useEffectivePhase } from "@/hooks/use-time-of-day";
 import { usePersistedMode } from "@/hooks/use-persisted-mode";
 
 /** 四段式滑桿的刻度(由早到晚),index 對應 range input 的值 */
-const STOPS: { phase: DayPhase; icon: string; label: string }[] = [
-  { phase: "dawn", icon: "🌅", label: "清晨" },
-  { phase: "day", icon: "☀️", label: "白天" },
-  { phase: "sunset", icon: "🌇", label: "夕陽" },
-  { phase: "night", icon: "🌙", label: "夜晚" },
+const STOPS: { phase: DayPhase; Icon: LucideIcon; label: string }[] = [
+  { phase: "dawn", Icon: Sunrise, label: "清晨" },
+  { phase: "day", Icon: Sun, label: "白天" },
+  { phase: "sunset", Icon: Sunset, label: "夕陽" },
+  { phase: "night", Icon: Moon, label: "夜晚" },
 ];
 
 const STORAGE_KEY = "self-site:phase-mode";
@@ -48,7 +49,7 @@ export function PhaseSlider({ className = "" }: { className?: string }) {
     >
       <div className="flex items-center justify-between gap-3 text-xs text-ink">
         <span className="flex items-center gap-1.5 font-medium">
-          <span className="text-sm leading-none">{current.icon}</span>
+          <current.Icon className="size-4" strokeWidth={2.1} aria-hidden />
           {current.label}
         </span>
         <button

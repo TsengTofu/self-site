@@ -130,12 +130,18 @@ export function PhotoScene({
     }
   }, [present]);
 
-  // 手機:預設把畫面捲到圖片中央(書桌區)
+  // 手機:預設把畫面捲到圖片中央(書桌區);dock 的「首頁」按鈕會發 scene:home 捲回來
   useEffect(() => {
     const el = scrollRef.current;
     if (el && el.scrollWidth > el.clientWidth) {
       el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
     }
+    const goHome = () => {
+      const box = scrollRef.current;
+      if (box) box.scrollTo({ left: (box.scrollWidth - box.clientWidth) / 2, behavior: "smooth" });
+    };
+    window.addEventListener("scene:home", goHome);
+    return () => window.removeEventListener("scene:home", goHome);
   }, []);
 
   const handleClick = (id: ItemId) => (e: MouseEvent<SVGElement>) => {
@@ -243,8 +249,8 @@ export function PhotoScene({
             const hasBeacon = ITEM_OVERLAY[spot.id] !== null;
             const showHint = hinting && hasBeacon;
             const bbox = hotspotBBox(spot);
-            const beaconX = bbox.x + bbox.w / 2;
-            const beaconY = bbox.y + bbox.h / 2;
+            const beaconX = bbox.x + bbox.w * (spot.beacon?.x ?? 0.5);
+            const beaconY = bbox.y + bbox.h * (spot.beacon?.y ?? 0.5);
             return (
               <g key={`${spot.id}-${i}`}>
                 {spot.rect && (
@@ -270,16 +276,16 @@ export function PhotoScene({
                     height={spot.screenRect.h}
                   />
                 )}
-                {/* 熱區圓圈提示(beacon):平常若隱若現,hover / focus / 首訪提示時亮起 */}
+                {/* 熱區圓圈提示(beacon):常駐小亮點,hover / focus / 首訪提示時更亮 */}
                 {hasBeacon && (
                   <g
                     className={`hotspot-beacon ${hoveredItem === spot.id ? "beacon-active" : ""} ${showHint ? "beacon-hint" : ""}`}
                     transform={`translate(${beaconX} ${beaconY})`}
                     pointerEvents="none"
-                    style={{ "--beacon-delay": `${i * 0.15}s` } as CSSProperties}
+                    style={{ "--beacon-delay": `${i * 0.37}s` } as CSSProperties}
                   >
-                    <circle className="beacon-ring" r={12} />
-                    <circle className="beacon-dot" r={5} />
+                    <circle className="beacon-ring" r={8} />
+                    <circle className="beacon-dot" r={7} />
                   </g>
                 )}
               </g>
