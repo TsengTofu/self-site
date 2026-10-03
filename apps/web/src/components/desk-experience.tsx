@@ -6,7 +6,6 @@ import { OverlayRoot } from "@/components/overlays/overlay-root";
 import { MusicPlayer } from "@/components/music-player";
 import { ReactionToast } from "@/components/reaction-toast";
 import { MobileDock } from "@/components/mobile-dock";
-import { SceneHeader } from "@/components/scene-header";
 import { TopMenu } from "@/components/top-menu";
 import { NightOwlToast } from "@/components/night-owl-toast";
 import { useSceneStore } from "@/stores/scene-store";
@@ -68,7 +67,8 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
           </div>
         </div>
 
-        <SceneHeader />
+        {/* 畫面上不放標題了,留一個只給螢幕閱讀器與搜尋引擎的 h1 */}
+        <h1 className="sr-only">나의 공간 — Tofu Tseng 的房間</h1>
 
         {/* 右上角收合選單:在線狀態、時段、視覺製作歷程 */}
         <TopMenu />
