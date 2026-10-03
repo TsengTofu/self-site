@@ -49,7 +49,8 @@ export const HOTSPOTS: Hotspot[] = [
   // 掛鉤上的軍綠背包 → 書單(元素插槽)
   { id: "backpack", rect: { x: 355, y: 205, w: 166, h: 315 }, slot: true },
   // 桌上左側的音響 → 歌單(元素插槽)
-  { id: "musicPlayer", rect: { x: 760, y: 592, w: 140, h: 89 }, slot: true },
+  // 音響縮到原本的 80%(左下角固定),不再跟手機擠在一起,跟筆電的比例也比較像真的
+  { id: "musicPlayer", rect: { x: 760, y: 610, w: 112, h: 71 }, slot: true },
   // 床尾的耳機 → 歌單(元素插槽;渲染順序在床之後,見 element-layers LAYERS)
   { id: "headphones", rect: { x: 1318, y: 852, w: 185, h: 125 }, slot: true },
   // 筆電(桌面中央)→ 專案(元素插槽)
@@ -60,7 +61,8 @@ export const HOTSPOTS: Hotspot[] = [
     slot: true,
   },
   // 手機(桌上筆電左前)→ Profile(元素插槽)
-  { id: "phone", rect: { x: 872, y: 672, w: 92, h: 50 }, slot: true },
+  // 手機往右挪到筆電左前方,跟音響之間留出空隙
+  { id: "phone", rect: { x: 902, y: 676, w: 92, h: 50 }, slot: true },
   // 斜靠鏡子的長板 → 彩蛋。畫面由 element-layers 的 DECOR 渲染(板尾被床蓋住,
   // 貼圖框與點擊範圍不同),這裡只是可點的板身多邊形,不掛 slot
   { id: "skateboard", points: "1558,502 1660,525 1640,870 1520,845" },
