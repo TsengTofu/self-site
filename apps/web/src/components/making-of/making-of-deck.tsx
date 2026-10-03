@@ -786,6 +786,45 @@ const LAB_PHASES: { id: Phase; label: string }[] = [
 const LAB_DEFAULT = { tilt: 46, spin: -22, gap: 74 };
 const FULL: Frac = { x: 0, y: 0, w: 1, h: 1 };
 
+/** 實驗室面板的拉桿;做成元件而不是 render 裡的函式,handler 裡讀 ref 才不會被當成 render 期間存取 */
+function LabSlider({
+  label,
+  value,
+  text,
+  min,
+  max,
+  step,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  text: string;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <label className="block">
+      <span className="flex justify-between text-xs" style={{ color: C.darkMute }}>
+        <span>{label}</span>
+        <span className="font-mono tabular-nums">{text}</span>
+      </span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        aria-label={label}
+        className="w-full"
+        style={{ accentColor: C.blueBright }}
+      />
+    </label>
+  );
+}
+
 function LabPanel({ active }: { active: boolean }) {
   const [phase, setPhase] = useState<Phase>("sunset");
   const [explode, setExplode] = useState(1);
@@ -875,33 +914,11 @@ function LabPanel({ active }: { active: boolean }) {
   const updateSel = (patch: Partial<LabExtra>) =>
     setExtras((prev) => prev.map((x) => (x.key === sel ? { ...x, ...patch } : x)));
 
-  const slider = (
-    label: string,
-    value: number,
-    text: string,
-    min: number,
-    max: number,
-    step: number,
-    onChange: (v: number) => void,
-  ) => (
-    <label className="block">
-      <span className="flex justify-between text-xs" style={{ color: C.darkMute }}>
-        <span>{label}</span>
-        <span className="font-mono tabular-nums">{text}</span>
-      </span>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        aria-label={label}
-        className="w-full"
-        style={{ accentColor: C.blueBright }}
-      />
-    </label>
-  );
+  // 拖動「展開程度」時先停掉自動播放的動畫
+  const onExplodeInput = (v: number) => {
+    cancelAnimationFrame(rafRef.current);
+    setExplode(v);
+  };
 
   return (
     <div className="mx-auto flex min-h-full w-full max-w-[1400px] flex-col justify-center px-5 py-6 md:px-8">
@@ -945,13 +962,10 @@ function LabPanel({ active }: { active: boolean }) {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            {slider("展開程度", explode, `${Math.round(explode * 100)}%`, 0, 1, 0.01, (v) => {
-              cancelAnimationFrame(rafRef.current);
-              setExplode(v);
-            })}
-            {slider("俯視角度", tilt, `${tilt}°`, 0, 75, 1, setTilt)}
-            {slider("水平轉角", spin, `${spin}°`, -45, 45, 1, setSpin)}
-            {slider("層距", gap, `${gap}px`, 30, 180, 1, setGap)}
+            <LabSlider label="展開程度" value={explode} text={`${Math.round(explode * 100)}%`} min={0} max={1} step={0.01} onChange={onExplodeInput} />
+            <LabSlider label="俯視角度" value={tilt} text={`${tilt}°`} min={0} max={75} step={1} onChange={setTilt} />
+            <LabSlider label="水平轉角" value={spin} text={`${spin}°`} min={-45} max={45} step={1} onChange={setSpin} />
+            <LabSlider label="層距" value={gap} text={`${gap}px`} min={30} max={180} step={1} onChange={setGap} />
             <div className="flex gap-2">
               <button
                 type="button"
@@ -1087,9 +1101,9 @@ function LabPanel({ active }: { active: boolean }) {
                 <div className="mb-1.5 text-xs font-bold" style={{ color: C.amber }}>
                   調整「{ADEF(selExtra.id).label}」
                 </div>
-                {slider("水平", Math.round(selExtra.x * 100), `${Math.round(selExtra.x * 100)}%`, 0, 95, 1, (v) => updateSel({ x: v / 100 }))}
-                {slider("垂直", Math.round(selExtra.y * 100), `${Math.round(selExtra.y * 100)}%`, 0, 95, 1, (v) => updateSel({ y: v / 100 }))}
-                {slider("大小", Math.round(selExtra.s * 100), `${Math.round(selExtra.s * 100)}%`, 30, 220, 1, (v) => updateSel({ s: v / 100 }))}
+                <LabSlider label="水平" value={Math.round(selExtra.x * 100)} text={`${Math.round(selExtra.x * 100)}%`} min={0} max={95} step={1} onChange={(v) => updateSel({ x: v / 100 })} />
+                <LabSlider label="垂直" value={Math.round(selExtra.y * 100)} text={`${Math.round(selExtra.y * 100)}%`} min={0} max={95} step={1} onChange={(v) => updateSel({ y: v / 100 })} />
+                <LabSlider label="大小" value={Math.round(selExtra.s * 100)} text={`${Math.round(selExtra.s * 100)}%`} min={30} max={220} step={1} onChange={(v) => updateSel({ s: v / 100 })} />
               </div>
             )}
           </div>
@@ -1378,7 +1392,10 @@ export function MakingOfDeck() {
   const railRef = useRef<HTMLDivElement>(null);
   const [idx, setIdx] = useState(0);
   const idxRef = useRef(0);
-  idxRef.current = idx;
+  // 給鍵盤／滾輪 handler 讀最新的 idx;同步放在 layout effect,不在 render 期間寫 ref
+  useLayoutEffect(() => {
+    idxRef.current = idx;
+  }, [idx]);
   // SSR 一律從 0 render（hydration 一致），paint 前再跳到 hash 指到的面板；
   // booted 之前不掛 transition，深連結落地不會演一段滑動
   const [booted, setBooted] = useState(false);
