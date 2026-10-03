@@ -472,22 +472,8 @@ body {
 }
 
 /* ---------- 🧪 首頁進場動畫提案(?introv=,見 layout 的 INTRO_SCRIPT) ----------
-   四種都只動 opacity / transform,交給 GPU 合成,不會一直重畫 */
-
-/* fade:整個場景從稍微放大的狀態淡入、慢慢推回原位 */
-@keyframes intro-fade {
-  from {
-    opacity: 0;
-    transform: scale(1.05);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-html[data-intro="fade"] .intro-scene {
-  animation: intro-fade 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
+   只動 opacity / transform,交給 GPU 合成,不會一直重畫
+   layers 分層長出、title 標題開場、title-layers 兩個串起來 */
 
 /* layers:空房間先淡入,家具一件一件由下往上長出來,人物最後 */
 @keyframes intro-base {
@@ -511,39 +497,22 @@ html[data-intro="fade"] .intro-scene {
 html[data-intro="layers"] .intro-scene {
   animation: intro-base 0.5s ease-out both;
 }
-html[data-intro="layers"] .intro-layer {
+html[data-intro="layers"] .intro-layer,
+html[data-intro="title-layers"] .intro-layer {
   transform-box: fill-box;
   animation: intro-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   animation-delay: var(--intro-delay, 0s);
 }
+/* 串起來時,家具等標題淡出之後才開始長(標題 1.3s 開始淡出) */
+html[data-intro="title-layers"] .intro-layer {
+  animation-delay: calc(var(--intro-delay, 0s) + 1.35s);
+}
 
-/* lights:一開始房間暗著,光從窗邊書桌那裡擴散開來,像開燈 */
-.intro-lights,
+/* title:先在奶油色畫面中央出現「나의 공간」,再整片淡出露出房間 */
 .intro-title {
   display: none;
   pointer-events: none;
 }
-@keyframes intro-lights {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(5);
-  }
-}
-html[data-intro="lights"] .intro-lights {
-  position: fixed;
-  inset: 0;
-  z-index: 25;
-  display: block;
-  background: radial-gradient(circle at 52% 55%, transparent 0, transparent 10%, rgba(20, 24, 34, 0.94) 34%);
-  transform-origin: 52% 55%;
-  animation: intro-lights 1.8s cubic-bezier(0.65, 0, 0.35, 1) 0.15s both;
-}
-
-/* title:先在奶油色畫面中央出現「나의 공간」,再整片淡出露出房間 */
 @keyframes intro-title-out {
   0% {
     opacity: 1;
@@ -566,7 +535,8 @@ html[data-intro="lights"] .intro-lights {
     letter-spacing: 0.02em;
   }
 }
-html[data-intro="title"] .intro-title {
+html[data-intro="title"] .intro-title,
+html[data-intro="title-layers"] .intro-title {
   position: fixed;
   inset: 0;
   z-index: 60;
@@ -575,7 +545,8 @@ html[data-intro="title"] .intro-title {
   background: var(--color-cream);
   animation: intro-title-out 0.7s ease-in 1.3s both;
 }
-html[data-intro="title"] .intro-title p {
+html[data-intro="title"] .intro-title p,
+html[data-intro="title-layers"] .intro-title p {
   animation: intro-title-text 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 }
 

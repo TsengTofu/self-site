@@ -42,12 +42,12 @@ export const viewport: Viewport = {
 };
 
 /**
- * 🧪 MOCK:首頁進場動畫提案 `?introv=fade|layers|lights|title`
+ * 🧪 MOCK:首頁進場動畫提案 `?introv=layers|title|title-layers`(站主保留分層長出與標題開場,可能串在一起)
  * 要在畫面畫出來之前就決定,不然場景會先出現、再突然消失重播(閃一下),
  * 所以在 <head> 裡同步讀網址,寫到 <html data-intro>,CSS 依這個屬性決定播哪一種
  * 選定後改成直接寫在 CSS,這段拿掉
  */
-const INTRO_SCRIPT = `try{var v=new URLSearchParams(location.search).get("introv");if(/^(fade|layers|lights|title)$/.test(v||""))document.documentElement.dataset.intro=v}catch(e){}`;
+const INTRO_SCRIPT = `try{var v=new URLSearchParams(location.search).get("introv");if(/^(layers|title|title-layers)$/.test(v||""))document.documentElement.dataset.intro=v}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
