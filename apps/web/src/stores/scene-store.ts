@@ -26,6 +26,8 @@ interface SceneState {
   playerMode: PlayerMode;
   /** 正在播的歌 */
   currentSongId: string | null;
+  /** 隨機播放:下一首隨機挑 */
+  shuffle: boolean;
   /** 展開播放器的動畫起點 */
   playerOrigin: DOMRect | null;
   /** 尚未實作功能的物件被點擊時的小反應 */
@@ -47,6 +49,9 @@ interface SceneState {
   closePlayer: () => void;
   /** 播放指定歌曲 */
   playSong: (id: string) => void;
+  /** 換到下一首(-1 是上一首);隨機播放時下一首隨機挑,不會挑到同一首 */
+  skipSong: (step: 1 | -1) => void;
+  toggleShuffle: () => void;
   clearReaction: () => void;
   setPresenceMode: (mode: PresenceMode) => void;
   setAutoPresent: (present: boolean) => void;
@@ -62,6 +67,7 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   origin: null,
   playerMode: "hidden",
   currentSongId: null,
+  shuffle: false,
   playerOrigin: null,
   reaction: null,
   presenceMode: "auto",
@@ -90,6 +96,18 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   minimizePlayer: () => set({ playerMode: "mini" }),
   closePlayer: () => set({ playerMode: "hidden", currentSongId: null, playerOrigin: null }),
   playSong: (id) => set({ currentSongId: id }),
+  skipSong: (step) => {
+    const { currentSongId, shuffle } = get();
+    const i = songs.findIndex((s) => s.id === currentSongId);
+    if (shuffle && step === 1 && songs.length > 1) {
+      // 從「除了現在這首」的歌裡隨機挑
+      const others = songs.filter((s) => s.id !== currentSongId);
+      set({ currentSongId: others[Math.floor(Math.random() * others.length)]!.id });
+      return;
+    }
+    set({ currentSongId: songs[(i + step + songs.length) % songs.length]!.id });
+  },
+  toggleShuffle: () => set((s) => ({ shuffle: !s.shuffle })),
   clearReaction: () => set({ reaction: null }),
   setPresenceMode: (mode) => set({ presenceMode: mode }),
   setAutoPresent: (present) => set({ autoPresent: present }),

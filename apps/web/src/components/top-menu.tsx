@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
-import { Menu, Music, Palette, X } from "lucide-react";
+import { Menu, Music, Music2, Palette, X } from "lucide-react";
 import { StatusBadge } from "@/components/status-badge";
 import { PhaseBadge } from "@/components/phase-badge";
 import { BadgePill, HoverLabel } from "@/components/badge-pill";
@@ -14,7 +14,7 @@ import { useSceneStore, selectIsOnline } from "@/stores/scene-store";
 /**
  * 右上角的收合選單:平常只有一顆圓鈕,點開往下展開
  * 在線狀態、時段、音樂開關、視覺製作歷程四顆圖示按鈕
- * 收合時圓鈕右上角留一顆狀態點(在線綠、離開灰),播音樂時左下角多一組跳動的音符
+ * 收合時圓鈕右上角留一顆狀態點(在線綠、離開灰),播音樂時旁邊會飄出音符
  */
 export function TopMenu() {
   const [open, setOpen] = useState(false);
@@ -60,11 +60,7 @@ export function TopMenu() {
         ) : (
           <Menu className="size-[18px]" strokeWidth={2.1} aria-hidden />
         )}
-        {!open && playing && (
-          <span aria-hidden className="absolute -bottom-0.5 -left-1 rounded-full bg-panel/85 px-1 py-0.5">
-            <EqBars height={8} className="bg-[#f6c98f]" />
-          </span>
-        )}
+        {!open && playing && <FloatingNotes />}
         {!open && (
           <span aria-hidden className="absolute right-0.5 top-0.5 flex size-2.5">
             {online && (
@@ -100,5 +96,28 @@ export function TopMenu() {
         ))}
       </div>
     </div>
+  );
+}
+
+/** 三顆音符的起點、飄的方向與錯開的時間(圓鈕在右上角,所以往左上飄) */
+const NOTES = [
+  { Icon: Music, left: -10, top: 14, dx: -16, delay: 0 },
+  { Icon: Music2, left: -2, top: 26, dx: -22, delay: 0.8 },
+  { Icon: Music, left: -16, top: 30, dx: -12, delay: 1.6 },
+];
+
+/** 播音樂時圓鈕旁邊飄出的音符,只是裝飾 */
+function FloatingNotes() {
+  return (
+    <span aria-hidden className="pointer-events-none absolute inset-0">
+      {NOTES.map(({ Icon, left, top, dx, delay }, i) => (
+        <Icon
+          key={i}
+          className="note-float absolute size-3.5 fill-[#f6c98f] text-[#c9893f] drop-shadow-[0_1px_1px_rgba(40,25,10,0.35)]"
+          strokeWidth={2.2}
+          style={{ left, top, "--note-dx": `${dx}px`, "--note-delay": `${delay}s` } as CSSProperties}
+        />
+      ))}
+    </span>
   );
 }
