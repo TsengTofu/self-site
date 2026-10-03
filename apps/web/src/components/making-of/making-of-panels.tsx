@@ -854,7 +854,8 @@ function LabPanel({ active }: { active: boolean }) {
     if (!active || playedRef.current) return;
     playedRef.current = true;
     if (prefersReducedMotion()) {
-      setExplode(0.6);
+      // 減少動態:不演動畫,下一幀直接停在展開一半的樣子
+      rafRef.current = requestAnimationFrame(() => setExplode(0.6));
       return;
     }
     const t = setTimeout(() => animateTo(0, 1500), 900);

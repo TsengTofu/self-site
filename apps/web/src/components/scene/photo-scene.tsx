@@ -135,6 +135,7 @@ export function PhotoScene({
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get("girl");
     if (q && (GIRL_STATES as readonly string[]).includes(q)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- 網址參數與隨機只能掛載後讀,伺服器端選了會 hydration mismatch
       setGirlState(q as GirlState);
       return;
     }

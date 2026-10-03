@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 /**
  * 🧪 MOCK 專用：讀網址參數切換設計提案。
@@ -12,9 +12,13 @@ import { useEffect, useState } from "react";
  * （titlev / stylev / layoutv / mkv / resumev / dockv / introv 已選定並固化，navv 兩案都不採用，key 已移除。）
  */
 export function useMockVariant(key: "btnv" | "headerv"): string | null {
-  const [variant, setVariant] = useState<string | null>(null);
-  useEffect(() => {
-    setVariant(new URLSearchParams(window.location.search).get(key));
-  }, [key]);
-  return variant;
+  // 伺服器端沒有網址參數,一律當作沒帶;hydration 後才讀真的網址
+  return useSyncExternalStore(
+    subscribeNothing,
+    () => new URLSearchParams(window.location.search).get(key),
+    () => null,
+  );
 }
+
+/** 網址參數只在進頁面時讀一次,不用訂閱變化 */
+const subscribeNothing = () => () => {};
