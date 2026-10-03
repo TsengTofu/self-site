@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Chiron_GoRound_TC, Gowun_Dodum } from "next/font/google";
 import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL, shareMeta } from "@/lib/site";
+import { SprayTransition } from "@/components/spray-transition";
 import "./globals.css";
 
 // 全站內文:圓體,跟手繪插畫的調性一致
@@ -55,7 +56,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
       </head>
-      <body className="bg-night font-sans text-white antialiased">{children}</body>
+      <body className="bg-night font-sans text-white antialiased">
+        {children}
+        {/* 噴漆轉場要跨頁播完,所以掛在這層 */}
+        <SprayTransition />
+      </body>
     </html>
   );
 }

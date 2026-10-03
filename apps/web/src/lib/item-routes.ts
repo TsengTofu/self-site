@@ -13,7 +13,6 @@ export const ITEM_ROUTES = {
   books: { item: "backpack", title: "人生指南", description: "最近讀過、喜歡到想推薦的書。" },
   notes: { item: "notebook", title: "喜歡的句子", description: "筆記本裡抄下來的句子。" },
   ocean: { item: "window", title: "窗外的海", description: "看著浪發呆一下。" },
-  skateboard: { item: "skateboard", title: "自由的味道", description: "靠在鏡子旁的長板，這格還在想要放什麼。" },
 } as const satisfies Record<string, { item: ItemId; title: string; description: string }>;
 
 export type ItemRoute = keyof typeof ITEM_ROUTES;
@@ -35,7 +34,6 @@ const OVERLAY_ROUTE: Record<OverlayKind, ItemRoute> = {
   books: "books",
   notebook: "notes",
   ocean: "ocean",
-  skateboard: "skateboard",
 };
 
 /** 場景現在的狀態對應哪個網址;什麼都沒開就是 null(首頁) */

@@ -77,7 +77,7 @@ export const ITEMS: Record<ItemId, ItemMeta> = {
 };
 
 /** 點擊後開啟的 overlay 種類;null 表示只做小反應(還沒想到要放什麼)。 */
-export type OverlayKind = "computer" | "books" | "notebook" | "skateboard" | "ocean";
+export type OverlayKind = "computer" | "books" | "notebook" | "ocean";
 
 export const ITEM_OVERLAY: Record<ItemId, OverlayKind | "player" | null> = {
   phone: null, // 不開 overlay,直接換頁到履歷(見 ITEM_LINK)
@@ -87,7 +87,7 @@ export const ITEM_OVERLAY: Record<ItemId, OverlayKind | "player" | null> = {
   backpack: "books",
   notebook: "notebook",
   album: null,
-  skateboard: "skateboard",
+  skateboard: null, // 不開 overlay,噴漆轉場後換頁到 /skateboard(見 ITEM_PAGE)
   doll: null,
   bubbleTea: null,
   bookStack: null,
@@ -98,4 +98,9 @@ export const ITEM_OVERLAY: Record<ItemId, OverlayKind | "player" | null> = {
 /** 點了直接換頁的物件:手機 = 收到一封信,打開就是我的履歷 */
 export const ITEM_LINK: Partial<Record<ItemId, string>> = {
   phone: "/resume",
+};
+
+/** 點了先播一段轉場再換頁的物件:滑板 = 噴漆噴滿畫面,再到風格不一樣的滑板頁 */
+export const ITEM_PAGE: Partial<Record<ItemId, string>> = {
+  skateboard: "/skateboard",
 };

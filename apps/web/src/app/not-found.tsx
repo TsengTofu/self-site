@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-/** 亂打路徑時看到的空狀態小卡,風格比照 skateboard-overlay 的「還沒想到要放什麼」空格卡 */
+/** 亂打路徑時看到的空狀態小卡,風格比照以前滑板的「還沒想到要放什麼」空格卡 */
 export default function NotFound() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center">

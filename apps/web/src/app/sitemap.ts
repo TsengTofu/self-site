@@ -10,6 +10,7 @@ const LAST_MODIFIED = {
   home: new Date("2026-08-01"),
   resume: new Date("2026-10-03"),
   makingOf: new Date("2026-08-06"),
+  skateboard: new Date("2026-10-04"),
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -43,6 +44,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: LAST_MODIFIED.makingOf,
       changeFrequency: "monthly",
       priority: 0.6,
+    },
+    {
+      url: `${SITE_URL}/skateboard`,
+      lastModified: LAST_MODIFIED.skateboard,
+      changeFrequency: "monthly",
+      priority: 0.4,
     },
   ];
 }
