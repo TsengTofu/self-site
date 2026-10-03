@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type CSSProperties } from "react";
 import type { ItemId } from "@/lib/items";
 import type { DayPhase } from "@/hooks/use-time-of-day";
 import { HOTSPOTS, IMAGE_W, IMAGE_H, hotspotBBox, type Rect } from "./hotspots";
@@ -177,7 +177,7 @@ export function ElementLayers({
           所以海鷗會從站著的人物身後飛過,夜晚也吃得到夜色 */}
       <SkyOverlays />
 
-      {LAYERS.map((name) => {
+      {LAYERS.map((name, layerIndex) => {
         const rect = SLOT_RECTS.get(name) ?? DECOR_RECTS.get(name);
         if (!rect || !available.has(name)) return null;
         // 檯燈:夜晚亮燈(lamp-on.png 已對齊同一畫布比例,直接換檔不位移)
@@ -206,9 +206,12 @@ export function ElementLayers({
         // 包在同一個 g 裡,hover 發亮與點擊彈跳會一起動
         const laptopClock = name === "laptop" && available.has("laptop-frame");
         return (
-          <g key={name} className={className} style={style}>
-            {ELEMENT_SHADOWS[name]?.map((sh, i) => <ContactShadow key={i} {...sh} />)}
-            {laptopClock ? <LaptopClock rect={rect} frameSrc={elementSrc("laptop-frame")} /> : image}
+          // 外層 intro-layer 只給「分層長出」的進場動畫用,跟點擊彈跳的動畫分開掛
+          <g key={name} className="intro-layer" style={{ "--intro-delay": `${0.25 + layerIndex * 0.07}s` } as CSSProperties}>
+            <g className={className} style={style}>
+              {ELEMENT_SHADOWS[name]?.map((sh, i) => <ContactShadow key={i} {...sh} />)}
+              {laptopClock ? <LaptopClock rect={rect} frameSrc={elementSrc("laptop-frame")} /> : image}
+            </g>
           </g>
         );
       })}
@@ -217,22 +220,22 @@ export function ElementLayers({
       {GIRL_STATES.filter((s) => available.has(`girl-${s}`) && (warm || s === girlState)).map((s) => (
         <g
           key={`girl-${s}`}
-          style={{
-            opacity: present && girlState === s ? 1 : 0,
-            transition: "opacity 700ms ease",
-          }}
+          className="intro-layer"
+          style={{ "--intro-delay": `${0.25 + LAYERS.length * 0.07}s` } as CSSProperties}
         >
-          {GIRL_SHADOWS[s].map((sh, i) => (
-            <ContactShadow key={i} {...sh} />
-          ))}
-          <image
-            href={elementSrc(`girl-${s}`)}
-            x={GIRL_RECTS[s].x}
-            y={GIRL_RECTS[s].y}
-            width={GIRL_RECTS[s].w}
-            height={GIRL_RECTS[s].h}
-            preserveAspectRatio="none"
-          />
+          <g style={{ opacity: present && girlState === s ? 1 : 0, transition: "opacity 700ms ease" }}>
+            {GIRL_SHADOWS[s].map((sh, i) => (
+              <ContactShadow key={i} {...sh} />
+            ))}
+            <image
+              href={elementSrc(`girl-${s}`)}
+              x={GIRL_RECTS[s].x}
+              y={GIRL_RECTS[s].y}
+              width={GIRL_RECTS[s].w}
+              height={GIRL_RECTS[s].h}
+              preserveAspectRatio="none"
+            />
+          </g>
         </g>
       ))}
     </svg>

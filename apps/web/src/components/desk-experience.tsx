@@ -57,12 +57,15 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
       <div inert={overlay !== null}>
         {/* 場景(鏡頭作用的那層) */}
         <div ref={stageRef} className="h-dvh w-full will-change-transform">
-          <PhotoScene
-            onItemClick={handleItemClick}
-            wigglingItem={wiggling}
-            hinting={hinting}
-            availableElements={availableElements}
-          />
+          {/* 進場動畫掛在這層(intro-scene),不碰鏡頭用的 stage */}
+          <div className="intro-scene h-full w-full">
+            <PhotoScene
+              onItemClick={handleItemClick}
+              wigglingItem={wiggling}
+              hinting={hinting}
+              availableElements={availableElements}
+            />
+          </div>
         </div>
 
         <SceneHeader />
@@ -70,6 +73,15 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
         {/* 右上角收合選單:在線狀態、時段、視覺製作歷程 */}
         <TopMenu />
         <MobileDock onItemClick={handleItemClick} />
+      </div>
+
+      {/* 🧪 進場動畫提案用的遮罩(見 layout 的 INTRO_SCRIPT 與 globals.css 的 intro-*),
+          沒帶 ?introv 時 display:none,不影響畫面 */}
+      <div aria-hidden className="intro-lights" />
+      <div aria-hidden className="intro-title">
+        <p className="font-hand text-4xl text-[#33271c] [-webkit-text-stroke:0.8px_currentColor] md:text-6xl">
+          나의 공간
+        </p>
       </div>
 
       <OverlayRoot />

@@ -41,9 +41,21 @@ export const viewport: Viewport = {
   themeColor: "#1b2230",
 };
 
+/**
+ * 🧪 MOCK:首頁進場動畫提案 `?introv=fade|layers|lights|title`
+ * 要在畫面畫出來之前就決定,不然場景會先出現、再突然消失重播(閃一下),
+ * 所以在 <head> 裡同步讀網址,寫到 <html data-intro>,CSS 依這個屬性決定播哪一種
+ * 選定後改成直接寫在 CSS,這段拿掉
+ */
+const INTRO_SCRIPT = `try{var v=new URLSearchParams(location.search).get("introv");if(/^(fade|layers|lights|title)$/.test(v||""))document.documentElement.dataset.intro=v}catch(e){}`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-Hant" className={`${chironGoRound.variable} ${gowunDodum.variable}`}>
+    // data-intro 由上面的小程式在 hydration 前寫入,伺服器端沒有,所以要關掉這層的比對警告
+    <html lang="zh-Hant" className={`${chironGoRound.variable} ${gowunDodum.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
+      </head>
       <body className="bg-night font-sans text-white antialiased">{children}</body>
     </html>
   );

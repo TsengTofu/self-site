@@ -81,9 +81,11 @@ export function MobileDock({ onItemClick }: MobileDockProps) {
   };
 
   return (
+    // 長按 icon 會浮起顯示說明,手機會順便選取文字、跳出系統選單,這裡全部關掉
     <nav
       aria-label="桌上的物件"
-      className="fixed inset-x-0 bottom-0 z-30 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden"
+      onContextMenu={(e) => e.preventDefault()}
+      className="fixed inset-x-0 bottom-0 z-30 select-none px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] md:hidden"
     >
       <div className="relative">
         {/* 底板固定不動,上面那層 icon 才會左右滑 */}

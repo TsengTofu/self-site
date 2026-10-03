@@ -471,6 +471,114 @@ body {
   animation: twinkle 2.6s ease-in-out infinite;
 }
 
+/* ---------- 🧪 首頁進場動畫提案(?introv=,見 layout 的 INTRO_SCRIPT) ----------
+   四種都只動 opacity / transform,交給 GPU 合成,不會一直重畫 */
+
+/* fade:整個場景從稍微放大的狀態淡入、慢慢推回原位 */
+@keyframes intro-fade {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+html[data-intro="fade"] .intro-scene {
+  animation: intro-fade 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* layers:空房間先淡入,家具一件一件由下往上長出來,人物最後 */
+@keyframes intro-base {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+html[data-intro="layers"] .intro-scene {
+  animation: intro-base 0.5s ease-out both;
+}
+html[data-intro="layers"] .intro-layer {
+  transform-box: fill-box;
+  animation: intro-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: var(--intro-delay, 0s);
+}
+
+/* lights:一開始房間暗著,光從窗邊書桌那裡擴散開來,像開燈 */
+.intro-lights,
+.intro-title {
+  display: none;
+  pointer-events: none;
+}
+@keyframes intro-lights {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(5);
+  }
+}
+html[data-intro="lights"] .intro-lights {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  display: block;
+  background: radial-gradient(circle at 52% 55%, transparent 0, transparent 10%, rgba(20, 24, 34, 0.94) 34%);
+  transform-origin: 52% 55%;
+  animation: intro-lights 1.8s cubic-bezier(0.65, 0, 0.35, 1) 0.15s both;
+}
+
+/* title:先在奶油色畫面中央出現「나의 공간」,再整片淡出露出房間 */
+@keyframes intro-title-out {
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes intro-title-text {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    letter-spacing: 0.3em;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    letter-spacing: 0.02em;
+  }
+}
+html[data-intro="title"] .intro-title {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: var(--color-cream);
+  animation: intro-title-out 0.7s ease-in 1.3s both;
+}
+html[data-intro="title"] .intro-title p {
+  animation: intro-title-text 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
 /* ---------- 無障礙:減少動態 ---------- */
 /* 系統開了「減少動態」時,所有 CSS 動畫/轉場都幾乎瞬間完成(不是關掉,是壓到極短,
    避免 animation-fill-mode / transitionend 監聽器因為動畫被整個拿掉而收不到事件)。 */
