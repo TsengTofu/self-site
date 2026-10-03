@@ -10,7 +10,7 @@ import {
   type MouseEvent,
 } from "react";
 import Image from "next/image";
-import { ITEMS, ITEM_LINK, ITEM_OVERLAY, type ItemId } from "@/lib/items";
+import { ITEMS, ITEM_LINK, ITEM_OVERLAY, ITEM_PAGE, type ItemId } from "@/lib/items";
 import { useEffectivePhase, type DayPhase } from "@/hooks/use-time-of-day";
 import { useSceneStore, selectIsOnline } from "@/stores/scene-store";
 import { HOTSPOTS, IMAGE_W, IMAGE_H, beaconPoint, hotspotBBox, tipPoint, type Hotspot } from "./hotspots";
@@ -64,8 +64,10 @@ const LIGHT_INTENSITY: Record<DayPhase, number> = {
 const LINK_SPOTS = HOTSPOTS.filter((spot) => ITEM_LINK[spot.id]);
 /** 來信對話框尾巴指的位置:物件上緣偏左 */
 const letterAnchor = (bbox: { x: number; y: number; w: number }) => ({ x: bbox.x + bbox.w * 0.2, y: bbox.y - 4 });
-/** 有提示點的物件(會開畫面的);手機改用來信對話框,不在這裡 */
-const BEACON_IDS = HOTSPOTS.filter((spot) => ITEM_OVERLAY[spot.id] !== null).map((spot) => spot.id);
+/** 有提示點的物件(會開畫面或換頁的);手機改用來信對話框,不在這裡 */
+const BEACON_IDS = HOTSPOTS.filter(
+  (spot) => ITEM_OVERLAY[spot.id] !== null || ITEM_PAGE[spot.id],
+).map((spot) => spot.id);
 /** 提示點輪流閃:每隔這麼久換下一個,同一時間只有一個在擴散(要跟 globals.css 的週期對上) */
 const BEACON_GAP_S = 1.2;
 
