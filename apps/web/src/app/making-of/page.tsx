@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   ...shareMeta(TITLE, DESCRIPTION, "article"),
 };
 
-/** 視覺風格製作歷程：記錄這個網站的插畫場景從無到有的過程。 */
+/** 視覺風格製作歷程：記錄這個網站的插畫場景從無到有的過程（上下捲動，每捲一次一個章節）。 */
 export default function MakingOfPage() {
   return <MakingOfView />;
 }

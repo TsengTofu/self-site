@@ -1,6 +1,6 @@
 /**
  * `/making-of` 的內容來源 —— 照 Claude Design「視覺探索流程 v2」的定稿規格全文照搬。
- * 版型 = 12 面板橫向 deck（making-of-deck.tsx），這裡只決定「呈現什麼」。
+ * 版型 = 12 個面板上下捲動（making-of-view.tsx，面板在 making-of-panels.tsx），這裡只決定「呈現什麼」。
  *
  * 敘事以設計稿為準（兩週、兩次放棄、一次翻轉；工具 = Gemini / ChatGPT / Illustrator），
  * 舊結合版的「並行開發／進行中」章節不在這份敘事裡，檔案與舊文案都留在 git 歷史。

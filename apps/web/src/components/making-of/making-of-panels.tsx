@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ArrowLeft, ArrowRight, Eye, EyeOff, House, Play, RotateCcw, X } from "lucide-react";
+import { Eye, EyeOff, House, Play, RotateCcw, X } from "lucide-react";
 import {
   ARCH,
   CHALLENGE,
@@ -17,7 +15,6 @@ import {
   HERO,
   LAB,
   OVERVIEW,
-  RAIL,
   SPEC,
   TAKEAWAYS,
   WALL,
@@ -71,11 +68,9 @@ export const PANELS: { key: string; hash: string | null }[] = [
   { key: "gallery", hash: "layers" },
   { key: "takeaways", hash: "takeaways" },
 ];
-const LAST = PANELS.length - 1;
-const LAB_IDX = PANELS.findIndex((p) => p.key === "lab");
 
 /** 結合版時代的錨點別名（#phase-spark 等老連結不斷鏈） */
-const LEGACY_HASH: Record<string, string> = {
+export const LEGACY_HASH: Record<string, string> = {
   "phase-spark": "divergence",
   "gemini-brief": "divergence",
   "chatgpt-tugofwar": "divergence",
@@ -93,13 +88,6 @@ const LEGACY_HASH: Record<string, string> = {
   "whats-next": "takeaways",
 };
 
-function panelIndexFromHash(): number | null {
-  const raw = window.location.hash.slice(1);
-  if (!raw) return null;
-  const hash = LEGACY_HASH[raw] ?? raw;
-  const i = PANELS.findIndex((p) => p.hash === hash);
-  return i >= 0 ? i : null;
-}
 
 /* ── 場景座標系（1920×1080，與 element-layers / hotspots 同一組 rect）── */
 interface Frac {
@@ -1372,7 +1360,7 @@ function TakeawaysPanel() {
 
 /* ── Deck 主體 ───────────────────────────────────────── */
 
-/** 圖層陳列的 hover 搖晃(頁面私有樣式,不進 globals);橫向 deck 與上下捲動版共用 */
+/** 圖層陳列的 hover 搖晃(頁面私有樣式,不進 globals) */
 export function DeckStyles() {
   return (
     <style>{`
@@ -1397,7 +1385,7 @@ interface DeckPanelProps {
   labActive: boolean;
 }
 
-/** 依面板 key 渲染對應內容;橫向 deck 與上下捲動版共用 */
+/** 依面板 key 渲染對應內容 */
 export function DeckPanel({ panelKey, reduced, onJump, labActive }: DeckPanelProps) {
   switch (panelKey) {
     case "hero":
@@ -1444,218 +1432,3 @@ export const PANEL_BG: Record<string, string> = {
   gallery: C.cream2,
   takeaways: C.cream,
 };
-
-export function MakingOfDeck() {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const railRef = useRef<HTMLDivElement>(null);
-  const [idx, setIdx] = useState(0);
-  const idxRef = useRef(0);
-  // 給鍵盤／滾輪 handler 讀最新的 idx;同步放在 layout effect,不在 render 期間寫 ref
-  useLayoutEffect(() => {
-    idxRef.current = idx;
-  }, [idx]);
-  // SSR 一律從 0 render（hydration 一致），paint 前再跳到 hash 指到的面板；
-  // booted 之前不掛 transition，深連結落地不會演一段滑動
-  const [booted, setBooted] = useState(false);
-  useLayoutEffect(() => {
-    const fromHash = panelIndexFromHash();
-    if (fromHash !== null) setIdx(fromHash);
-    // transition class 要等「落地那一幀畫完」才掛：跟 setIdx 同一個 commit 掛上去，
-    // transform 的變化還是會被 transition 吃到，深連結會演一段橫掃全部面板的動畫。
-    // 雙層 rAF = 確定瀏覽器已經用目標位置畫過第一幀。
-    let raf2 = 0;
-    const raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => setBooted(true));
-    });
-    return () => {
-      cancelAnimationFrame(raf1);
-      cancelAnimationFrame(raf2);
-    };
-  }, []);
-  // 掛載後的 hash 變更（站內錨點連結、使用者改網址）也要跟著跳面板；
-  // 自己的 replaceState 不會觸發 hashchange，不會迴圈
-  useEffect(() => {
-    const onHash = () => {
-      const i = panelIndexFromHash();
-      if (i !== null) setIdx(i);
-    };
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => setReduced(prefersReducedMotion()), []);
-
-  const go = (i: number) => setIdx(Math.max(0, Math.min(LAST, i)));
-  const goHash = (hash: string) => {
-    const i = PANELS.findIndex((p) => p.hash === hash);
-    if (i >= 0) go(i);
-  };
-
-  // 可深連結的面板掛 hash；序幕清掉
-  useEffect(() => {
-    if (!booted) return;
-    const { pathname, search } = window.location;
-    const hash = PANELS[idx]?.hash;
-    window.history.replaceState(null, "", hash ? `${pathname}${search}#${hash}` : `${pathname}${search}`);
-  }, [idx, booted]);
-
-  // 鍵盤 ← →（表單元素與對照滑桿聚焦時讓路）
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, [role="slider"]')) return;
-      if (e.key === "ArrowRight" || e.key === "Right") go(idxRef.current + 1);
-      if (e.key === "ArrowLeft" || e.key === "Left") go(idxRef.current - 1);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
-  // 觸控左右滑（面板內部縱向捲動與互動元件讓路）
-  const touchRef = useRef<{ x: number; y: number } | null>(null);
-  const onTouchStart = (e: React.TouchEvent) => {
-    if (e.target instanceof HTMLElement && e.target.closest('input, button, a, [role="slider"], [draggable="true"]')) return;
-    const t = e.touches[0];
-    if (t) touchRef.current = { x: t.clientX, y: t.clientY };
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    const start = touchRef.current;
-    touchRef.current = null;
-    const t = e.changedTouches[0];
-    if (!start || !t) return;
-    const dx = t.clientX - start.x;
-    const dy = t.clientY - start.y;
-    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-    go(idxRef.current + (dx < 0 ? 1 : -1));
-  };
-
-  // 觸控板兩指橫滑（momentum 連發用鎖擋）
-  const wheelLockRef = useRef(0);
-  useEffect(() => {
-    const onWheel = (e: WheelEvent) => {
-      if (e.target instanceof HTMLElement && e.target.closest('[role="slider"]')) return;
-      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || Math.abs(e.deltaX) < 40) return;
-      const now = Date.now();
-      if (now - wheelLockRef.current < 650) return;
-      wheelLockRef.current = now;
-      go(idxRef.current + (e.deltaX > 0 ? 1 : -1));
-    };
-    window.addEventListener("wheel", onWheel, { passive: true });
-    return () => window.removeEventListener("wheel", onWheel);
-  }, []);
-
-  // 頁籤列可捲（手機）：換面板把 active 頁籤置中；不用 smooth，背景分頁會卡
-  useEffect(() => {
-    const rail = railRef.current;
-    const node = rail?.querySelector<HTMLElement>('[aria-current="step"]');
-    if (!rail || !node) return;
-    rail.scrollLeft = node.offsetLeft - (rail.clientWidth - node.clientWidth) / 2;
-  }, [idx]);
-
-  // 序幕進場一次；之後每次換面板，該面板的 [data-panel] 淡入。
-  // revertOnUpdate：先還原上一輪，不讓兩個 from 疊在同批元素把中途值當終點
-  useGSAP(
-    () => {
-      if (prefersReducedMotion()) return;
-      const q = gsap.utils.selector(rootRef);
-      gsap.from(q("[data-hero]"), { opacity: 0, y: 20, duration: 0.6, stagger: 0.08, ease: "power2.out" });
-    },
-    { scope: rootRef },
-  );
-  useGSAP(
-    () => {
-      if (prefersReducedMotion() || idx === 0) return;
-      const q = gsap.utils.selector(rootRef);
-      gsap.from(q(`[data-deck="${idx}"] [data-panel]`), {
-        opacity: 0,
-        y: 18,
-        duration: 0.4,
-        stagger: 0.06,
-        ease: "power2.out",
-        overwrite: "auto",
-      });
-    },
-    { dependencies: [idx], scope: rootRef, revertOnUpdate: true },
-  );
-
-  return (
-    <main
-      ref={rootRef}
-      className="flex h-dvh min-h-[560px] flex-col overflow-hidden"
-      style={{ backgroundColor: C.cream, color: "#3e3226" }}
-    >
-      <DeckStyles />
-      <div className="min-h-0 flex-1 overflow-hidden">
-        <div
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-          className={`flex h-full w-full ${booted ? "transition-transform duration-500 ease-out motion-reduce:transition-none" : ""}`}
-          style={{ transform: `translateX(-${idx * 100}%)` }}
-        >
-          {PANELS.map((panel, i) => (
-            <section
-              key={panel.key}
-              data-deck={i}
-              aria-label={RAIL[i]}
-              inert={i !== idx}
-              className="relative h-full w-full shrink-0 basis-full overflow-y-auto"
-              style={{ background: PANEL_BG[panel.key] }}
-            >
-              <DeckPanel panelKey={panel.key} reduced={reduced} onJump={goHash} labActive={idx === LAB_IDX} />
-            </section>
-          ))}
-        </div>
-      </div>
-
-      {/* 底部頁籤列：←→＋頁籤＋計數 */}
-      <div
-        className="flex shrink-0 items-center gap-3 px-4 py-2.5 md:px-7"
-        style={{ backgroundColor: "rgba(246,240,228,0.96)", borderTop: `1px solid ${C.line}` }}
-      >
-        <button
-          type="button"
-          onClick={() => go(idx - 1)}
-          disabled={idx === 0}
-          aria-label="上一頁"
-          className="flex size-[34px] items-center justify-center rounded-full transition enabled:hover:brightness-95 disabled:opacity-35"
-          style={{ border: "1px solid rgba(62,50,38,0.18)", backgroundColor: C.cream, color: C.head }}
-        >
-          <ArrowLeft className="size-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => go(idx + 1)}
-          disabled={idx === LAST}
-          aria-label="下一頁"
-          className="flex size-[34px] items-center justify-center rounded-full transition enabled:hover:brightness-95 disabled:opacity-35"
-          style={{ border: "1px solid rgba(62,50,38,0.18)", backgroundColor: C.cream, color: C.head }}
-        >
-          <ArrowRight className="size-4" />
-        </button>
-        <div ref={railRef} className="flex flex-1 gap-1.5 overflow-x-auto [scrollbar-width:none]">
-          {RAIL.map((label, i) => {
-            const on = i === idx;
-            return (
-              <button
-                key={label}
-                type="button"
-                onClick={() => go(i)}
-                aria-current={on ? "step" : undefined}
-                className="whitespace-nowrap rounded-full px-3 py-1.5 text-xs transition"
-                style={
-                  on
-                    ? { backgroundColor: C.head, color: "#fff", fontWeight: 700, border: `1px solid ${C.head}` }
-                    : { color: C.body, backgroundColor: "rgba(138,103,70,0.08)", border: "1px solid transparent" }
-                }
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-        <span aria-hidden className="whitespace-nowrap tabular-nums text-xs tabular-nums" style={{ color: C.mute }}>
-          {String(idx + 1).padStart(2, "0")} / {String(PANELS.length).padStart(2, "0")}
-        </span>
-      </div>
-    </main>
-  );
-}

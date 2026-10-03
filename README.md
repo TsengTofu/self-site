@@ -7,7 +7,7 @@
 - `/` — 手繪海景房場景：分層元素、四時段光影、人物三態、找貓咪彩蛋
   - 物件網址：`/projects`、`/music`、`/books`、`/notes`、`/ocean`、`/skateboard`，進來會自動打開對應的物件（對照表在 `lib/item-routes.ts`）
 - `/resume` — 正式履歷（直式時間軸，內容在 `data/resume.ts`）
-- `/making-of` — 視覺風格製作歷程（總覽 + 可點擊時間軸，兩畫面左右切換）
+- `/making-of` — 視覺風格製作歷程（12 個章節上下捲動，每捲一次停一章）
 
 ## Tech Stack
 
