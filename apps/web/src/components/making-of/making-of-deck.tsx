@@ -35,7 +35,7 @@ import { elementSrc } from "@/components/scene/element-layers";
  */
 
 /* ── v2 色彩規格（只在這頁用，不進全站 token）────────── */
-const C = {
+export const C = {
   cream: "#f6f0e4",
   cream2: "#efe6d3",
   head: "#6b4f37",
@@ -53,10 +53,11 @@ const C = {
   darkMute: "#a89b83",
   darkText: "#e9dfca",
 };
-const SERIF = 'Georgia, "Noto Serif TC", "Songti TC", serif';
+/** 標題字型跟首頁、履歷一樣用全站的字型(原本是襯線字) */
+const HEADING_FONT = "var(--font-sans), system-ui, sans-serif";
 
 /* ── 面板與深連結 ─────────────────────────────────────── */
-const PANELS: { key: string; hash: string | null }[] = [
+export const PANELS: { key: string; hash: string | null }[] = [
   { key: "hero", hash: null },
   { key: "flow", hash: "flow" },
   { key: "challenge", hash: "challenge" },
@@ -164,7 +165,7 @@ function PanelTitle({
   return (
     <h2
       className={`font-bold ${size === "lg" ? "text-2xl md:text-[2rem]" : "text-xl md:text-[1.7rem]"} leading-snug`}
-      style={{ fontFamily: SERIF, color: dark ? C.darkHead : C.head }}
+      style={{ fontFamily: HEADING_FONT, color: dark ? C.darkHead : C.head }}
     >
       {text}
     </h2>
@@ -209,7 +210,7 @@ function HeroPanel({ reduced }: { reduced: boolean }) {
           <h1
             data-hero
             className="mb-4 text-3xl font-bold leading-[1.3] md:text-4xl lg:text-[2.7rem]"
-            style={{ fontFamily: SERIF, color: C.head, textWrap: "balance" }}
+            style={{ fontFamily: HEADING_FONT, color: C.head, textWrap: "balance" }}
           >
             {HERO.titleLines[0]}
             <br />
@@ -222,10 +223,10 @@ function HeroPanel({ reduced }: { reduced: boolean }) {
             {HERO.stats.map((s) => (
               <div key={s.unit + s.label} className="pt-2.5" style={{ borderTop: "2px solid rgba(62,50,38,0.16)" }}>
                 <div className="mb-0.5 flex items-baseline gap-2">
-                  <b className="text-4xl font-bold leading-none" style={{ fontFamily: SERIF, color: C.blue }}>
+                  <b className="text-4xl font-bold leading-none" style={{ fontFamily: HEADING_FONT, color: C.blue }}>
                     {s.n}
                   </b>
-                  <span className="font-mono text-[11px] uppercase tracking-[0.16em]" style={{ color: "#a3937c" }}>
+                  <span className="tabular-nums text-[11px] uppercase tracking-[0.16em]" style={{ color: "#a3937c" }}>
                     {s.unit}
                   </span>
                 </div>
@@ -298,10 +299,10 @@ function FlowPanel({ onJump }: { onJump: (hash: string) => void }) {
               className="flex flex-col gap-2 rounded-xl p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md"
               style={{ backgroundColor: C.cream, border: `1px solid ${C.line}`, borderTop: `3px solid ${topBar}` }}
             >
-              <span className="text-xs font-bold tracking-[0.08em]" style={{ fontFamily: SERIF, color: tone }}>
+              <span className="text-xs font-bold tracking-[0.08em]" style={{ fontFamily: HEADING_FONT, color: tone }}>
                 {card.no}
               </span>
-              <b className="text-[15px] leading-normal" style={{ fontFamily: SERIF, color: C.head }}>
+              <b className="text-[15px] leading-normal" style={{ fontFamily: HEADING_FONT, color: C.head }}>
                 {card.heading}
               </b>
               <span className="text-[13px] leading-relaxed" style={{ color: C.body }}>
@@ -343,7 +344,7 @@ function ChallengePanel() {
             <div className="mb-2 text-[11px] font-bold tracking-[0.12em]" style={{ color: C.blue }}>
               {card.tag}
             </div>
-            <b className="mb-1.5 block text-[17px]" style={{ fontFamily: SERIF, color: C.head }}>
+            <b className="mb-1.5 block text-[17px]" style={{ fontFamily: HEADING_FONT, color: C.head }}>
               {card.heading}
             </b>
             <span className="text-sm leading-relaxed" style={{ color: C.body }}>
@@ -354,14 +355,14 @@ function ChallengePanel() {
       </div>
       <div data-panel className="mt-7 flex flex-wrap items-center gap-4">
         <span
-          className="rounded-full px-5 py-2.5 font-mono text-sm line-through"
+          className="rounded-full px-5 py-2.5 tabular-nums text-sm line-through"
           style={{ color: C.mute, backgroundColor: C.cream2, border: "1px solid rgba(62,50,38,0.12)" }}
         >
           {CHALLENGE.before}
         </span>
         <span style={{ color: C.mute }}>→</span>
         <span
-          className="rounded-full px-5 py-2.5 font-mono text-sm font-bold"
+          className="rounded-full px-5 py-2.5 tabular-nums text-sm font-bold"
           style={{
             color: C.blue,
             backgroundColor: "rgba(74,144,184,0.14)",
@@ -422,7 +423,7 @@ function DivergencePanel() {
           </div>
         </div>
         <div>
-          <h3 className="mb-1 text-[17px] font-bold" style={{ fontFamily: SERIF, color: C.head }}>
+          <h3 className="mb-1 text-[17px] font-bold" style={{ fontFamily: HEADING_FONT, color: C.head }}>
             {ex.title}
           </h3>
           <p className="mb-3 max-w-[66ch] text-sm leading-relaxed" style={{ color: C.body }}>
@@ -626,10 +627,10 @@ function ComparePanel() {
           </span>
         </div>
         {/* 兩側時段標籤 */}
-        <span className="absolute left-3 top-3 rounded-md px-2 py-1 font-mono text-[11px]" style={{ backgroundColor: "rgba(246,240,228,0.85)", color: C.head }}>
+        <span className="absolute left-3 top-3 rounded-md px-2 py-1 tabular-nums text-[11px]" style={{ backgroundColor: "rgba(246,240,228,0.85)", color: C.head }}>
           中午 midday
         </span>
-        <span className="absolute right-3 top-3 rounded-md px-2 py-1 font-mono text-[11px]" style={{ backgroundColor: "rgba(20,16,12,0.65)", color: C.darkText }}>
+        <span className="absolute right-3 top-3 rounded-md px-2 py-1 tabular-nums text-[11px]" style={{ backgroundColor: "rgba(20,16,12,0.65)", color: C.darkText }}>
           {phase.label}
         </span>
       </div>
@@ -702,7 +703,7 @@ function ArchPanel() {
       >
         <div>
           <div
-            className="rounded-xl px-4 py-3.5 text-center font-mono text-sm"
+            className="rounded-xl px-4 py-3.5 text-center tabular-nums text-sm"
             style={{ color: C.blue, backgroundColor: "rgba(74,144,184,0.12)", border: "1px solid rgba(74,144,184,0.28)" }}
           >
             {ARCH.stateLine}
@@ -715,7 +716,7 @@ function ArchPanel() {
             style={{ backgroundColor: C.cream, border: "1px solid rgba(62,50,38,0.1)" }}
           >
             {ARCH.chips.map((chip) => (
-              <span key={chip} className="rounded-lg p-3 text-center font-mono text-[13px]" style={{ color: C.head, backgroundColor: C.cream2 }}>
+              <span key={chip} className="rounded-lg p-3 text-center tabular-nums text-[13px]" style={{ color: C.head, backgroundColor: C.cream2 }}>
                 {chip}
               </span>
             ))}
@@ -724,7 +725,7 @@ function ArchPanel() {
         <div className="flex flex-col gap-4.5">
           {ARCH.points.map((pt, i) => (
             <div key={pt.heading} className={i > 0 ? "pt-4" : ""} style={i > 0 ? { borderTop: `1px solid ${C.line}` } : undefined}>
-              <b className="mb-1 block text-[17px]" style={{ fontFamily: SERIF, color: C.head }}>
+              <b className="mb-1 block text-[17px]" style={{ fontFamily: HEADING_FONT, color: C.head }}>
                 {pt.heading}
               </b>
               <span className="text-sm leading-relaxed" style={{ color: C.body }}>
@@ -808,7 +809,7 @@ function LabSlider({
     <label className="block">
       <span className="flex justify-between text-xs" style={{ color: C.darkMute }}>
         <span>{label}</span>
-        <span className="font-mono tabular-nums">{text}</span>
+        <span className="tabular-nums tabular-nums">{text}</span>
       </span>
       <input
         type="range"
@@ -1062,7 +1063,7 @@ function LabPanel({ active }: { active: boolean }) {
                   <button
                     type="button"
                     onClick={() => L.extra && setSel((p) => (p === L.key ? null : L.key))}
-                    className="flex-1 rounded-[9px] px-2.5 py-1.5 text-left font-mono text-xs"
+                    className="flex-1 rounded-[9px] px-2.5 py-1.5 text-left tabular-nums text-xs"
                     style={{
                       cursor: L.extra ? "pointer" : "default",
                       color: L.on ? C.darkText : "#6f6656",
@@ -1164,7 +1165,7 @@ function LabPanel({ active }: { active: boolean }) {
                 </div>
                 <span
                   aria-hidden
-                  className="absolute left-2 top-2 rounded-md px-2 py-1 font-mono text-[10.5px]"
+                  className="absolute left-2 top-2 rounded-md px-2 py-1 tabular-nums text-[10.5px]"
                   style={{
                     backgroundColor: "rgba(14,19,27,0.82)",
                     color: C.darkText,
@@ -1298,13 +1299,13 @@ function TakeawaysPanel() {
         className="mt-6 grid grid-cols-[minmax(0,1fr)_84px_minmax(0,1fr)] overflow-hidden rounded-[14px] md:grid-cols-[minmax(0,1fr)_132px_minmax(0,1fr)]"
         style={{ border: "1px solid rgba(62,50,38,0.12)" }}
       >
-        <div className="px-4 py-3.5 text-right text-base font-bold md:px-5" style={{ fontFamily: SERIF, color: C.blue, backgroundColor: "rgba(74,144,184,0.09)" }}>
+        <div className="px-4 py-3.5 text-right text-base font-bold md:px-5" style={{ fontFamily: HEADING_FONT, color: C.blue, backgroundColor: "rgba(74,144,184,0.09)" }}>
           {TAKEAWAYS.divisionHeads.ai}
         </div>
         <div className="flex items-center justify-center text-[13px]" style={{ color: C.mute, backgroundColor: "rgba(246,240,228,0.7)" }}>
           {TAKEAWAYS.divisionHeads.mid}
         </div>
-        <div className="px-4 py-3.5 text-base font-bold md:px-5" style={{ fontFamily: SERIF, color: C.head, backgroundColor: "rgba(200,150,90,0.1)" }}>
+        <div className="px-4 py-3.5 text-base font-bold md:px-5" style={{ fontFamily: HEADING_FONT, color: C.head, backgroundColor: "rgba(200,150,90,0.1)" }}>
           {TAKEAWAYS.divisionHeads.me}
         </div>
         {TAKEAWAYS.division.map((row) => (
@@ -1332,10 +1333,10 @@ function TakeawaysPanel() {
           ][i]!;
           return (
             <div key={card.no} className="rounded-[14px] px-5 py-5" style={{ backgroundColor: tint.bg, border: `1px solid ${tint.bd}` }}>
-              <div className="mb-2 text-[1.9rem] leading-none" style={{ fontFamily: SERIF, color: tint.no }}>
+              <div className="mb-2 text-[1.9rem] leading-none" style={{ fontFamily: HEADING_FONT, color: tint.no }}>
                 {card.no}
               </div>
-              <b className="mb-1.5 block text-base" style={{ fontFamily: SERIF, color: C.head }}>
+              <b className="mb-1.5 block text-base" style={{ fontFamily: HEADING_FONT, color: C.head }}>
                 {card.heading}
               </b>
               <span className="text-[13px] leading-relaxed" style={{ color: C.body }}>
@@ -1371,7 +1372,64 @@ function TakeawaysPanel() {
 
 /* ── Deck 主體 ───────────────────────────────────────── */
 
-const PANEL_BG: Record<string, string> = {
+/** 圖層陳列的 hover 搖晃(頁面私有樣式,不進 globals);橫向 deck 與上下捲動版共用 */
+export function DeckStyles() {
+  return (
+    <style>{`
+      @keyframes mo-wobble {
+        0%, 100% { transform: scale(1.14) rotate(-2.5deg); }
+        50% { transform: scale(1.14) rotate(2.5deg); }
+      }
+      .mo-wobble-host:hover { animation: mo-wobble 1.2s ease-in-out infinite; }
+      @media (prefers-reduced-motion: reduce) {
+        .mo-wobble-host:hover { animation: none; }
+      }
+    `}</style>
+  );
+}
+
+interface DeckPanelProps {
+  panelKey: string;
+  reduced: boolean;
+  /** 流程面板的節點點了要跳到哪一頁 */
+  onJump: (hash: string) => void;
+  /** 實驗台在畫面上時才開始播展開動畫 */
+  labActive: boolean;
+}
+
+/** 依面板 key 渲染對應內容;橫向 deck 與上下捲動版共用 */
+export function DeckPanel({ panelKey, reduced, onJump, labActive }: DeckPanelProps) {
+  switch (panelKey) {
+    case "hero":
+      return <HeroPanel reduced={reduced} />;
+    case "flow":
+      return <FlowPanel onJump={onJump} />;
+    case "challenge":
+      return <ChallengePanel />;
+    case "divergence":
+      return <DivergencePanel />;
+    case "wall":
+      return <WallPanel />;
+    case "handwork":
+      return <HandworkPanel />;
+    case "compare":
+      return <ComparePanel />;
+    case "spec":
+      return <SpecPanel />;
+    case "arch":
+      return <ArchPanel />;
+    case "lab":
+      return <LabPanel active={labActive} />;
+    case "gallery":
+      return <GalleryPanel />;
+    case "takeaways":
+      return <TakeawaysPanel />;
+    default:
+      return null;
+  }
+}
+
+export const PANEL_BG: Record<string, string> = {
   hero: "radial-gradient(ellipse at 80% 10%, rgba(74,144,184,0.16), transparent 55%), linear-gradient(140deg, #f6f0e4, #efe6d3)",
   flow: C.cream2,
   challenge: C.cream,
@@ -1525,17 +1583,7 @@ export function MakingOfDeck() {
       className="flex h-dvh min-h-[560px] flex-col overflow-hidden"
       style={{ backgroundColor: C.cream, color: "#3e3226" }}
     >
-      {/* 圖層陳列的 hover 搖晃（頁面私有樣式，不進 globals） */}
-      <style>{`
-        @keyframes mo-wobble {
-          0%, 100% { transform: scale(1.14) rotate(-2.5deg); }
-          50% { transform: scale(1.14) rotate(2.5deg); }
-        }
-        .mo-wobble-host:hover { animation: mo-wobble 1.2s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce) {
-          .mo-wobble-host:hover { animation: none; }
-        }
-      `}</style>
+      <DeckStyles />
       <div className="min-h-0 flex-1 overflow-hidden">
         <div
           onTouchStart={onTouchStart}
@@ -1552,18 +1600,7 @@ export function MakingOfDeck() {
               className="relative h-full w-full shrink-0 basis-full overflow-y-auto"
               style={{ background: PANEL_BG[panel.key] }}
             >
-              {panel.key === "hero" && <HeroPanel reduced={reduced} />}
-              {panel.key === "flow" && <FlowPanel onJump={goHash} />}
-              {panel.key === "challenge" && <ChallengePanel />}
-              {panel.key === "divergence" && <DivergencePanel />}
-              {panel.key === "wall" && <WallPanel />}
-              {panel.key === "handwork" && <HandworkPanel />}
-              {panel.key === "compare" && <ComparePanel />}
-              {panel.key === "spec" && <SpecPanel />}
-              {panel.key === "arch" && <ArchPanel />}
-              {panel.key === "lab" && <LabPanel active={idx === LAB_IDX} />}
-              {panel.key === "gallery" && <GalleryPanel />}
-              {panel.key === "takeaways" && <TakeawaysPanel />}
+              <DeckPanel panelKey={panel.key} reduced={reduced} onJump={goHash} labActive={idx === LAB_IDX} />
             </section>
           ))}
         </div>
@@ -1615,7 +1652,7 @@ export function MakingOfDeck() {
             );
           })}
         </div>
-        <span aria-hidden className="whitespace-nowrap font-mono text-xs tabular-nums" style={{ color: C.mute }}>
+        <span aria-hidden className="whitespace-nowrap tabular-nums text-xs tabular-nums" style={{ color: C.mute }}>
           {String(idx + 1).padStart(2, "0")} / {String(PANELS.length).padStart(2, "0")}
         </span>
       </div>
