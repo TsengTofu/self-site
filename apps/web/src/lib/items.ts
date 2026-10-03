@@ -28,7 +28,7 @@ export interface ItemMeta {
 }
 
 export const ITEMS: Record<ItemId, ItemMeta> = {
-  phone: { id: "phone", label: "手機", hint: "看看我的 Profile" },
+  phone: { id: "phone", label: "手機", hint: "看看我的履歷" },
   laptop: { id: "laptop", label: "電腦", hint: "看看我的專案" },
   headphones: { id: "headphones", label: "耳機", hint: "打開我的播放器" },
   musicPlayer: { id: "musicPlayer", label: "音響", hint: "打開我的播放器" },
@@ -77,10 +77,10 @@ export const ITEMS: Record<ItemId, ItemMeta> = {
 };
 
 /** 點擊後開啟的 overlay 種類;null 表示只做小反應(還沒想到要放什麼)。 */
-export type OverlayKind = "phone" | "computer" | "books" | "notebook" | "skateboard" | "ocean";
+export type OverlayKind = "computer" | "books" | "notebook" | "skateboard" | "ocean";
 
 export const ITEM_OVERLAY: Record<ItemId, OverlayKind | "player" | null> = {
-  phone: "phone",
+  phone: null, // 不開 overlay,直接換頁到履歷(見 ITEM_LINK)
   laptop: "computer",
   headphones: "player",
   musicPlayer: "player",
@@ -93,4 +93,9 @@ export const ITEM_OVERLAY: Record<ItemId, OverlayKind | "player" | null> = {
   bookStack: null,
   poster: null,
   window: "ocean",
+};
+
+/** 點了直接換頁的物件:手機 = 收到一封信,打開就是我的履歷 */
+export const ITEM_LINK: Partial<Record<ItemId, string>> = {
+  phone: "/resume",
 };

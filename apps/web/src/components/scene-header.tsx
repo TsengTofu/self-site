@@ -1,19 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { FileUser, Palette } from "lucide-react";
+import { Palette } from "lucide-react";
+import { useEffectivePhase } from "@/hooks/use-time-of-day";
 import { CONTROL_BASE, TONE_CLASS, TONE_TEXT, useControlTone } from "@/lib/control-tone";
 
 /** 圖示滑過時往上跳一下,一看就知道可以點 */
 const LINK_ICON = "size-4 transition-transform duration-200 ease-out group-hover:-translate-y-px group-hover:-rotate-6";
 
+/** 標題字色跟著時段換:夜晚牆面很暗,改用淺色字,其他時段牆面夠亮,用深色字 */
+const TITLE_COLOR = {
+  light: { eyebrow: "text-[#6d5843]", title: "text-[#33271c]" },
+  dark: { eyebrow: "text-[#d3c5b2]", title: "text-[#f5ede1]" },
+};
+
 /**
  * 場景左上角標題:常駐顯示,不再 hover 才展開
- * 左上角是淺色牆面,深色字直接放上去就讀得清楚,不加光暈也不加卡片底
- * 子頁做成按鈕,桌機手機都看得到
+ * 不加光暈也不加卡片底,字色跟著時段的牆面明暗切換
+ * 履歷改從場景裡的手機進去,這裡只留視覺製作歷程
  */
 export function SceneHeader() {
   const tone = useControlTone();
+  const phase = useEffectivePhase();
+  const color = phase === "night" ? TITLE_COLOR.dark : TITLE_COLOR.light;
   const link = `group pointer-events-auto ${CONTROL_BASE} ${TONE_CLASS[tone]} ${TONE_TEXT[tone]}`;
 
   return (
@@ -21,18 +30,17 @@ export function SceneHeader() {
       className="rise-in pointer-events-none absolute left-4 top-4 z-20 select-none md:left-7 md:top-6"
       style={{ animationDelay: "0.45s" }}
     >
-      <p className="text-[10px] font-bold tracking-[0.35em] text-[#6d5843]">MY SPACE</p>
+      <p className={`text-[10px] font-bold tracking-[0.35em] transition-colors duration-1000 ${color.eyebrow}`}>
+        MY SPACE
+      </p>
       {/* Gowun Dodum 只有一種字重,加一點同色描邊讓它粗一些,字形不會走樣 */}
-      <h1 className="font-hand mt-0.5 text-2xl text-[#33271c] [-webkit-text-stroke:0.6px_currentColor] md:text-3xl">
+      <h1
+        className={`font-hand mt-0.5 text-2xl transition-colors duration-1000 [-webkit-text-stroke:0.6px_currentColor] md:text-3xl ${color.title}`}
+      >
         나의 공간
       </h1>
-      <p className="mt-1.5 text-[11px] font-semibold text-[#4a3a2c] md:text-xs">試著與空間互動吧！</p>
 
-      <nav aria-label="子頁面" className="mt-2.5 flex flex-wrap gap-2">
-        <Link href="/resume" className={link}>
-          <FileUser className={LINK_ICON} strokeWidth={2.1} aria-hidden />
-          履歷
-        </Link>
+      <nav aria-label="子頁面" className="mt-3 flex flex-wrap gap-2">
         <Link href="/making-of" className={link}>
           <Palette className={LINK_ICON} strokeWidth={2.1} aria-hidden />
           視覺製作歷程

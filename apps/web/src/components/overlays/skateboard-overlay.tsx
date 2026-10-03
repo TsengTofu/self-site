@@ -1,10 +1,10 @@
 "use client";
 
-import { profile } from "@/data/profile";
+import { resume } from "@/data/resume";
 import { useSceneStore } from "@/stores/scene-store";
 import { OverlayShell } from "./overlay-shell";
 
-const IDEA_MAIL = `https://mail.google.com/mail/?view=cm&fs=1&to=${profile.email}&su=${encodeURIComponent(
+const IDEA_MAIL = `https://mail.google.com/mail/?view=cm&fs=1&to=${resume.email}&su=${encodeURIComponent(
   "滑板那格我有個點子!",
 )}`;
 

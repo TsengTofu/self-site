@@ -5,7 +5,7 @@
 三個頁面：
 
 - `/` — 手繪海景房場景：分層元素、四時段光影、人物三態、找貓咪彩蛋
-  - 物件網址：`/projects`、`/profile`、`/music`、`/books`、`/notes`、`/ocean`、`/skateboard`，進來會自動打開對應的物件（對照表在 `lib/item-routes.ts`）
+  - 物件網址：`/projects`、`/music`、`/books`、`/notes`、`/ocean`、`/skateboard`，進來會自動打開對應的物件（對照表在 `lib/item-routes.ts`）
 - `/resume` — 正式履歷（直式時間軸，內容在 `data/resume.ts`）
 - `/making-of` — 視覺風格製作歷程（總覽 + 可點擊時間軸，兩畫面左右切換）
 
@@ -40,7 +40,7 @@ self-site/
 │           ├── components/
 │           │   ├── scene/            # 場景系統：photo-scene / element-layers /
 │           │   │                     #   hotspots（座標）/ cat-peekaboo / scene-overlays
-│           │   ├── overlays/         # 各物件的視窗（手機/電腦/書/筆記本/滑板/海景）
+│           │   ├── overlays/         # 各物件的視窗（電腦/書/筆記本/滑板/海景）
 │           │   ├── resume/           # /resume 頁
 │           │   ├── making-of/        # /making-of 頁
 │           │   ├── desk-experience.tsx   # 首頁總指揮：鏡頭、點擊路由、overlay
@@ -60,8 +60,8 @@ self-site/
 
 | 物件 | 行為 |
 | --- | --- |
-| 📱 手機 | 飛到中央，App：Profile 摘要（→ /resume）/ 聯絡 |
-| 💻 電腦 | 鏡頭拉近螢幕 → 專案視窗；有 `demoUrl` 的專案可內嵌實機操作（LIVE ▶） |
+| 📱 手機 | 上方有「履歷」來信對話框，點了直接換頁到 /resume |
+| 💻 電腦 | 螢幕顯示現在時間；點了鏡頭拉近 → 專案視窗，有 `demoUrl` 的專案可內嵌實機操作（LIVE ▶） |
 | 🎧 耳機 / 🔊 音響 | 音樂 Player：展開選歌 → YouTube 播放，可縮左下角 mini 不中斷 |
 | 🎒 背包 | 近期讀過想推薦的書 |
 | 🪟 窗戶 | 拉近海景（時段連動、點海面起漣漪） |

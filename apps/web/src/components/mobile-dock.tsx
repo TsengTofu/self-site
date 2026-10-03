@@ -13,7 +13,7 @@ const DOCK_GROUPS: ItemId[][] = [
 
 /** 按下時泡泡裡的說明 */
 const DOCK_LABEL: Partial<Record<ItemId, string>> = {
-  phone: "手機・關於我",
+  phone: "手機・我的履歷",
   laptop: "電腦・我的專案",
   headphones: "耳機・上班歌單",
   backpack: "背包・最近讀的書",
