@@ -4,7 +4,7 @@ import { shareMeta } from "@/lib/site";
 
 const TITLE = "視覺風格製作歷程 — Tofu Tseng";
 const DESCRIPTION =
-  "這個網站的房間插畫是怎麼被做出來的：從 AI 風格探索、生成圖撞牆、佔位符先行開發，到 Illustrator 手工重畫與拆層整合的完整歷程。";
+  "作品集首頁互動 lofi 房間插畫的視覺探索紀錄：Gemini ✕ ChatGPT ✕ Illustrator，兩週、兩次放棄、一次翻轉，從一張好看的圖到一套拆解後的圖層。";
 
 export const metadata: Metadata = {
   title: TITLE,
