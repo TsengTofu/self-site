@@ -41,3 +41,10 @@ export const songs: Song[] = [
     coverColor: "#8fc7a3",
   },
 ];
+
+/**
+ * 歌曲的封面:直接用 YouTube 提供的影片縮圖(16:9、沒有黑邊的 mqdefault),
+ * 圖片從 YouTube 讀取,不另外存一份官方專輯封面或 Logo
+ */
+export const songCover = (song: Song) =>
+  song.youtubeVideoId ? `https://i.ytimg.com/vi/${song.youtubeVideoId}/mqdefault.jpg` : null;

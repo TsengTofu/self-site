@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Maximize2, Music, Pause, Play, SkipForward, Square, X } from "lucide-react";
-import { songs } from "@/data/music";
+import { songCover, songs } from "@/data/music";
 import { useSceneStore } from "@/stores/scene-store";
 import { prefersReducedMotion } from "@/lib/motion";
 import { useModalFocus } from "@self-site/ui/use-modal-focus";
@@ -18,11 +18,25 @@ import { BAR_BUTTON } from "@/components/overlays/full-page";
  * enablejsapi 讓我們自己的按鈕可以用 postMessage 叫它暫停/繼續
  */
 const embedUrl = (videoId: string) =>
-  `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&controls=0&disablekb=1&fs=0&iv_load_policy=3&enablejsapi=1`;
+  `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&controls=0&disablekb=1&fs=0&iv_load_policy=3&cc_load_policy=0&enablejsapi=1`;
 
-/** 對 YouTube iframe 下指令(pauseVideo / playVideo),不用另外載 YouTube 的 API 腳本 */
-function sendCommand(iframe: HTMLIFrameElement | null, func: "pauseVideo" | "playVideo") {
-  iframe?.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args: [] }), "*");
+/** 對 YouTube iframe 下指令,不用另外載 YouTube 的 API 腳本 */
+function sendCommand(iframe: HTMLIFrameElement | null, func: string, args: unknown[] = []) {
+  iframe?.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args }), "*");
+}
+
+/**
+ * 預設不要字幕:YouTube 會依觀看者自己的偏好自動開字幕,網址參數關不掉,
+ * 只能等播放器載入後叫它卸下字幕模組;字幕模組開播後才載入,所以分幾次送
+ */
+const CAPTIONS_OFF_DELAYS = [800, 2000, 4000];
+function hideCaptions(iframe: HTMLIFrameElement | null) {
+  CAPTIONS_OFF_DELAYS.forEach((ms) =>
+    window.setTimeout(() => {
+      sendCommand(iframe, "unloadModule", ["captions"]);
+      sendCommand(iframe, "unloadModule", ["cc"]);
+    }, ms),
+  );
 }
 
 /** mini 卡片上的小圓鈕 */
@@ -126,24 +140,28 @@ export function MusicPlayer() {
         {/* slot 1:header(只在展開時顯示) */}
         {expanded && (
           <header className="flex shrink-0 items-center gap-3 border-b border-ink-soft/10 bg-cream/95 px-4 py-3 md:col-span-2 md:px-10">
-            <MusicDisc coverColor={song?.coverColor ?? null} size={11} spinning={playing} />
+            {/* 手機寬度不夠,頂部列不放光碟(mini 卡片上看得到) */}
+            <span className="hidden sm:block">
+              <MusicDisc image={song ? songCover(song) : null} coverColor={song?.coverColor} size={11} spinning={playing} />
+            </span>
             <div className="min-w-0 flex-1">
               <p className="text-[10px] font-bold tracking-[0.35em] text-ink-dim">MUSIC</p>
-              <h2 className="text-lg font-bold md:text-xl">我在聽什麼</h2>
+              <h2 className="whitespace-nowrap text-lg font-bold md:text-xl">我在聽什麼</h2>
               <p className="hidden text-xs text-ink-soft sm:block">
                 {song ? "回到房間後，影片會縮到左下角繼續播" : "戴上耳機，聽聽我的世界"}
               </p>
             </div>
             {canPlay && (
-              <button type="button" onClick={togglePause} className={BAR_BUTTON}>
+              // 手機寬度不夠,暫停和停止只留圖示,文字給讀屏
+              <button type="button" onClick={togglePause} aria-label={playing ? "暫停" : "繼續播放"} className={BAR_BUTTON}>
                 <PauseIcon className="size-3.5 fill-current" aria-hidden />
-                {playing ? "暫停" : "繼續播放"}
+                <span className="hidden sm:inline">{playing ? "暫停" : "繼續播放"}</span>
               </button>
             )}
             {song && (
-              <button type="button" onClick={closePlayer} className={BAR_BUTTON}>
+              <button type="button" onClick={closePlayer} aria-label="停止" className={BAR_BUTTON}>
                 <Square className="size-3.5 fill-current" aria-hidden />
-                停止
+                <span className="hidden sm:inline">停止</span>
               </button>
             )}
             <button type="button" onClick={dismiss} className={BAR_BUTTON}>
@@ -182,6 +200,7 @@ export function MusicPlayer() {
             <iframe
               key={song.id}
               ref={iframeRef}
+              onLoad={(e) => hideCaptions(e.currentTarget)}
               className="pointer-events-none h-full w-full"
               src={embedUrl(song.youtubeVideoId)}
               title={`${song.artist} — ${song.title}`}
@@ -205,7 +224,12 @@ export function MusicPlayer() {
                       isCurrent ? "bg-white/80 shadow-sm" : ""
                     }`}
                   >
-                    <span className="size-8 shrink-0 rounded-full" style={{ backgroundColor: s.coverColor }} />
+                    {/* 縮圖:YouTube 影片封面,沒有的話用代表色 */}
+                    <span
+                      aria-hidden
+                      className="h-9 w-16 shrink-0 rounded-md bg-cover bg-center shadow-sm"
+                      style={{ backgroundColor: s.coverColor, backgroundImage: songCover(s) ? `url("${songCover(s)}")` : undefined }}
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-ink">{s.title}</p>
                       <p className="truncate text-xs text-ink-dim">{s.artist}</p>
@@ -221,7 +245,7 @@ export function MusicPlayer() {
         {/* slot 4:mini 控制列(只在收合時顯示) */}
         {!expanded && (
           <div className="flex items-center gap-2.5 p-2.5 pr-3">
-            <MusicDisc coverColor={song?.coverColor ?? null} size={12} spinning={playing} />
+            <MusicDisc image={song ? songCover(song) : null} coverColor={song?.coverColor} size={12} spinning={playing} />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold text-white">{song?.title ?? "還沒選歌"}</p>
               <p className="truncate text-xs text-white/50">{song?.artist ?? "點耳機或音響挑一首"}</p>
@@ -268,7 +292,7 @@ function IdlePill() {
         onClick={(e) => expandPlayer(e.currentTarget.getBoundingClientRect())}
         className="flex items-center gap-2.5 rounded-full pr-2 text-left transition hover:bg-white/5"
       >
-        <MusicDisc coverColor={null} size={11} />
+        <MusicDisc image={songCover(songs[0]!)} size={11} />
         <span>
           <span className="block text-sm font-bold text-white">我在聽什麼</span>
           <span className="block text-[11px] text-white/50">點開看歌單</span>

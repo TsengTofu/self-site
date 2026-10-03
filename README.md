@@ -46,7 +46,7 @@ self-site/
 │           │   ├── desk-experience.tsx   # 首頁總指揮：鏡頭、點擊路由、overlay
 │           │   ├── music-player.tsx      # 音樂 Player（展開選歌 / 左下 mini）
 │           │   ├── mobile-dock.tsx       # 手機版底部 dock（按下浮起 + 說明泡泡，寬度不夠可左右滑）
-│           │   └── scene-header.tsx      # 左上標題與子頁按鈕
+│           │   └── top-menu.tsx          # 右上收合選單（在線、時段、音樂、視覺製作歷程）
 │           ├── data/                 # ✏️ 內容（履歷/專案/書/句子/歌/製作歷程）
 │           ├── hooks/                # 在座循環、鏡頭、時段…
 │           ├── lib/                  # items 註冊表、site（網域）、motion、gsap-setup
