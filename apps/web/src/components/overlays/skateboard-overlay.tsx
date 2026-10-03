@@ -1,45 +1,45 @@
 "use client";
 
 import { resume } from "@/data/resume";
-import { useSceneStore } from "@/stores/scene-store";
-import { OverlayShell } from "./overlay-shell";
+import { ItemIcon } from "@/components/item-icons";
+import { FullPage } from "./full-page";
 
 const IDEA_MAIL = `https://mail.google.com/mail/?view=cm&fs=1&to=${resume.email}&su=${encodeURIComponent(
-  "滑板那格我有個點子!",
+  "滑板那格我有個點子！",
 )}`;
 
-/** 滑板:還沒想到要放什麼,先做成一個徵求點子的彩蛋。 */
+/** 滑板:還沒想到要放什麼,先做成一個徵求點子的彩蛋 */
 export function SkateboardOverlay() {
-  const closeOverlay = useSceneStore((s) => s.closeOverlay);
-
   return (
-    <OverlayShell label="滑板" onClose={closeOverlay} className="w-full max-w-md">
-      <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-panel p-8 text-center shadow-2xl">
-        <span className="inline-block text-6xl transition hover:rotate-[-16deg]">🛹</span>
-        <h2 className="text-lg font-bold text-white">這格還空著</h2>
-        <p className="text-sm leading-relaxed text-white/60">
-          滑板要放什麼,我還沒想好。
-          <br />
-          也許是學滑板的摔倒集錦,也許是人生的 side quest 清單。
-        </p>
-        <div className="flex gap-2">
-          <a
-            href={IDEA_MAIL}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-full bg-gradient-to-r from-accent to-accent-soft px-5 py-2 text-sm font-bold text-white transition hover:brightness-110"
-          >
-            跟我說你的點子
-          </a>
-          <button
-            type="button"
-            onClick={closeOverlay}
-            className="rounded-full bg-white/10 px-5 py-2 text-sm text-white/70 transition hover:bg-white/20"
-          >
-            先滑走
-          </button>
+    <FullPage eyebrow="SKATEBOARD" title="自由的味道">
+      {(leave) => (
+        <div className="mx-auto flex min-h-full max-w-md flex-col items-center justify-center gap-5 px-6 py-12 text-center">
+          <ItemIcon id="skateboard" className="size-20 text-ink-soft transition duration-300 hover:-rotate-12" />
+          <h3 className="text-xl font-bold">這格還空著</h3>
+          <p className="text-sm leading-relaxed text-ink-soft">
+            滑板要放什麼，我還沒想好。
+            <br />
+            也許是學滑板的摔倒集錦，也許是人生的 side quest 清單。
+          </p>
+          <div className="flex flex-wrap justify-center gap-2.5">
+            <a
+              href={IDEA_MAIL}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-cream shadow-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
+            >
+              跟我說你的點子
+            </a>
+            <button
+              type="button"
+              onClick={leave}
+              className="rounded-full border border-ink-soft/25 px-5 py-2.5 text-sm font-medium text-ink-soft transition duration-200 ease-out hover:-translate-y-0.5 hover:bg-ink-soft/5 active:translate-y-0"
+            >
+              先滑走
+            </button>
+          </div>
         </div>
-      </div>
-    </OverlayShell>
+      )}
+    </FullPage>
   );
 }

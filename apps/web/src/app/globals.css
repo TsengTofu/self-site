@@ -424,7 +424,8 @@ body {
   animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* 全螢幕 overlay(電腦專案、海景):鏡頭推近到一半就淡入蓋住,關閉時淡出 */
+/* 全頁畫面(overlays/full-page、海景、播放器):鏡頭有推近的(電腦、海景)推到一半才淡入蓋住,
+   其他直接淡入(cover-in-now);關閉時淡出 */
 @keyframes cover-in {
   from {
     opacity: 0;
@@ -435,6 +436,9 @@ body {
 }
 .cover-in {
   animation: cover-in 0.35s ease-out 0.3s both;
+}
+.cover-in-now {
+  animation: cover-in 0.3s ease-out both;
 }
 @keyframes cover-out {
   from {

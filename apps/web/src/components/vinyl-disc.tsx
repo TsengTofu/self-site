@@ -1,5 +1,7 @@
+import { Headphones } from "lucide-react";
+
 interface VinylDiscProps {
-  /** 目前歌曲的封面色;沒選歌時傳 null,顯示預設的粉藍漸層 + 🎧。 */
+  /** 目前歌曲的封面色;沒選歌時傳 null,顯示預設的粉藍漸層 + 耳機圖示 */
   coverColor: string | null;
   /** 對應 Tailwind size-11 / size-12 —— header 用 11,mini 用 12。 */
   size: 11 | 12;
@@ -23,7 +25,11 @@ export function VinylDisc({ coverColor, size }: VinylDiscProps) {
           : undefined
       }
     >
-      {coverColor ? <span className="size-2.5 rounded-full bg-[#20242f]" /> : "🎧"}
+      {coverColor ? (
+        <span className="size-2.5 rounded-full bg-[#20242f]" />
+      ) : (
+        <Headphones className="size-5 text-white" strokeWidth={2} aria-hidden />
+      )}
     </span>
   );
 }
