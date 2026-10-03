@@ -26,6 +26,8 @@ interface HotspotBase {
   screenRect?: Rect;
   /** 標記這個熱區同時是元素圖層插槽錨點(見 element-layers.tsx 的 ELEMENT_SLOTS) */
   slot?: true;
+  /** 提示點的位置(佔外接框寬高的比例),沒填就在正中央 */
+  beacon?: { x: number; y: number };
 }
 
 /** 形狀二選一:矩形 rect 或多邊形 points(斜放物件);兩個都沒有 tsc 會擋,hotspotBBox 才不會算出 NaN */
@@ -54,15 +56,18 @@ export const HOTSPOTS: Hotspot[] = [
   // 床尾的耳機 → 歌單(元素插槽;渲染順序在床之後,見 element-layers LAYERS)
   { id: "headphones", rect: { x: 1318, y: 852, w: 185, h: 125 }, slot: true },
   // 筆電(桌面中央)→ 專案(元素插槽)
+  // 往右挪 30,左邊騰出空間給手機;右後角會蓋住檯燈底座(檯燈排在筆電後面)
   {
     id: "laptop",
-    rect: { x: 925, y: 512, w: 250, h: 176 },
-    screenRect: { x: 933, y: 520, w: 165, h: 115 },
+    rect: { x: 955, y: 512, w: 250, h: 176 },
+    screenRect: { x: 963, y: 520, w: 165, h: 115 },
     slot: true,
+    // 螢幕正中央是時間,提示點改放在鍵盤上
+    beacon: { x: 0.5, y: 0.8 },
   },
-  // 手機(桌上筆電左前)→ Profile(元素插槽)
-  // 手機往右挪到筆電左前方,跟音響之間留出空隙
-  { id: "phone", rect: { x: 902, y: 676, w: 92, h: 50 }, slot: true },
+  // 手機(音響與筆電之間)→ Profile(元素插槽)
+  // 整支放在桌面上,不再懸出桌緣(桌緣大約在 y 700)
+  { id: "phone", rect: { x: 878, y: 646, w: 92, h: 50 }, slot: true },
   // 斜靠鏡子的長板 → 彩蛋。畫面由 element-layers 的 DECOR 渲染(板尾被床蓋住,
   // 貼圖框與點擊範圍不同),這裡只是可點的板身多邊形,不掛 slot
   { id: "skateboard", points: "1558,502 1660,525 1640,870 1520,845" },
