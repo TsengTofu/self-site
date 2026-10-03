@@ -241,7 +241,7 @@ function HeroPanel({ reduced }: { reduced: boolean }) {
               回到場景
             </Link>
             <Link href="/resume" className="transition hover:opacity-70" style={{ color: C.body }}>
-              看互動履歷 →
+              看履歷 →
             </Link>
           </div>
           <p data-hero className="mt-6 text-[13px] italic" style={{ color: "#b1aaa1" }}>
@@ -1354,7 +1354,7 @@ function TakeawaysPanel() {
             回到場景
           </Link>
           <Link href="/resume" className="transition hover:opacity-70" style={{ color: C.body }}>
-            看互動履歷 →
+            看履歷 →
           </Link>
         </div>
         <div className="flex flex-wrap gap-2.5">
