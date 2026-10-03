@@ -13,7 +13,8 @@ import Image from "next/image";
 import { ITEMS, ITEM_LINK, ITEM_OVERLAY, type ItemId } from "@/lib/items";
 import { useEffectivePhase, type DayPhase } from "@/hooks/use-time-of-day";
 import { useSceneStore, selectIsOnline } from "@/stores/scene-store";
-import { HOTSPOTS, IMAGE_W, IMAGE_H, hotspotBBox, type Hotspot } from "./hotspots";
+import { HOTSPOTS, IMAGE_W, IMAGE_H, beaconPoint, hotspotBBox, tipPoint, type Hotspot } from "./hotspots";
+import { GIRL_LAYERS } from "./girl-layers";
 import { CatPeekaboo } from "./cat-peekaboo";
 import { ElementLayers, GIRL_STATES, type GirlState } from "./element-layers";
 import { LetterBadge, letterBadgeBox } from "./letter-badge";
@@ -63,8 +64,8 @@ const LIGHT_INTENSITY: Record<DayPhase, number> = {
 const LINK_SPOTS = HOTSPOTS.filter((spot) => ITEM_LINK[spot.id]);
 /** 來信對話框尾巴指的位置:物件上緣偏左 */
 const letterAnchor = (bbox: { x: number; y: number; w: number }) => ({ x: bbox.x + bbox.w * 0.2, y: bbox.y - 4 });
-/** 有提示點的熱區(會開畫面的物件);手機改用來信對話框,不在這裡 */
-const BEACON_SPOTS = HOTSPOTS.filter((spot) => ITEM_OVERLAY[spot.id] !== null);
+/** 有提示點的物件(會開畫面的);手機改用來信對話框,不在這裡 */
+const BEACON_IDS = HOTSPOTS.filter((spot) => ITEM_OVERLAY[spot.id] !== null).map((spot) => spot.id);
 /** 提示點輪流閃:每隔這麼久換下一個,同一時間只有一個在擴散(要跟 globals.css 的週期對上) */
 const BEACON_GAP_S = 1.2;
 
@@ -148,6 +149,25 @@ export function PhotoScene({
     }
   }, []);
 
+  // 人物在座時,她的輪廓擋在觸發點前面;被她擋住或戴在身上的東西換位置(見 girl-layers.ts)
+  const girlLayer = present ? GIRL_LAYERS[girlState] : null;
+  const onTopSpots = girlLayer?.onTop ?? [];
+  const belowSpots = HOTSPOTS.filter((spot) => !onTopSpots.some((s) => s.id === spot.id)).map(
+    (spot): Hotspot => {
+      const moved = girlLayer?.behind?.find((b) => b.id === spot.id);
+      return moved ? { ...spot, ...moved } : spot;
+    },
+  );
+
+  /** hover 文字提示:把物件指定的錨點(底圖座標)換成螢幕座標,cover 裁切與鏡頭縮放都算進去 */
+  const showTooltip = (spot: Hotspot, el: SVGElement) => {
+    const ctm = (el as SVGGraphicsElement).getScreenCTM();
+    if (!ctm) return;
+    const tip = tipPoint(spot);
+    const p = new DOMPoint(tip.x, tip.y).matrixTransform(ctm);
+    setTooltip({ id: spot.id, x: p.x, y: p.y });
+  };
+
   const handleClick = (id: ItemId) => (e: MouseEvent<SVGElement>) => {
     onItemClick(id, e.currentTarget.getBoundingClientRect());
   };
@@ -169,8 +189,7 @@ export function PhotoScene({
       onKeyDown: handleKey(spot.id),
       onMouseEnter: (e: MouseEvent<SVGElement>) => {
         setHoveredItem(spot.id);
-        const rect = e.currentTarget.getBoundingClientRect();
-        setTooltip({ id: spot.id, x: rect.left + rect.width / 2, y: rect.top });
+        showTooltip(spot, e.currentTarget);
       },
       onMouseLeave: () => {
         setHoveredItem(null);
@@ -179,8 +198,7 @@ export function PhotoScene({
       // 移除手繪 stroke 後,鍵盤 focus 仍需要可見提示 —— 比照 hover 亮起 beacon
       onFocus: (e: FocusEvent<SVGElement>) => {
         setHoveredItem(spot.id);
-        const rect = e.currentTarget.getBoundingClientRect();
-        setTooltip({ id: spot.id, x: rect.left + rect.width / 2, y: rect.top });
+        showTooltip(spot, e.currentTarget);
       },
       onBlur: () => {
         setHoveredItem(null);
@@ -188,6 +206,34 @@ export function PhotoScene({
       },
     };
   };
+
+  /** 一個熱區的點擊形狀,加上鏡頭縮放目標(透明、不吃事件,只給鏡頭算位置) */
+  const renderShape = (spot: Hotspot, i: number) => (
+    <g key={`${spot.id}-${i}`}>
+      {spot.rect && (
+        <rect
+          {...shapeProps(spot)}
+          x={spot.rect.x}
+          y={spot.rect.y}
+          width={spot.rect.w}
+          height={spot.rect.h}
+          rx={8}
+        />
+      )}
+      {spot.points && <polygon {...shapeProps(spot)} points={spot.points} />}
+      {spot.screenRect && (
+        <rect
+          data-zoom-target={spot.id}
+          pointerEvents="none"
+          fill="transparent"
+          x={spot.screenRect.x}
+          y={spot.screenRect.y}
+          width={spot.screenRect.w}
+          height={spot.screenRect.h}
+        />
+      )}
+    </g>
+  );
 
   return (
     <div
@@ -263,69 +309,51 @@ export function PhotoScene({
           role="group"
           aria-label="我的書桌"
         >
-          {HOTSPOTS.map((spot, i) => {
-            const common = shapeProps(spot);
-            // 只有「有功能」的熱區(ITEM_OVERLAY 非 null)才放圓圈提示,空物件不用騙人家可以點
-            const beaconOrder = BEACON_SPOTS.indexOf(spot);
-            const hasBeacon = beaconOrder >= 0;
-            const showHint = hinting && hasBeacon;
-            const bbox = hotspotBBox(spot);
-            const anchor = letterAnchor(bbox);
-            const linkBox = ITEM_LINK[spot.id] ? letterBadgeBox(anchor.x, anchor.y) : null;
-            const beaconX = bbox.x + bbox.w * (spot.beacon?.x ?? 0.5);
-            const beaconY = bbox.y + bbox.h * (spot.beacon?.y ?? 0.5);
+          {belowSpots.map(renderShape)}
+
+          {/* 人物輪廓:擋住她身後的觸發點,點到她身上什麼都不會發生 */}
+          {girlLayer && <polygon points={girlLayer.silhouette} fill="transparent" aria-hidden />}
+
+          {/* 她身上的觸發點(例如戴在頭上的耳機),要排在輪廓後面才點得到 */}
+          {onTopSpots.map(renderShape)}
+
+          {/* 來信對話框的點擊範圍:對話框畫在打光層下面,點擊要在這層才不會被窗戶熱區擋住;
+              對話框浮在人物前面,所以也排在輪廓後面 */}
+          {LINK_SPOTS.map((spot) => {
+            const anchor = letterAnchor(hotspotBBox(spot));
+            const box = letterBadgeBox(anchor.x, anchor.y);
             return (
-              <g key={`${spot.id}-${i}`}>
-                {spot.rect && (
-                  <rect
-                    {...common}
-                    x={spot.rect.x}
-                    y={spot.rect.y}
-                    width={spot.rect.w}
-                    height={spot.rect.h}
-                    rx={8}
-                  />
-                )}
-                {spot.points && <polygon {...common} points={spot.points} />}
-                {/* 來信對話框的點擊範圍:對話框畫在打光層下面,點擊要在這層才不會被窗戶熱區擋住 */}
-                {linkBox && (
-                  <rect
-                    aria-hidden
-                    x={linkBox.x}
-                    y={linkBox.y}
-                    width={linkBox.w}
-                    height={linkBox.h}
-                    fill="transparent"
-                    className="cursor-pointer"
-                    onClick={handleClick(spot.id)}
-                    onMouseEnter={() => setHoveredItem(spot.id)}
-                    onMouseLeave={() => setHoveredItem(null)}
-                  />
-                )}
-                {/* 鏡頭縮放目標:透明、不吃事件,只給鏡頭算位置 */}
-                {spot.screenRect && (
-                  <rect
-                    data-zoom-target={spot.id}
-                    pointerEvents="none"
-                    fill="transparent"
-                    x={spot.screenRect.x}
-                    y={spot.screenRect.y}
-                    width={spot.screenRect.w}
-                    height={spot.screenRect.h}
-                  />
-                )}
-                {/* 熱區圓圈提示(beacon):常駐小亮點,hover / focus / 首訪提示時更亮 */}
-                {hasBeacon && (
-                  <g
-                    className={`hotspot-beacon ${hoveredItem === spot.id ? "beacon-active" : ""} ${showHint ? "beacon-hint" : ""}`}
-                    transform={`translate(${beaconX} ${beaconY})`}
-                    pointerEvents="none"
-                    style={{ "--beacon-delay": `${beaconOrder * BEACON_GAP_S}s` } as CSSProperties}
-                  >
-                    <circle className="beacon-ring" r={5} />
-                    <circle className="beacon-dot" r={4.5} />
-                  </g>
-                )}
+              <rect
+                key={`letter-${spot.id}`}
+                aria-hidden
+                x={box.x}
+                y={box.y}
+                width={box.w}
+                height={box.h}
+                fill="transparent"
+                className="cursor-pointer"
+                onClick={handleClick(spot.id)}
+                onMouseEnter={() => setHoveredItem(spot.id)}
+                onMouseLeave={() => setHoveredItem(null)}
+              />
+            );
+          })}
+
+          {/* 熱區圓圈提示(beacon):常駐小亮點,hover / focus / 首訪提示時更亮;只有「有功能」的物件才放 */}
+          {[...belowSpots, ...onTopSpots].map((spot) => {
+            const order = BEACON_IDS.indexOf(spot.id);
+            if (order < 0) return null;
+            const p = beaconPoint(spot);
+            return (
+              <g
+                key={`beacon-${spot.id}`}
+                className={`hotspot-beacon ${hoveredItem === spot.id ? "beacon-active" : ""} ${hinting ? "beacon-hint" : ""}`}
+                transform={`translate(${p.x} ${p.y})`}
+                pointerEvents="none"
+                style={{ "--beacon-delay": `${order * BEACON_GAP_S}s` } as CSSProperties}
+              >
+                <circle className="beacon-ring" r={5} />
+                <circle className="beacon-dot" r={4.5} />
               </g>
             );
           })}
@@ -333,10 +361,11 @@ export function PhotoScene({
 
       </div>
 
-      {/* Hover 提示(桌機);換頁的物件(手機)已經有來信對話框,不再重複 */}
+      {/* Hover 提示(桌機);換頁的物件(手機)已經有來信對話框,不再重複
+          w-max:靠近右邊的物件(耳機、長板)不會被擠成一字一行 */}
       {tooltip && !overlay && !ITEM_LINK[tooltip.id] && (
         <div
-          className="pointer-events-none fixed z-30 hidden -translate-x-1/2 -translate-y-full rounded-full border border-white/10 bg-[#141824]/95 px-3.5 py-1.5 text-xs text-white shadow-xl md:block"
+          className="pointer-events-none fixed z-30 hidden w-max -translate-x-1/2 -translate-y-full rounded-full border border-white/10 bg-[#141824]/95 px-3.5 py-1.5 text-xs text-white shadow-xl md:block"
           style={{ left: tooltip.x, top: tooltip.y - 10 }}
         >
           {ITEMS[tooltip.id].hint}
