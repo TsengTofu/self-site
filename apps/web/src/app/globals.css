@@ -434,6 +434,73 @@ body {
   animation: eq-bounce 0.9s ease-in-out infinite;
 }
 
+/* ---------- 滑板轉場(components/skate-transition.tsx),照分鏡:板子彈起 → 往左掃過刷成紙 → 手寫卡片 ----------
+   板子起點用 --dx / --dy / --s 傳進來(從場景上的位置長到畫面中間) */
+@keyframes skate-lift {
+  0% {
+    transform: translate(var(--dx), var(--dy)) scale(var(--s)) rotate(0deg);
+  }
+  60% {
+    transform: translate(0, 0) scale(1.06) rotate(-17deg);
+  }
+  100% {
+    transform: translate(0, 0) scale(1) rotate(-14deg);
+  }
+}
+@keyframes skate-sweep {
+  from {
+    transform: translate(0, 0) scale(1) rotate(-14deg);
+  }
+  to {
+    transform: translate(-105vw, 8vh) scale(1.5) rotate(-38deg);
+  }
+}
+@keyframes skate-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(-12deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15) rotate(-12deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-12deg);
+  }
+}
+/* 手寫字從左往右「寫」出來 */
+@keyframes skate-write {
+  from {
+    clip-path: inset(-20% 100% -20% -5%);
+  }
+  to {
+    clip-path: inset(-20% -5% -20% -5%);
+  }
+}
+/* 線條畫出來:path 要先設 pathLength=1 */
+@keyframes skate-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes skate-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.skate-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: skate-draw 0.5s ease-out forwards;
+}
+
 /* 進場浮現(overlay 內容與標題,配 animation-delay 做 stagger) */
 @keyframes rise-in {
   from {

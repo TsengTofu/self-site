@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Chiron_GoRound_TC, Gowun_Dodum } from "next/font/google";
 import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL, shareMeta } from "@/lib/site";
-import { SprayTransition } from "@/components/spray-transition";
+import { SkateTransition } from "@/components/skate-transition";
 import "./globals.css";
 
 // 全站內文:圓體,跟手繪插畫的調性一致
@@ -58,8 +58,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-night font-sans text-white antialiased">
         {children}
-        {/* 噴漆轉場要跨頁播完,所以掛在這層 */}
-        <SprayTransition />
+        {/* 滑板轉場要跨頁播完,所以掛在這層 */}
+        <SkateTransition />
       </body>
     </html>
   );
