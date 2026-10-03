@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { ITEM_OVERLAY, type ItemId, type OverlayKind } from "@/lib/items";
+import { songs } from "@/data/music";
 
 /** 右上角狀態:auto = 跟著場景裡的女生;online / away = 手動固定 */
 export type PresenceMode = "auto" | "online" | "away";
@@ -13,7 +14,7 @@ interface Reaction {
   nonce: number; // 每次點擊遞增,讓同一個物件能重複觸發 toast
 }
 
-/** 音樂播放器面板狀態:hidden = 關閉、expanded = 展開選歌、mini = 左下膠囊 */
+/** 音樂播放器面板狀態:hidden = 關閉、expanded = 全螢幕播放、mini = 左下角的小卡片 */
 export type PlayerMode = "hidden" | "expanded" | "mini";
 
 interface SceneState {
@@ -40,7 +41,7 @@ interface SceneState {
   closeOverlay: () => void;
   /** 展開播放器;不重置 currentSongId(mini 播放中重新展開要繼續播) */
   expandPlayer: (rect?: DOMRect) => void;
-  /** 收合成左下角 mini 膠囊 */
+  /** 收合成左下角的 mini 小卡片 */
   minimizePlayer: () => void;
   /** 完全關閉播放器(= 停止播放) */
   closePlayer: () => void;
@@ -75,6 +76,8 @@ export const useSceneStore = create<SceneState>((set, get) => ({
       return;
     }
     if (target === "player") {
+      // 全螢幕播放器沒有「還沒選歌」的空畫面,沒在播就直接從第一首開始
+      if (!get().currentSongId) set({ currentSongId: songs[0]?.id ?? null });
       get().expandPlayer(rect);
       return;
     }

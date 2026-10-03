@@ -19,7 +19,7 @@ const SHINE = "conic-gradient(from 20deg, #e4e7ef, #c9d5f2, #f1d2e2, #d4eedf, #f
 
 /**
  * 播放器用的光碟:有封面就印在碟面上(圖案光碟),沒有就是彩虹反光的空白光碟
- * 全頁頂部列、mini 卡片、桌機左下角的小膠囊共用
+ * 全螢幕播放器的底部控制列用
  */
 export function MusicDisc({ image, coverColor, size, spinning = false }: MusicDiscProps) {
   const face = image
