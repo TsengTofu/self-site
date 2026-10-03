@@ -20,7 +20,10 @@ export function useModalFocus<T extends HTMLElement>(
 ) {
   const previouslyFocused = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+  // 每次 render 後同步最新的 onClose(render 期間直接寫 ref 會被 React Compiler 規則擋下)
+  useLayoutEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   // 觸發元素的祖先常在同一次 commit 被設成 inert,瀏覽器繪製前就會把焦點清掉,
   // passive effect 才抓 activeElement 有機會只拿到 body;layout effect 在繪製前先記下來
