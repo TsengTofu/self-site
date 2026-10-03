@@ -22,8 +22,8 @@ SRC_DIR = os.path.join(ROOT, "assets", "scene", "elements")
 OUT_DIR = os.path.join(ROOT, "public", "scene", "elements")
 
 # 源檔解析度不到 2× 的元素(檔名不含副檔名):轉檔時先放大 2 倍再存
-# 床已換成真正 2× 的源檔所以拿掉了;其他還沒補到 2× 的(cabinet、girl-*、cat-sleep/back/stretch)
-# 等站主補圖,補圖前想先頂一下可以把名字加進來
+# 目前 23 張源檔都已經是 2×,清單是空的
+# 之後新元素的源檔不夠大、又還沒時間重出時,把名字加進來先頂著
 UPSCALE_2X: set[str] = set()
 
 # 放大 2 倍後輪廓的半透明過渡帶也跟著變兩倍寬,alpha 陡度乘回 2 才是原生 2× 該有的邊
