@@ -2,6 +2,7 @@
  * 正式履歷頁(/resume)的內容
  * 內容整理自履歷母版
  * 起訖年月以 104 匯出為準,現職不寫公司名
+ * 英文版在 resume.en.ts,結構跟這裡一樣
  */
 
 /** 條目可以帶粗體小標:[小標, 內文] */
@@ -31,6 +32,8 @@ export interface Experience {
   /** 職稱底下的一句話說明 */
   intro?: string;
   metrics?: readonly Metric[];
+  /** 收合時顯示的重點(最重要的亮點);展開才看 intro、bullets、groups */
+  highlights: readonly Bullet[];
   bullets?: readonly Bullet[];
   /** 底下的子專案(例如 COMMEET 的四個平台) */
   groups?: readonly ProjectGroup[];
@@ -38,6 +41,8 @@ export interface Experience {
 }
 
 export interface SkillGroup {
+  /** 給元件配圖示用 */
+  id: "framework" | "data" | "style" | "test" | "tooling" | "ai" | "collab" | "viz" | "lang";
   label: string;
   items: readonly string[];
 }
@@ -84,30 +89,30 @@ export const resume: Resume = {
     "設計轉前端、約 7 年經驗的前端工程師，專精 React、TypeScript、Next.js 與 B2B SaaS 平台。擅長在有技術債的產品裡做結構性的事：五層巢狀階層式表格（虛擬化）、config-driven 側邊欄與權限架構、簽署合約多步驟流程與 PDF 管線，並以架構思維推動重構（Semi Design → Shadcn/ui、全站上傳元件改寫、Turborepo service 抽象）。深入排查並修復團隊長期的 Git 上版衝突問題；自 2024/07 起將 AI 導入日常工程流程，把上版作業自動化。",
 
   skills: [
-    { label: "框架與語言", items: ["React", "TypeScript", "Next.js（SPA／SSR）", "Vue", "JavaScript"] },
+    { id: "framework", label: "框架與語言", items: ["React", "TypeScript", "Next.js（SPA／SSR）", "Vue", "JavaScript"] },
     {
-      label: "狀態、表單與資料",
+      id: "data", label: "狀態、表單與資料",
       items: ["Zustand", "React Hook Form", "TanStack Query", "TanStack Table", "Zod", "REST API 串接"],
     },
     {
-      label: "樣式與設計系統",
+      id: "style", label: "樣式與設計系統",
       items: ["Shadcn/ui", "Tailwind CSS", "Semi Design", "SCSS Module", "設計 Token", "Storybook（探索中）"],
     },
-    { label: "測試", items: ["Jest", "React Testing Library"] },
+    { id: "test", label: "測試", items: ["Jest", "React Testing Library"] },
     {
-      label: "架構與工具",
+      id: "tooling", label: "架構與工具",
       items: ["Turborepo（Monorepo）", "Git／GitLab CI", "release-it", "Commitizen", "commitlint", "Husky", "GPG 簽章", "i18n"],
     },
     {
-      label: "AI 工程",
+      id: "ai", label: "AI 工程",
       items: ["Claude Code（skills、sandbox）", "MCP（Notion／Figma／Shadcn UI）", "AI Agent 輔助開發與重構", "AI Code Review"],
     },
     {
-      label: "協作",
+      id: "collab", label: "協作",
       items: ["跨職能協作（PM／設計／後端／QA）", "規格對齊", "Code Review 制度", "Agile／Scrum", "團隊流程從零建立"],
     },
-    { label: "視覺化", items: ["D3", "Vis", "ECharts", "Shadcn Chart"] },
-    { label: "語言", items: ["中文（母語）", "英文", "韓文（TOPIK Level 2）"] },
+    { id: "viz", label: "視覺化", items: ["D3", "Vis", "ECharts", "Shadcn Chart"] },
+    { id: "lang", label: "語言", items: ["中文（母語）", "英文", "韓文（TOPIK Level 2）"] },
   ],
 
   // 新到舊,現職在最上面
@@ -118,6 +123,19 @@ export const resume: Resume = {
       org: "B2B SaaS",
       start: "2025/11",
       stack: ["React", "Next.js", "TypeScript", "Shadcn/ui", "Turborepo", "Claude Code", "MCP"],
+      highlights: [
+        ["AI 導入", "上版流程整合為單一指令，每日 60 → 10 分鐘；AI 產出必經架構審查，單一 Task 約 1.5–2 天交付 QA。"],
+        ["治理與擴散", "Skill 抽離敏感設定、訂權限規則、帶成員上手；內部 AI 分享會 6 場；爭取到 AI Agent 預算。"],
+        [
+          "流程從零建立",
+          "導入 Sprint、Git 策略、PR 制度；上版流程爭議中以漸進式方案取得跨團隊共識；找出正式站衝突根因，此後穩定迭代 20 版。",
+        ],
+        [
+          "需求與交付",
+          "與 PM、設計、後端釐清邊界並提供多方案；1.5 個月完成簽署合約多步驟流程；主導元件庫遷移與全站上傳元件改寫（近 100 檔）。",
+        ],
+        ["承接", "2026/07 起獨自承接全部前端，補齊交接文件，進度不中斷。"],
+      ],
       intro:
         "以重構為核心職責加入，首週即投入開發；前期完成複雜功能，中後期主導架構重構與工程流程建立，並在團隊人力調整後承接前端全部職責。",
       metrics: [
@@ -181,6 +199,14 @@ export const resume: Resume = {
       start: "2019/10",
       end: "2025/10",
       stack: ["Next.js", "TypeScript", "Zustand", "TanStack", "Vue", "D3"],
+      highlights: [
+        [
+          "差旅報銷平台",
+          "與財務、PM 長期對齊簽核與報表需求；五層巢狀階層式表格；側邊欄 config-driven 重構，改動由 6 檔收斂為 1 個設定檔；建立 PR 審核流程。",
+        ],
+        ["TRP 數據平台", "從零定義協作流程、Coding Style 與 Code Review；撰寫開發與上版文件。"],
+        ["TSMC 視覺化 SPA", "直接面對客戶窗口，每週兩次會議持續四個月，從需求到交付。"],
+      ],
       intro:
         "橫跨 6 個 B2B 平台，從 UI 切版成長到主導協作流程與架構規劃，並從零建立 TRP 與 COMMEET 兩個平台的前端協作機制。",
       metrics: [
@@ -242,6 +268,7 @@ export const resume: Resume = {
       start: "2019/02",
       end: "2019/06",
       stack: ["JavaScript", "React", "REST API"],
+      highlights: ["全端訓練營，從零實作電商網站 STYLiSH，研究 JavaScript 核心基礎。"],
       bullets: [
         "從零實作電商網站 STYLiSH，協作串接 RESTful API，並在網頁版與 App 版開發相同功能。",
         "與同學共同鑽研 JavaScript 核心基礎，包含 Prototype、this、closure。",
@@ -256,6 +283,10 @@ export const resume: Resume = {
       start: "2015/07",
       end: "2018/09",
       stack: ["HTML", "CSS", "JavaScript", "AJAX", "Photoshop", "Illustrator"],
+      highlights: [
+        "3M、Samsung 等品牌的視覺設計、EDM 與 RWD 切版，橫跨設計與前端實作。",
+        "設計背景成為日後與設計師協作、落地設計系統的優勢。",
+      ],
       intro: "負責品牌客戶 3M、Samsung 的視覺設計、EDM 與網頁切版，橫跨設計與前端實作。",
       bullets: [
         "為 3M 多個產品線設計 EDM 並切版嵌入官方網站，以可選取文字為主的切版方式優化 SEO。",
@@ -272,6 +303,7 @@ export const resume: Resume = {
       start: "2014/07",
       end: "2015/03",
       stack: ["Photoshop", "Illustrator"],
+      highlights: ["運用 Adobe 系列軟體設計 POSM 陳列、動態 Banner 與網頁版型，並負責專案時程與客戶溝通。"],
       bullets: ["運用 Adobe 系列軟體設計 POSM 陳列、動態 Banner 與網頁版型。", "負責專案時程掌控與客戶溝通。"],
     },
   ],
@@ -313,4 +345,5 @@ export const resume: Resume = {
 };
 
 /** 「2025/11 – 現在」這種期間字串 */
-export const periodOf = (exp: Pick<Experience, "start" | "end">) => `${exp.start} – ${exp.end ?? "現在"}`;
+export const periodOf = (exp: Pick<Experience, "start" | "end">, present = "現在") =>
+  `${exp.start} – ${exp.end ?? present}`;
