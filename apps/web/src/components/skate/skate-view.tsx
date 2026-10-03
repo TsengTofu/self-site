@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, Camera } from "lucide-react";
 import type { SkateContent } from "@/data/skate";
 import { gmailComposeUrl } from "@/lib/links";
+import { SKATE_BASE } from "@/lib/skate-theme";
 import { HeaderSwitch } from "@/components/site-header";
 
 /** 噴漆字型(頁面用 next/font 載入,變數叫 --font-spray) */
@@ -26,7 +27,10 @@ function SectionTitle({ en, title, color }: { en: string; title: string; color: 
  */
 export function SkateView({ data }: { data: SkateContent }) {
   return (
-    <main className="min-h-dvh overflow-hidden bg-[#161514] text-[#f5f1ea] [background-image:radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:4px_4px]">
+    <main
+      style={{ backgroundColor: SKATE_BASE }}
+      className="min-h-dvh overflow-hidden text-[#f5f1ea] [background-image:radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:4px_4px]"
+    >
       <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8">
         <HeaderSwitch current="skateboard" tone="dark">
           <header className="flex items-center justify-between py-5">

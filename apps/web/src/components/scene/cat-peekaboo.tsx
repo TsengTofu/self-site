@@ -77,8 +77,10 @@ export function CatPeekaboo({ hidden = false, present, girlState }: CatPeekabooP
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    // 隨機選點一定要等掛載後(伺服器與瀏覽器選到的不一樣會 hydration mismatch),這裡的 setState 是刻意的
     const q = new URLSearchParams(window.location.search).get("catspot");
     if (q !== null && !Number.isNaN(Number(q))) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- 見上方:掛載後才選點
       setSpot(SPOTS[Math.abs(Number(q)) % SPOTS.length]!);
       return;
     }

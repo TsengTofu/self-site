@@ -32,7 +32,9 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
   const reaction = useSceneStore((s) => s.reaction);
   const overlay = useSceneStore((s) => s.overlay);
 
-  const [wiggling, setWiggling] = useState<ItemId | null>(null);
+  // 搖晃 450ms 後結束:記下「哪一次」已經搖完,不用另外存正在搖的物件
+  const [doneNonce, setDoneNonce] = useState<number | null>(null);
+  const wiggling: ItemId | null = reaction && reaction.nonce !== doneNonce ? reaction.itemId : null;
 
   usePresenceCycle();
   useSceneCamera(stageRef);
@@ -44,8 +46,7 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
   /* ---------- 點到未實作物件時搖一下 ---------- */
   useEffect(() => {
     if (!reaction) return;
-    setWiggling(reaction.itemId);
-    const t = setTimeout(() => setWiggling(null), 450);
+    const t = setTimeout(() => setDoneNonce(reaction.nonce), 450);
     return () => clearTimeout(t);
   }, [reaction]);
 

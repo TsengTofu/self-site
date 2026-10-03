@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { prefersReducedMotion } from "@/lib/motion";
+import { SKATE_BASE } from "@/lib/skate-theme";
 
 const EVENT = "spray:go";
 
@@ -13,7 +14,6 @@ export function startSprayTransition(href: string) {
 
 /** 噴漆的顏色,一列換一色;最後的空隙用底色補滿,跟滑板頁的底色一樣才接得上 */
 const PAINTS = ["#ff4f8b", "#ffd23f", "#39d0ff", "#b6f24a"];
-export const SPRAY_BASE = "#161514";
 const DURATION_MS = 1400;
 /** 換頁太久(網路卡住)就先收掉轉場,不要把畫面蓋死 */
 const GIVE_UP_MS = 5000;
@@ -100,7 +100,7 @@ function paint(canvas: HTMLCanvasElement, done: () => void) {
     }
     // 只補還沒噴到的透明空隙,已經噴上去的顏色不蓋掉
     ctx.globalCompositeOperation = "destination-over";
-    ctx.fillStyle = SPRAY_BASE;
+    ctx.fillStyle = SKATE_BASE;
     ctx.fillRect(0, 0, w, h);
     ctx.globalCompositeOperation = "source-over";
     done();

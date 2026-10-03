@@ -30,9 +30,12 @@ import { EqBars } from "@/components/eq-bars";
 const embedUrl = (videoId: string) =>
   `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&controls=0&disablekb=1&fs=0&iv_load_policy=3&cc_load_policy=0&enablejsapi=1`;
 
+/** 只跟 YouTube 的播放器講話,也只收它傳來的訊息 */
+const YT_ORIGIN = "https://www.youtube-nocookie.com";
+
 /** 對 YouTube iframe 下指令,不用另外載 YouTube 的 API 腳本 */
 function sendCommand(iframe: HTMLIFrameElement | null, func: string, args: unknown[] = []) {
-  iframe?.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args }), "*");
+  iframe?.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args }), YT_ORIGIN);
 }
 
 /**
@@ -69,7 +72,7 @@ function listenToPlayer(iframe: HTMLIFrameElement, id: string) {
     window.setTimeout(() => {
       iframe.contentWindow?.postMessage(
         JSON.stringify({ event: "listening", id, channel: "widget" }),
-        "*",
+        YT_ORIGIN,
       );
     }, ms),
   );
@@ -190,7 +193,7 @@ export function MusicPlayer() {
     let last: number | null = null;
     let stuckTimer: number | undefined;
     const onMessage = (e: MessageEvent) => {
-      if (e.source !== iframeRef.current?.contentWindow) return;
+      if (e.origin !== YT_ORIGIN || e.source !== iframeRef.current?.contentWindow) return;
       const state = readPlayerState(e.data);
       if (state === null || state === last) return;
       last = state;
