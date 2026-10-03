@@ -6,7 +6,6 @@ import { ITEMS, type ItemId } from "@/lib/items";
 import { ItemIcon } from "@/components/item-icons";
 import { PhaseSlider } from "./phase-slider";
 import { PresenceChip } from "./presence-chip";
-import { RingToggle } from "./ring-toggle";
 
 /** 導覽清單(與舊 dock 同一組物件,順序沿用) */
 const NAV_ITEMS: ItemId[] = [
@@ -31,7 +30,7 @@ interface OrbitNavProps {
 
 /**
  * 圓形導覽鈕:收合時是右下角一顆圓,點開後展開所有可互動物件 + 場景設定
- * (時段滑桿、來電開關;在座狀態為純顯示)。
+ * (時段滑桿;在座狀態為純顯示)。
  * 兩種展開造型由 shape 決定,目前是 mock 比較階段(見 ?navv 參數)。
  */
 export function OrbitNav({ onItemClick, shape }: OrbitNavProps) {
@@ -89,12 +88,11 @@ export function OrbitNav({ onItemClick, shape }: OrbitNavProps) {
     </button>
   );
 
-  /** 設定區(時段滑桿 + 在座顯示 + 來電開關) */
+  /** 設定區(時段滑桿 + 在座顯示) */
   const settings = (
     <div className="flex w-56 flex-col gap-2 rounded-2xl border border-ink-soft/15 bg-cream/95 p-2.5 shadow-lg backdrop-blur">
       <PhaseSlider className="border-0 bg-transparent p-0 shadow-none" />
       <div className="h-px bg-ink-soft/12" />
-      <RingToggle />
       <div className="px-2.5 pb-0.5">
         <PresenceChip />
       </div>
@@ -159,7 +157,6 @@ export function OrbitNav({ onItemClick, shape }: OrbitNavProps) {
             </div>
             <div className="mt-4 flex flex-col gap-2.5 border-t border-ink-soft/12 pt-4">
               <PhaseSlider className="border-0 bg-transparent p-0 shadow-none" />
-              <RingToggle />
               <div className="px-2.5">
                 <PresenceChip />
               </div>

@@ -37,17 +37,6 @@ interface Tooltip {
 }
 
 /**
- * 來電聲波圈的錨點 —— 由 phone 熱區的外接框中心推導(單一座標來源),
- * 不再另外手抄一組 cx/cy(舊值 cx=1313 cy=1028,推導後 ≈ 1313,1033,誤差在畫面上不可見)。
- */
-const phoneHotspot = HOTSPOTS.find((spot) => spot.id === "phone");
-const PHONE_BBOX = phoneHotspot ? hotspotBBox(phoneHotspot) : { x: 0, y: 0, w: 0, h: 0 };
-const PHONE_CENTER_X = PHONE_BBOX.x + PHONE_BBOX.w / 2;
-const PHONE_CENTER_Y = PHONE_BBOX.y + PHONE_BBOX.h / 2;
-/** 響鈴 emoji 顯示在聲波圈上方一點的位置(相對電話中心的偏移) */
-const RING_BELL_OFFSET_Y = -55;
-
-/**
  * 時段打光層 — 使用者提供的四張帶 alpha 漸層圖,整張壓在場景上;
  * 白天幾乎透明,夜晚是藍色調 + 檯燈位置的暖黃光暈。
  */
@@ -86,7 +75,6 @@ export function PhotoScene({
 }: PhotoSceneProps) {
   const phase = useEffectivePhase();
   const present = useSceneStore(selectIsOnline);
-  const phoneRinging = useSceneStore((s) => s.phoneRinging);
   const overlay = useSceneStore((s) => s.overlay);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredItem, setHoveredItem] = useState<ItemId | null>(null);
@@ -247,27 +235,6 @@ export function PhotoScene({
           role="group"
           aria-label="我的書桌"
         >
-          {/* 來電中:電話上冒出聲波圈(不吃事件,點擊仍落在電話熱區) */}
-          {phoneRinging && (
-            <g pointerEvents="none">
-              <circle cx={PHONE_CENTER_X} cy={PHONE_CENTER_Y} className="ring-pulse" />
-              <circle
-                cx={PHONE_CENTER_X}
-                cy={PHONE_CENTER_Y}
-                className="ring-pulse"
-                style={{ animationDelay: "0.55s" }}
-              />
-              <text
-                x={PHONE_CENTER_X}
-                y={PHONE_CENTER_Y + RING_BELL_OFFSET_Y}
-                textAnchor="middle"
-                fontSize={31}
-                className="ring-bell"
-              >
-                🔔
-              </text>
-            </g>
-          )}
           {HOTSPOTS.map((spot, i) => {
             const common = shapeProps(spot);
             // 只有「有功能」的熱區(ITEM_OVERLAY 非 null)才放圓圈提示,空物件不用騙人家可以點

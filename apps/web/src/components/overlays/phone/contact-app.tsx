@@ -7,16 +7,8 @@ import { gmailComposeUrl } from "@/lib/links";
 
 const GMAIL_COMPOSE = gmailComposeUrl("嗨 Tseng,從你的桌上看到你 👋");
 
-interface ContactAppProps {
-  headline?: string;
-  tagline?: string;
-}
-
-/** 手機裡的聯絡 App — 直接開 Gmail 撰寫視窗寄信給我。來電接聽後也用這頁(換標題)。 */
-export function ContactApp({
-  headline = "聊聊吧",
-  tagline = "不管是工作機會、專案合作,還是想交換歌單。",
-}: ContactAppProps) {
+/** 手機裡的聯絡 App — 直接開 Gmail 撰寫視窗寄信給我 */
+export function ContactApp() {
   const [copied, setCopied] = useState(false);
 
   const copyEmail = async () => {
@@ -34,8 +26,8 @@ export function ContactApp({
     <div className="flex h-full flex-col items-center justify-center gap-5 p-6 text-center text-white">
       <Mail className="size-12" strokeWidth={1.5} />
       <div>
-        <h2 className="text-lg font-bold">{headline}</h2>
-        <p className="mt-1 text-sm text-white/60">{tagline}</p>
+        <h2 className="text-lg font-bold">聊聊吧</h2>
+        <p className="mt-1 text-sm text-white/60">不管是工作機會、專案合作，還是想交換歌單。</p>
       </div>
 
       <a

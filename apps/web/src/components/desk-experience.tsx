@@ -9,20 +9,17 @@ import { MobileDock } from "@/components/mobile-dock";
 import { SceneHeader } from "@/components/scene-header";
 import { StatusBadge } from "@/components/status-badge";
 import { PhaseBadge } from "@/components/phase-badge";
-import { RingBadge } from "@/components/ring-badge";
 import { NightOwlToast } from "@/components/night-owl-toast";
 import { useSceneStore } from "@/stores/scene-store";
 import type { ItemId } from "@/lib/items";
 import { setupGsapTickerFallback } from "@/lib/gsap-setup";
 import { usePresenceCycle } from "@/hooks/use-presence";
-import { usePhoneRing } from "@/hooks/use-phone-ring";
 import { useSceneCamera } from "@/hooks/use-scene-camera";
 import { useItemClickRouter } from "@/hooks/use-item-click-router";
 import { useHotspotHint } from "@/hooks/use-hotspot-hint";
 import { useTitleEgg } from "@/hooks/use-title-egg";
 import { useMockVariant } from "@/lib/mock-variant";
 import { OrbitNav, type OrbitShape } from "@/components/nav/orbit-nav";
-import { useAlarmScheduler } from "@/hooks/use-alarm-scheduler";
 
 setupGsapTickerFallback();
 
@@ -41,8 +38,6 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
   const [wiggling, setWiggling] = useState<ItemId | null>(null);
 
   usePresenceCycle();
-  usePhoneRing();
-  useAlarmScheduler();
   useSceneCamera(stageRef);
   useTitleEgg();
   const handleItemClick = useItemClickRouter();
@@ -79,18 +74,17 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
         <SceneHeader onReplayHint={replayHint} />
 
       {/* 🧪 MOCK 導覽提案(?navv=)
-          未帶參數 / navv=0 → 原始版:右上角三顆藥丸 + 手機底部 dock(保留)
+          未帶參數 / navv=0 → 原始版:右上角兩顆藥丸 + 手機底部 dock(保留)
           navv=list|sheet → 圓形導覽鈕(收合時一顆圓,點開展開物件 + 設定),
-                            手機與桌機共用;上線改純顯示、來電收進選單 */}
+                            手機與桌機共用;上線改純顯示 */}
       {orbitShape ? (
         <OrbitNav onItemClick={handleItemClick} shape={orbitShape} />
       ) : (
         <>
-          {/* 右上角狀態膠囊:在線 / 時段 / 來電,共用一個容器定位 */}
+          {/* 右上角狀態膠囊:在線 / 時段,共用一個容器定位 */}
           <div className="fixed right-4 top-4 z-20 flex flex-col items-end gap-2 md:right-8 md:top-8">
             <StatusBadge />
             <PhaseBadge />
-            <RingBadge />
           </div>
           <MobileDock onItemClick={handleItemClick} />
         </>

@@ -1,18 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { User, Mail, AlarmClock, type LucideIcon } from "lucide-react";
+import { User, Mail, type LucideIcon } from "lucide-react";
 import { useSceneStore, type PhoneApp } from "@/stores/scene-store";
 import { OverlayShell } from "@/components/overlays/overlay-shell";
 import { ProfileApp } from "./profile-app";
 import { ContactApp } from "./contact-app";
-import { AlarmApp } from "./alarm-app";
-import { IncomingCallApp } from "./incoming-call-app";
 
 const APPS: { id: PhoneApp; label: string; Icon: LucideIcon; bg: string }[] = [
   { id: "profile", label: "Profile", Icon: User, bg: "from-accent to-[#5b7ea8]" },
   { id: "contact", label: "Mail", Icon: Mail, bg: "from-accent-soft to-[#b06a92]" },
-  { id: "alarm", label: "Alarm", Icon: AlarmClock, bg: "from-[#e9b44c] to-[#c98a2e]" },
 ];
 
 function useClock() {
@@ -24,9 +21,9 @@ function useClock() {
   return now.toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
-/** 點手機後飛到畫面中央的手機。點兩下場景中的手機會直接進鬧鐘。 */
+/** 點手機後飛到畫面中央的手機 */
 export function PhoneOverlay() {
-  // 只訂閱用到的三個欄位,不讓響鈴/在座狀態變動整支重繪
+  // 只訂閱用到的三個欄位,不讓在座狀態變動整支重繪
   const phoneApp = useSceneStore((s) => s.phoneApp);
   const setPhoneApp = useSceneStore((s) => s.setPhoneApp);
   const closeOverlay = useSceneStore((s) => s.closeOverlay);
@@ -65,15 +62,10 @@ export function PhoneOverlay() {
                   </button>
                 ))}
               </div>
-              <p className="mt-auto text-center text-[10px] text-white/25">
-                小秘密:在桌面上點手機兩下,會直接打開鬧鐘
-              </p>
             </div>
           )}
           {phoneApp === "profile" && <ProfileApp />}
           {phoneApp === "contact" && <ContactApp />}
-          {phoneApp === "alarm" && <AlarmApp />}
-          {phoneApp === "incoming" && <IncomingCallApp />}
         </div>
 
         {/* Home indicator:在 app 裡點回主畫面,在主畫面點關閉 */}

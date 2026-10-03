@@ -59,7 +59,7 @@ export const HOTSPOTS: Hotspot[] = [
     screenRect: { x: 933, y: 520, w: 165, h: 115 },
     slot: true,
   },
-  // 手機(桌上筆電左前)→ Profile / 鬧鐘(元素插槽)
+  // 手機(桌上筆電左前)→ Profile(元素插槽)
   { id: "phone", rect: { x: 872, y: 672, w: 92, h: 50 }, slot: true },
   // 斜靠鏡子的長板 → 彩蛋。畫面由 element-layers 的 DECOR 渲染(板尾被床蓋住,
   // 貼圖框與點擊範圍不同),這裡只是可點的板身多邊形,不掛 slot
