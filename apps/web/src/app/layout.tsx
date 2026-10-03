@@ -42,12 +42,11 @@ export const viewport: Viewport = {
 };
 
 /**
- * 🧪 MOCK:首頁進場動畫提案 `?introv=layers|title|title-layers`(站主保留分層長出與標題開場,可能串在一起)
- * 要在畫面畫出來之前就決定,不然場景會先出現、再突然消失重播(閃一下),
- * 所以在 <head> 裡同步讀網址,寫到 <html data-intro>,CSS 依這個屬性決定播哪一種
- * 選定後改成直接寫在 CSS,這段拿掉
+ * 首頁進場動畫:先蓋一層奶油色浮出「나의 공간」,淡出後家具一件件長出來
+ * 在 <head> 同步判斷再寫到 <html data-intro>,不然場景會先閃出來再被蓋住
+ * 只在首頁、同分頁第一次進來時播(播完就拿掉),減少動態時不播;網址帶 ?intro 可強制重播
  */
-const INTRO_SCRIPT = `try{var v=new URLSearchParams(location.search).get("introv");if(/^(layers|title|title-layers)$/.test(v||""))document.documentElement.dataset.intro=v}catch(e){}`;
+const INTRO_SCRIPT = `try{var d=document.documentElement,k="self-site:intro",f=new URLSearchParams(location.search).has("intro");if(location.pathname==="/"&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&(f||!sessionStorage.getItem(k))){d.dataset.intro="on";sessionStorage.setItem(k,"1");setTimeout(function(){delete d.dataset.intro},4500)}}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
