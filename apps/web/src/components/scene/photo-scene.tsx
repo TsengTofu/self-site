@@ -306,8 +306,8 @@ export function PhotoScene({
 
       </div>
 
-      {/* Hover 提示(桌機) */}
-      {tooltip && !overlay && (
+      {/* Hover 提示(桌機);換頁的物件(手機)已經有來信對話框,不再重複 */}
+      {tooltip && !overlay && !ITEM_LINK[tooltip.id] && (
         <div
           className="pointer-events-none fixed z-30 hidden -translate-x-1/2 -translate-y-full rounded-full border border-white/10 bg-[#141824]/95 px-3.5 py-1.5 text-xs text-white shadow-xl md:block"
           style={{ left: tooltip.x, top: tooltip.y - 10 }}

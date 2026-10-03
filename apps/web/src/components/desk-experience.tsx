@@ -7,8 +7,7 @@ import { MusicPlayer } from "@/components/music-player";
 import { ReactionToast } from "@/components/reaction-toast";
 import { MobileDock } from "@/components/mobile-dock";
 import { SceneHeader } from "@/components/scene-header";
-import { StatusBadge } from "@/components/status-badge";
-import { PhaseBadge } from "@/components/phase-badge";
+import { TopMenu } from "@/components/top-menu";
 import { NightOwlToast } from "@/components/night-owl-toast";
 import { useSceneStore } from "@/stores/scene-store";
 import type { ItemId } from "@/lib/items";
@@ -68,11 +67,8 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
 
         <SceneHeader />
 
-        {/* 右上角狀態膠囊:在線 / 時段,共用一個容器定位 */}
-        <div className="fixed right-4 top-4 z-20 flex flex-col items-end gap-2 md:right-8 md:top-8">
-          <StatusBadge />
-          <PhaseBadge />
-        </div>
+        {/* 右上角收合選單:在線狀態、時段、視覺製作歷程 */}
+        <TopMenu />
         <MobileDock onItemClick={handleItemClick} />
       </div>
 

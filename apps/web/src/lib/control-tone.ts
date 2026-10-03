@@ -20,6 +20,10 @@ export function useControlTone(): ControlTone {
 export const CONTROL_BASE =
   "inline-flex items-center gap-1.5 rounded-full border py-1.5 pl-2.5 pr-3 text-xs font-medium backdrop-blur-md transition duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-95";
 
+/** 只有圖示的圓形按鈕(右上選單裡用) */
+export const ROUND_BASE =
+  "relative grid size-10 place-items-center rounded-full border backdrop-blur-md transition duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-95";
+
 /** 各配色的底色與框線(文字顏色另外放,上線/離開要能蓋過去) */
 export const TONE_CLASS: Record<ControlTone, string> = {
   // 現行:奶油色實底,最清楚但也最搶眼

@@ -1,12 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { Palette } from "lucide-react";
 import { useEffectivePhase } from "@/hooks/use-time-of-day";
-import { CONTROL_BASE, TONE_CLASS, TONE_TEXT, useControlTone } from "@/lib/control-tone";
-
-/** 圖示滑過時往上跳一下,一看就知道可以點 */
-const LINK_ICON = "size-4 transition-transform duration-200 ease-out group-hover:-translate-y-px group-hover:-rotate-6";
 
 /** 標題字色跟著時段換:夜晚牆面很暗,改用淺色字,其他時段牆面夠亮,用深色字 */
 const TITLE_COLOR = {
@@ -15,15 +9,12 @@ const TITLE_COLOR = {
 };
 
 /**
- * 場景左上角標題:常駐顯示,不再 hover 才展開
- * 不加光暈也不加卡片底,字色跟著時段的牆面明暗切換
- * 履歷改從場景裡的手機進去,這裡只留視覺製作歷程
+ * 場景左上角標題:常駐顯示,不加光暈也不加卡片底,字色跟著時段的牆面明暗切換
+ * 履歷從場景裡的手機進去,視覺製作歷程收進右上角的選單
  */
 export function SceneHeader() {
-  const tone = useControlTone();
   const phase = useEffectivePhase();
   const color = phase === "night" ? TITLE_COLOR.dark : TITLE_COLOR.light;
-  const link = `group pointer-events-auto ${CONTROL_BASE} ${TONE_CLASS[tone]} ${TONE_TEXT[tone]}`;
 
   return (
     <header
@@ -39,13 +30,6 @@ export function SceneHeader() {
       >
         나의 공간
       </h1>
-
-      <nav aria-label="子頁面" className="mt-3 flex flex-wrap gap-2">
-        <Link href="/making-of" className={link}>
-          <Palette className={LINK_ICON} strokeWidth={2.1} aria-hidden />
-          視覺製作歷程
-        </Link>
-      </nav>
     </header>
   );
 }

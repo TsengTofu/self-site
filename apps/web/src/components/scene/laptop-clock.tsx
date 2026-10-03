@@ -17,9 +17,9 @@ const SCREEN_CORNERS = [
 /** 深色底往外多畫一點,邊緣藏在挖空版筆電圖(laptop-frame)的黑框底下,不會透白 */
 const BLEED = 5;
 
-/** 文字排版用的區域大小,再用仿射矩陣貼到螢幕上 */
-const BOX_W = 100;
-const BOX_H = 70;
+/** 日期與時間各自放在螢幕的哪個高度(0 = 上緣、1 = 下緣,指文字底線)與字級(底圖像素) */
+const DATE_LINE = { at: 0.31, size: 12 };
+const TIME_LINE = { at: 0.7, size: 40 };
 
 // 每 15 秒看一次時間,快照是「第幾分鐘」
 // 同一分鐘內值不變,所以只有換分鐘時才會重繪
@@ -61,15 +61,16 @@ export function LaptopClock({ rect, frameSrc }: LaptopClockProps) {
       return `${x + ((x - cx) / len) * BLEED},${y + ((y - cy) / len) * BLEED}`;
     })
     .join(" ");
-  // 用左上、右上、左下三個角算矩陣,右下角的透視誤差只有一兩個像素
-  const matrix = [
-    (tr[0] - tl[0]) / BOX_W,
-    (tr[1] - tl[1]) / BOX_W,
-    (bl[0] - tl[0]) / BOX_H,
-    (bl[1] - tl[1]) / BOX_H,
-    tl[0],
-    tl[1],
-  ].join(" ");
+  // 螢幕有一點透視,每一行各自算「這個高度上螢幕的左右兩端」,文字放在正中間
+  // 只跟著上緣轉一點角度,不做傾斜變形,日期和時間的中心才會對齊
+  const angle = (Math.atan2(tr[1] - tl[1], tr[0] - tl[0]) * 180) / Math.PI;
+  const lineAt = (v: number) => {
+    const lx = tl[0] + (bl[0] - tl[0]) * v;
+    const ly = tl[1] + (bl[1] - tl[1]) * v;
+    const rx = tr[0] + (br[0] - tr[0]) * v;
+    const ry = tr[1] + (br[1] - tr[1]) * v;
+    return `translate(${(lx + rx) / 2} ${(ly + ry) / 2}) rotate(${angle})`;
+  };
 
   const now = minute === null ? null : new Date(minute * 60_000);
   const time = now
@@ -89,11 +90,11 @@ export function LaptopClock({ rect, frameSrc }: LaptopClockProps) {
       <polygon points={points} fill="url(#laptop-wallpaper)" />
       <image href={frameSrc} x={rect.x} y={rect.y} width={rect.w} height={rect.h} preserveAspectRatio="none" />
       {now && (
-        <g transform={`matrix(${matrix})`} className="font-sans" fill="#fff">
-          <text x={BOX_W / 2} y={20} textAnchor="middle" fontSize={5.4} opacity={0.85} letterSpacing={0.2}>
+        <g className="font-sans" fill="#fff" textAnchor="middle">
+          <text transform={lineAt(DATE_LINE.at)} fontSize={DATE_LINE.size} fontWeight={500} opacity={0.88}>
             {date}
           </text>
-          <text x={BOX_W / 2} y={47} textAnchor="middle" fontSize={27} fontWeight={600}>
+          <text transform={lineAt(TIME_LINE.at)} fontSize={TIME_LINE.size} fontWeight={600}>
             {time}
           </text>
         </g>

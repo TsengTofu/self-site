@@ -142,6 +142,21 @@ body {
   }
 }
 
+/* ---------- 右上角選單(top-menu):展開時按鈕依序往下滑出 ---------- */
+@keyframes menu-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.menu-item-in {
+  animation: menu-item-in 0.2s ease-out both;
+}
+
 /* ---------- 手機上方的來信對話框(scene/letter-badge),顏色寫在元件的 SVG 屬性上 ---------- */
 .letter-float {
   filter: drop-shadow(0 4px 6px rgba(60, 40, 20, 0.22));
