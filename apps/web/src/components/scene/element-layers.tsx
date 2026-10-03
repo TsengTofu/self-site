@@ -202,12 +202,13 @@ export function ElementLayers({
             preserveAspectRatio="none"
           />
         );
+        // 筆電改用螢幕挖空的版本,底下墊深色螢幕、上面寫時間
+        // 包在同一個 g 裡,hover 發亮與點擊彈跳會一起動
+        const laptopClock = name === "laptop" && available.has("laptop-frame");
         return (
           <g key={name} className={className} style={style}>
             {ELEMENT_SHADOWS[name]?.map((sh, i) => <ContactShadow key={i} {...sh} />)}
-            {image}
-            {/* 筆電螢幕顯示現在時間,包在同一個 g 裡,hover 發亮與點擊彈跳會一起動 */}
-            {name === "laptop" && <LaptopClock rect={rect} />}
+            {laptopClock ? <LaptopClock rect={rect} frameSrc={elementSrc("laptop-frame")} /> : image}
           </g>
         );
       })}

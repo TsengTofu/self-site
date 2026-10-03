@@ -26,6 +26,7 @@
 | `backpack`    | 355, 205, 166, 315   |
 | `musicPlayer` | 760, 610, 112, 71    |
 | `laptop`      | 955, 512, 250, 176(螢幕縮放框 963, 520, 165, 115) |
+| `laptop-frame` | 同上(螢幕挖空版,`scripts/make-laptop-frame.py` 從 laptop.png 產生;網站實際顯示這張,底下墊時鐘畫面) |
 | `phone`       | 890, 646, 92, 50     |
 | `headphones`  | 1318, 852, 185, 125  |
 | `notebook`    | (這版構圖沒有,熱區關閉) |

@@ -14,6 +14,9 @@ const SCREEN_CORNERS = [
   [34, 246],
 ] as const;
 
+/** 深色底往外多畫一點,邊緣藏在挖空版筆電圖(laptop-frame)的黑框底下,不會透白 */
+const BLEED = 5;
+
 /** 文字排版用的區域大小,再用仿射矩陣貼到螢幕上 */
 const BOX_W = 100;
 const BOX_H = 70;
@@ -30,11 +33,17 @@ const getServerMinute = () => null;
 /** 日期用英文:Saturday, October 3 */
 const DATE_FORMAT = new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric" });
 
+interface LaptopClockProps {
+  rect: Rect;
+  /** 螢幕挖空的筆電圖;順序是 深色底 → 筆電 → 時間 */
+  frameSrc: string;
+}
+
 /**
  * 筆電螢幕的預設畫面:像鎖定畫面一樣顯示現在的日期和時間
  * 時間跟著訪客自己的時區;伺服器端不輸出文字,避免 hydration 對不上
  */
-export function LaptopClock({ rect }: { rect: Rect }) {
+export function LaptopClock({ rect, frameSrc }: LaptopClockProps) {
   const minute = useSyncExternalStore(subscribe, getMinute, getServerMinute);
 
   const toScene = ([x, y]: readonly [number, number]) =>
@@ -43,7 +52,15 @@ export function LaptopClock({ rect }: { rect: Rect }) {
   const tr = toScene(SCREEN_CORNERS[1]);
   const br = toScene(SCREEN_CORNERS[2]);
   const bl = toScene(SCREEN_CORNERS[3]);
-  const points = [tl, tr, br, bl].map((p) => p.join(",")).join(" ");
+  // 四個角各自往外推 BLEED(以螢幕中心為準),深色底比螢幕大一圈
+  const cx = (tl[0] + tr[0] + br[0] + bl[0]) / 4;
+  const cy = (tl[1] + tr[1] + br[1] + bl[1]) / 4;
+  const points = [tl, tr, br, bl]
+    .map(([x, y]) => {
+      const len = Math.hypot(x - cx, y - cy);
+      return `${x + ((x - cx) / len) * BLEED},${y + ((y - cy) / len) * BLEED}`;
+    })
+    .join(" ");
   // 用左上、右上、左下三個角算矩陣,右下角的透視誤差只有一兩個像素
   const matrix = [
     (tr[0] - tl[0]) / BOX_W,
@@ -70,6 +87,7 @@ export function LaptopClock({ rect }: { rect: Rect }) {
         </linearGradient>
       </defs>
       <polygon points={points} fill="url(#laptop-wallpaper)" />
+      <image href={frameSrc} x={rect.x} y={rect.y} width={rect.w} height={rect.h} preserveAspectRatio="none" />
       {now && (
         <g transform={`matrix(${matrix})`} className="font-sans" fill="#fff">
           <text x={BOX_W / 2} y={20} textAnchor="middle" fontSize={5.4} opacity={0.85} letterSpacing={0.2}>
