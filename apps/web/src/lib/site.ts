@@ -10,8 +10,8 @@ import type { Metadata } from "next";
  */
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
-export const SITE_NAME = "On My Desk";
-export const SITE_TITLE = "On My Desk — Tofu Tseng";
+export const SITE_NAME = "My Space";
+export const SITE_TITLE = "My Space — Tofu Tseng";
 export const SITE_DESCRIPTION = "互動式桌面場景個人網站：點點桌上的東西，認識我。";
 
 /** 分享卡片圖：三個頁面共用；尺寸與 alt 給齊，爬蟲就不用先抓圖 */

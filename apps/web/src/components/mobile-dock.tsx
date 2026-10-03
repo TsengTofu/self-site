@@ -25,9 +25,10 @@ export function MobileDock({ onItemClick }: MobileDockProps) {
   return (
     <nav
       aria-label="桌上的物件"
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-ink-soft/15 bg-cream/92 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden"
     >
-      <ul className="flex items-center gap-0.5 px-2 py-1.5">
+      {/* 浮在場景上的半透明膠囊:不再是一整條實心底,看得到後面的地板 */}
+      <ul className="flex items-center gap-0.5 rounded-2xl bg-cream/45 px-1.5 py-1 shadow-[0_4px_18px_rgba(60,40,20,.12)] ring-1 ring-white/50 backdrop-blur-md">
         {DOCK_ORDER.map((id) => {
           const meta = ITEMS[id];
           return (
@@ -36,9 +37,9 @@ export function MobileDock({ onItemClick }: MobileDockProps) {
                 type="button"
                 aria-label={meta.label}
                 onClick={(e) => onItemClick(id, e.currentTarget.getBoundingClientRect())}
-                className="grid h-11 w-full place-items-center rounded-xl text-[#5a4a3c] transition active:scale-90 active:bg-ink-soft/10"
+                className="grid h-11 w-full place-items-center rounded-xl text-ink-soft/85 transition active:scale-90 active:bg-ink-soft/10"
               >
-                <ItemIcon id={id} className="size-7" />
+                <ItemIcon id={id} className="size-6" />
               </button>
             </li>
           );

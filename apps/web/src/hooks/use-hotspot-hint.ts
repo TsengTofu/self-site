@@ -9,7 +9,7 @@ const HINT_DURATION_MS = 4000;
 /**
  * 首訪提示脈衝:第一次造訪、延遲 1.2s 後,讓場景裡「有功能」的熱區脈衝提示 4 秒
  * (告訴摸不到 hover 的觸控裝置使用者「這裡可以點」),之後寫入 localStorage 不再自動播放。
- * `replay` 給 SceneHeader 的 ✦ 按鈕隨時手動重播用。
+ * `replay` 留著給之後要手動重播的入口(標題旁的 ✦ 按鈕已拿掉)
  */
 export function useHotspotHint() {
   const [hinting, setHinting] = useState(false);

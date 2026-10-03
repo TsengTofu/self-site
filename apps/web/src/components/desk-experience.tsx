@@ -41,7 +41,7 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
   useSceneCamera(stageRef);
   useTitleEgg();
   const handleItemClick = useItemClickRouter();
-  const { hinting, replay: replayHint } = useHotspotHint();
+  const { hinting } = useHotspotHint();
   // 🧪 MOCK:導覽提案切換(?navv=list|sheet),無參數 / 0 = 原始版(右上角 + dock)
   const navv = useMockVariant("navv");
   const orbitShape = (["list", "sheet"] as const).includes(navv as OrbitShape)
@@ -71,7 +71,7 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
           />
         </div>
 
-        <SceneHeader onReplayHint={replayHint} />
+        <SceneHeader />
 
       {/* 🧪 MOCK 導覽提案(?navv=)
           未帶參數 / navv=0 → 原始版:右上角兩顆藥丸 + 手機底部 dock(保留)

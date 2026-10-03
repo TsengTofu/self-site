@@ -20,6 +20,14 @@
   --color-night: #1b2230; /* body 底 */
 }
 
+/* Tailwind v4 的 preflight 不再幫按鈕設手指游標,這裡統一補回來 */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+}
+
 /* 場景橫捲時的垂直拖曳不該觸發瀏覽器 pull-to-refresh / 回彈 */
 html,
 body {

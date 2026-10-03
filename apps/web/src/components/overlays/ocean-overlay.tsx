@@ -210,7 +210,7 @@ export function OceanOverlay() {
       {/* 提示 + 關閉 */}
       <div className="pointer-events-none absolute inset-x-0 bottom-6 flex flex-col items-center gap-1 text-center">
         <p className="text-sm text-white/90 drop-shadow">點點海面 · 看著浪發呆一下</p>
-        <p className="text-xs text-white/70 drop-shadow">按 ESC 回到房間</p>
+        <p className="hidden text-xs text-white/70 drop-shadow md:block">按 ESC 回到房間</p>
       </div>
       <button
         type="button"
