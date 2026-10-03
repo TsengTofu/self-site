@@ -87,7 +87,7 @@ export const ITEM_OVERLAY: Record<ItemId, OverlayKind | "player" | null> = {
   backpack: "books",
   notebook: "notebook",
   album: null,
-  skateboard: null, // 不開 overlay,噴漆轉場後換頁到 /skateboard(見 ITEM_PAGE)
+  skateboard: null, // 不開 overlay,播完轉場後換頁到 /skateboard(見 ITEM_PAGE)
   doll: null,
   bubbleTea: null,
   bookStack: null,
@@ -100,7 +100,7 @@ export const ITEM_LINK: Partial<Record<ItemId, string>> = {
   phone: "/resume",
 };
 
-/** 點了先播一段轉場再換頁的物件:滑板 = 噴漆噴滿畫面,再到風格不一樣的滑板頁 */
+/** 點了先播一段轉場再換頁的物件:滑板 = 板子飛起來、把畫面刷成紙,再到風格不一樣的滑板頁 */
 export const ITEM_PAGE: Partial<Record<ItemId, string>> = {
   skateboard: "/skateboard",
 };

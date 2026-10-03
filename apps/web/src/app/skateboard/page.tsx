@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   ...shareMeta(TITLE, DESCRIPTION, "website"),
 };
 
-/** 滑板頁:從房間點滑板,噴漆噴滿畫面後進來 */
+/** 滑板頁:從房間點滑板,板子飛起來、把畫面刷成紙後進來 */
 export default function SkateboardPage() {
   return (
     <div className={sprayPaint.variable}>

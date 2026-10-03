@@ -22,7 +22,7 @@ function SectionTitle({ en, title, color }: { en: string; title: string; color: 
 
 /**
  * 滑板頁:跟房間的奶油色完全不同,走柏油地、噴漆、貼紙的街頭感
- * 從房間點滑板會先噴滿漆再進來(components/spray-transition.tsx),底色跟噴漆的底色一樣
+ * 從房間點滑板會先播一段轉場再進來(components/skate-transition.tsx)
  * 內容都從 data/skate.ts 傳進來
  */
 export function SkateView({ data }: { data: SkateContent }) {
