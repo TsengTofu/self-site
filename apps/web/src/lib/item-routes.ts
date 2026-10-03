@@ -9,11 +9,11 @@ import type { PlayerMode } from "@/stores/scene-store";
  */
 export const ITEM_ROUTES = {
   projects: { item: "laptop", title: "我的專案", description: "我做過的專案，有些可以直接在這裡點開來玩。" },
-  music: { item: "headphones", title: "上班歌單", description: "我上班時在聽的歌。" },
-  books: { item: "backpack", title: "最近讀的書", description: "背包裡最近在讀的書。" },
+  music: { item: "headphones", title: "我在聽什麼", description: "最近在聽的歌。" },
+  books: { item: "backpack", title: "人生指南", description: "最近讀過、喜歡到想推薦的書。" },
   notes: { item: "notebook", title: "喜歡的句子", description: "筆記本裡抄下來的句子。" },
   ocean: { item: "window", title: "窗外的海", description: "看著浪發呆一下。" },
-  skateboard: { item: "skateboard", title: "滑板", description: "靠在鏡子旁的長板。" },
+  skateboard: { item: "skateboard", title: "自由的味道", description: "靠在鏡子旁的長板，這格還在想要放什麼。" },
 } as const satisfies Record<string, { item: ItemId; title: string; description: string }>;
 
 export type ItemRoute = keyof typeof ITEM_ROUTES;

@@ -10,15 +10,13 @@ interface BadgePillProps {
   children: ReactNode;
   /** 二態開關才給(aria-pressed);循環切換模式的不用 */
   pressed?: boolean;
-  /** 換掉預設的文字顏色(例如離開橘) */
-  textClassName?: string;
 }
 
 /**
  * 右上選單裡的圓形按鈕:畫面上只有圖示,說明放在 aria-label,
  * 桌機滑過時在左邊冒出一小段文字
  */
-export function BadgePill({ onClick, label, children, pressed, textClassName }: BadgePillProps) {
+export function BadgePill({ onClick, label, children, pressed }: BadgePillProps) {
   const tone = useControlTone();
   return (
     <button
@@ -26,7 +24,7 @@ export function BadgePill({ onClick, label, children, pressed, textClassName }: 
       onClick={onClick}
       aria-label={label}
       aria-pressed={pressed}
-      className={`group ${ROUND_BASE} ${TONE_CLASS[tone]} ${textClassName ?? TONE_TEXT[tone]}`}
+      className={`group ${ROUND_BASE} ${TONE_CLASS[tone]} ${TONE_TEXT[tone]}`}
     >
       {children}
       <HoverLabel>{label}</HoverLabel>

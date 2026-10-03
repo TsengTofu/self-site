@@ -89,12 +89,13 @@ export function LaptopClock({ rect, frameSrc }: LaptopClockProps) {
       </defs>
       <polygon points={points} fill="url(#laptop-wallpaper)" />
       <image href={frameSrc} x={rect.x} y={rect.y} width={rect.w} height={rect.h} preserveAspectRatio="none" />
+      {/* 字色壓淡一點,跟深色螢幕融在一起,不會白得刺眼 */}
       {now && (
-        <g className="font-sans" fill="#fff" textAnchor="middle">
-          <text transform={lineAt(DATE_LINE.at)} fontSize={DATE_LINE.size} fontWeight={500} opacity={0.88}>
+        <g className="font-sans" fill="#dfe5f2" textAnchor="middle">
+          <text transform={lineAt(DATE_LINE.at)} fontSize={DATE_LINE.size} fontWeight={500} opacity={0.6}>
             {date}
           </text>
-          <text transform={lineAt(TIME_LINE.at)} fontSize={TIME_LINE.size} fontWeight={600}>
+          <text transform={lineAt(TIME_LINE.at)} fontSize={TIME_LINE.size} fontWeight={600} opacity={0.78}>
             {time}
           </text>
         </g>

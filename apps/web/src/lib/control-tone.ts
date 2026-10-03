@@ -39,9 +39,3 @@ export const TONE_TEXT: Record<ControlTone, string> = {
   wall: "text-ink-soft hover:text-ink",
   ink: "text-cream",
 };
-
-/** 上線/離開的顏色;深色底要用亮一點的版本 */
-export function presenceColor(tone: ControlTone, online: boolean) {
-  if (tone === "ink") return online ? "text-[#a6e0b4]" : "text-[#f2cb8f]";
-  return online ? "text-[#3d8a52]" : "text-[#b0742c]";
-}

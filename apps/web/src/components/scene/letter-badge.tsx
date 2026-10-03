@@ -1,5 +1,4 @@
 import { Mail } from "lucide-react";
-import type { MouseEvent } from "react";
 
 /** 對話框本體的大小(底圖像素),只放一個信封,做成圓角小方塊 */
 const W = 44;
@@ -19,22 +18,26 @@ interface LetterBadgeProps {
   y: number;
   /** 滑過手機時放大一點 */
   active: boolean;
-  onClick: (e: MouseEvent<SVGGElement>) => void;
+}
+
+/** 對話框佔的範圍(含尾巴、上下浮動的幅度),熱區那層用它放一塊透明的點擊範圍 */
+export function letterBadgeBox(x: number, y: number) {
+  return { x: x - W / 2 - 2, y: y - TAIL - H - 8, w: W + 4, h: H + TAIL + 10 };
 }
 
 /**
  * 手機上方的「來信」對話框:信封 + 未讀紅點,輕輕上下浮動
- * 一眼就知道點手機是看履歷;畫在打光層上面,夜晚也看得清楚
- * 鍵盤使用者走手機本身的熱區,這裡只給滑鼠和觸控點
+ * 一眼就知道點手機是看履歷;畫在打光層下面,夜晚跟場景一起變暗
+ * 這裡只負責畫,點擊範圍在熱區那層(見 letterBadgeBox),不然會被上層的窗戶熱區擋住
  */
-export function LetterBadge({ x, y, active, onClick }: LetterBadgeProps) {
+export function LetterBadge({ x, y, active }: LetterBadgeProps) {
   // 尾巴在對話框正中間
   const left = x - W / 2;
   const top = y - TAIL - H;
   const tail = `M ${x - 7} ${top + H - 1} L ${x} ${y} L ${x + 7} ${top + H - 1} Z`;
 
   return (
-    <g aria-hidden className="letter-float cursor-pointer" onClick={onClick}>
+    <g aria-hidden className="letter-float">
       <g className={`letter-badge ${active ? "letter-badge-active" : ""}`} style={{ transformOrigin: `${x}px ${y}px` }}>
         <rect x={left} y={top} width={W} height={H} rx={12} {...BODY} />
         <path d={tail} {...BODY} />

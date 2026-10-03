@@ -15,13 +15,13 @@ const DOCK_GROUPS: ItemId[][] = [
 const DOCK_LABEL: Partial<Record<ItemId, string>> = {
   phone: "手機・我的履歷",
   laptop: "電腦・我的專案",
-  headphones: "耳機・上班歌單",
-  backpack: "背包・最近讀的書",
+  headphones: "耳機・我在聽什麼",
+  backpack: "背包・人生指南",
   notebook: "筆記本・喜歡的句子",
-  skateboard: "滑板・？？？",
+  skateboard: "滑板・自由的味道",
   window: "海景・看向大海",
   bookStack: "書架・最近的心頭好",
-  poster: "海報・牆上的本命",
+  poster: "海報・WHO'S THERE?BOYNEXTDOOR",
 };
 
 /** 按住超過這個時間才浮起,手指只是滑過去找 icon 時不會一直跳 */

@@ -12,7 +12,7 @@ import { useSceneStore, selectIsOnline } from "@/stores/scene-store";
 /**
  * 右上角的收合選單:平常只有一顆圓鈕,點開往下展開
  * 在線狀態、時段、視覺製作歷程三顆圖示按鈕
- * 收合時如果在線,圓鈕角落留一顆綠點,不用打開也看得到狀態
+ * 收合時圓鈕角落留一顆狀態點(在線綠、離開灰),不用打開也看得到
  */
 export function TopMenu() {
   const [open, setOpen] = useState(false);
@@ -55,10 +55,14 @@ export function TopMenu() {
         ) : (
           <Menu className="size-[18px]" strokeWidth={2.1} aria-hidden />
         )}
-        {!open && online && (
+        {!open && (
           <span aria-hidden className="absolute right-0.5 top-0.5 flex size-2.5">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#5fae74] opacity-60" />
-            <span className="relative inline-flex size-2.5 rounded-full border border-cream bg-[#4ba05f]" />
+            {online && (
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#5fae74] opacity-60" />
+            )}
+            <span
+              className={`relative inline-flex size-2.5 rounded-full border border-cream ${online ? "bg-[#4ba05f]" : "bg-[#a39a91]"}`}
+            />
           </span>
         )}
       </button>
