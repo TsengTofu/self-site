@@ -3,7 +3,7 @@
 import { useMockVariant } from "@/lib/mock-variant";
 
 /**
- * 🧪 MOCK:左上子頁按鈕與右上狀態膠囊的配色提案
+ * 🧪 MOCK:右上角選單按鈕的配色提案
  * `?btnv=glass|wall|ink`,沒帶參數 = 現行的奶油色
  * 選定之後把選中的那組留下,這個檔案和 btnv key 一起拿掉
  */
@@ -15,10 +15,6 @@ export function useControlTone(): ControlTone {
   const v = useMockVariant("btnv");
   return TONES.find((t) => t === v) ?? "cream";
 }
-
-/** 膠囊共用的形狀與動態(滑過浮起、按下回彈) */
-export const CONTROL_BASE =
-  "inline-flex items-center gap-1.5 rounded-full border py-1.5 pl-2.5 pr-3 text-xs font-medium backdrop-blur-md transition duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-95";
 
 /** 只有圖示的圓形按鈕(右上選單裡用) */
 export const ROUND_BASE =
