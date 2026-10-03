@@ -1,18 +1,41 @@
 "use client";
 
 import { useMockVariant } from "@/lib/mock-variant";
+import { useEffectivePhase, type DayPhase } from "@/hooks/use-time-of-day";
 
 /**
- * 🧪 MOCK:右上角選單按鈕的配色提案
- * `?btnv=glass|wall|ink`,沒帶參數 = 現行的奶油色
+ * 🧪 MOCK:右上角選單按鈕的配色提案,沒帶參數 = 現行的奶油色
+ * `?btnv=glass|wall|ink|sage|clay|sea|blush|outline|sticker|phase`
+ * phase 不是固定顏色,會跟著時段換(清晨粉、白天奶油、黃昏陶土、夜晚深色)
  * 選定之後把選中的那組留下,這個檔案和 btnv key 一起拿掉
  */
-export type ControlTone = "cream" | "glass" | "wall" | "ink";
+export type ControlTone =
+  "cream" | "glass" | "wall" | "ink" | "sage" | "clay" | "sea" | "blush" | "outline" | "sticker";
 
-const TONES: readonly ControlTone[] = ["glass", "wall", "ink"];
+const TONES: readonly ControlTone[] = [
+  "glass",
+  "wall",
+  "ink",
+  "sage",
+  "clay",
+  "sea",
+  "blush",
+  "outline",
+  "sticker",
+];
+
+/** btnv=phase 時,各時段用哪一組 */
+const PHASE_TONE: Record<DayPhase, ControlTone> = {
+  dawn: "blush",
+  day: "cream",
+  sunset: "clay",
+  night: "ink",
+};
 
 export function useControlTone(): ControlTone {
   const v = useMockVariant("btnv");
+  const phase = useEffectivePhase();
+  if (v === "phase") return PHASE_TONE[phase];
   return TONES.find((t) => t === v) ?? "cream";
 }
 
@@ -30,6 +53,19 @@ export const TONE_CLASS: Record<ControlTone, string> = {
   wall: "border-[#d6c3a9]/80 bg-[#eee2d1]/80 hover:bg-[#eee2d1]",
   // 深色:小而清楚,夜景裡也讀得到
   ink: "border-transparent bg-[#3a2e24]/70 shadow-sm hover:bg-[#3a2e24]/85",
+  // 鼠尾草綠:取自背包和床單,跟房間同色系但比奶油色清楚
+  sage: "border-[#6f7f62]/40 bg-[#8a9a7b]/85 shadow-sm hover:bg-[#8a9a7b]",
+  // 陶土色:取自盆栽,暖色、在牆上最跳
+  clay: "border-[#a85f42]/40 bg-[#c97b5a]/85 shadow-sm hover:bg-[#c97b5a]",
+  // 海藍:取自窗外的海,跟暖色牆面對比
+  sea: "border-[#3f7590]/40 bg-[#5b8fa8]/80 shadow-sm hover:bg-[#5b8fa8]",
+  // 清晨粉:柔和、存在感低,但比牆面色好認
+  blush: "border-[#e2b7b0]/70 bg-[#f6dcd5]/85 shadow-sm hover:bg-[#f6dcd5]",
+  // 只有線條:跟插畫的描線一樣,不加底色
+  outline: "border-ink/60 bg-transparent hover:bg-ink/5",
+  // 貼紙:白底黑框加實心陰影,像手繪貼紙
+  sticker:
+    "border-ink/80 bg-[#fffaf0] shadow-[2px_2px_0_rgba(62,50,38,0.85)] hover:shadow-[3px_3px_0_rgba(62,50,38,0.85)]",
 };
 
 /** 各配色的預設文字顏色 */
@@ -38,4 +74,10 @@ export const TONE_TEXT: Record<ControlTone, string> = {
   glass: "text-ink",
   wall: "text-ink-soft hover:text-ink",
   ink: "text-cream",
+  sage: "text-cream",
+  clay: "text-cream",
+  sea: "text-white",
+  blush: "text-ink",
+  outline: "text-ink",
+  sticker: "text-ink",
 };

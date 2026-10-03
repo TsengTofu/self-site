@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 
 /**
  * 🧪 MOCK 專用：讀網址參數切換設計提案。
- * - `?btnv=glass|wall|ink` 右上選單按鈕的配色（見 lib/control-tone）
+ * - `?btnv=glass|wall|ink|sage|clay|sea|blush|outline|sticker|phase` 右上選單按鈕的配色（見 lib/control-tone）
  * - `?headerv=back|nav|crumb` 入口以外頁面的 header（見 components/site-header）
  *
  * 沒帶參數 = 正式現狀，畫面零改變。

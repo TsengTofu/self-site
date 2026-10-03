@@ -21,8 +21,10 @@ import { MetricIconView, SkillLogo } from "./resume-icons";
 import { RoleBlock } from "./role-block";
 
 /** 按鈕滑過時微微浮起,按下回彈 */
-const LIFT = "transition duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]";
-const ARROW = "size-4 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5";
+const LIFT =
+  "transition duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]";
+const ARROW =
+  "size-4 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5";
 const CARD = "rounded-2xl border border-ink-soft/10 bg-white/60";
 const CHIP = "rounded-full bg-ink-soft/[0.07] px-2.5 py-1 text-[11px] font-medium text-ink-soft";
 
@@ -88,7 +90,10 @@ function TopBar({ profile, lang, t }: { profile: Profile; lang: ResumeLang; t: R
 /** 右上角的語言切換:中文 /resume、英文 /resume/en、韓文 /resume/ko */
 function LangSwitch({ lang, label }: { lang: ResumeLang; label: string }) {
   return (
-    <nav aria-label={label} className="flex rounded-full border border-ink-soft/20 bg-white/60 p-0.5 text-xs font-medium">
+    <nav
+      aria-label={label}
+      className="flex rounded-full border border-ink-soft/20 bg-white/60 p-0.5 text-xs font-medium"
+    >
       {(Object.keys(RESUME_LANGS) as ResumeLang[]).map((key) => (
         <Link
           key={key}
@@ -253,7 +258,9 @@ function RoleHeader({ exp, t }: { exp: Experience; t: ResumeCopy }) {
   const dim = "group-data-[open=false]/role:text-ink-dim/70";
   return (
     <>
-      <span className={`flex flex-wrap items-center gap-2 text-xs font-semibold tabular-nums text-ink-dim ${dim}`}>
+      <span
+        className={`flex flex-wrap items-center gap-2 text-xs font-semibold tabular-nums text-ink-dim ${dim}`}
+      >
         {periodOf(exp, t.present)}
         {current && (
           <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold tracking-wider text-white">
@@ -286,7 +293,10 @@ function RoleBody({ exp, t, colon }: { exp: Experience; t: ResumeCopy; colon: st
           >
             <span className="group-open:hidden">{t.more}</span>
             <span className="hidden group-open:inline">{t.less}</span>
-            <ChevronDown className="size-3.5 transition-transform group-open:rotate-180" aria-hidden />
+            <ChevronDown
+              className="size-3.5 transition-transform group-open:rotate-180"
+              aria-hidden
+            />
           </summary>
 
           <div className="mt-2">
@@ -297,8 +307,12 @@ function RoleBody({ exp, t, colon }: { exp: Experience; t: ResumeCopy; colon: st
                 {exp.groups.map((g) => (
                   <div key={g.title} className={`${CARD} p-4 md:p-5`}>
                     <h4 className="text-sm font-bold text-ink">{g.title}</h4>
-                    {g.stack && <p className="mt-1 text-[11px] text-ink-dim">{g.stack.join("・")}</p>}
-                    {g.intro && <p className="mt-2 text-sm leading-relaxed text-ink-soft">{g.intro}</p>}
+                    {g.stack && (
+                      <p className="mt-1 text-[11px] text-ink-dim">{g.stack.join("・")}</p>
+                    )}
+                    {g.intro && (
+                      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{g.intro}</p>
+                    )}
                     {g.bullets && <BulletList items={g.bullets} colon={colon} />}
                   </div>
                 ))}
@@ -336,30 +350,23 @@ function RoleDot({ current }: { current: boolean }) {
   );
 }
 
-/** 版型一:直式時間軸,技能標籤跟內容都在職稱下面 */
-function TimelineItem({ exp, last, t, colon }: { exp: Experience; last: boolean; t: ResumeCopy; colon: string }) {
-  return (
-    <li className="relative pb-10 pl-8 last:pb-0 md:pl-10">
-      {/* 時間軸的線,最後一段不往下畫 */}
-      {!last && <span aria-hidden className="absolute -bottom-1 left-[7px] top-6 w-px bg-ink-soft/20" />}
-      <RoleBlock
-        collapsible={!exp.featured}
-        dot={<RoleDot current={!exp.end} />}
-        header={<RoleHeader exp={exp} t={t} />}
-      >
-        {/* 技術標籤緊跟在職稱下面,一眼看出這份工作用什麼 */}
-        <StackChips stack={exp.stack} />
-        <RoleBody exp={exp} t={t} colon={colon} />
-      </RoleBlock>
-    </li>
-  );
-}
-
-/** 版型二:左欄放期間、職稱與重點技能,右欄只放描述跟數字卡片 */
-function SplitItem({ exp, last, t, colon }: { exp: Experience; last: boolean; t: ResumeCopy; colon: string }) {
+/** 一段經歷:左欄放期間、職稱與重點技能,右欄只放描述跟數字卡片 */
+function ExperienceItem({
+  exp,
+  last,
+  t,
+  colon,
+}: {
+  exp: Experience;
+  last: boolean;
+  t: ResumeCopy;
+  colon: string;
+}) {
   return (
     <li className="relative pb-10 last:pb-0">
-      {!last && <span aria-hidden className="absolute -bottom-1 left-[7px] top-6 w-px bg-ink-soft/20" />}
+      {!last && (
+        <span aria-hidden className="absolute -bottom-1 left-[7px] top-6 w-px bg-ink-soft/20" />
+      )}
       <RoleBlock
         collapsible={!exp.featured}
         className="grid gap-x-10 md:grid-cols-[240px_minmax(0,1fr)]"
@@ -394,27 +401,15 @@ function SkillsSpec({ groups }: { groups: readonly SkillGroup[] }) {
   );
 }
 
-/** 經歷的排版:timeline = 直式時間軸(預設);split = 左欄職稱與技能、右欄描述與卡片 */
-export type ExperienceLayout = "timeline" | "split";
-
 /**
  * 正式履歷:聯絡資訊放最上面,接著經歷、技能、教學與學歷
  * 畫面只吃傳進來的資料(來源見 data/resume/index.ts 的 getResume),不寫死任何內容
  * 重點經歷(featured)一直展開,其他的先收合成灰色,點了才打開
  */
-export function ResumeView({
-  data,
-  lang,
-  layout = "timeline",
-}: {
-  data: Resume;
-  lang: ResumeLang;
-  layout?: ExperienceLayout;
-}) {
+export function ResumeView({ data, lang }: { data: Resume; lang: ResumeLang }) {
   const t = RESUME_UI[lang];
   const colon = lang === "zh" ? "：" : ": ";
   const { profile, experiences, education } = data;
-  const Item = layout === "split" ? SplitItem : TimelineItem;
 
   return (
     <main lang={RESUME_LANGS[lang].htmlLang} className="min-h-dvh bg-cream text-ink print:bg-white">
@@ -432,15 +427,24 @@ export function ResumeView({
               <span>{profile.nameZh}</span>
             </h1>
             <p className="mt-4 text-base font-medium text-ink md:text-lg">{profile.headline}</p>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-soft md:text-[15px]">{profile.summary}</p>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-soft md:text-[15px]">
+              {profile.summary}
+            </p>
           </div>
           <ContactCard profile={profile} t={t} />
         </section>
 
-        <Section en="EXPERIENCE" title={t.experience} stacked={layout === "split"}>
+        {/* 經歷的左欄要給職稱與技能用,區塊標題改放上面整排 */}
+        <Section en="EXPERIENCE" title={t.experience} stacked>
           <ol>
             {experiences.map((exp, i) => (
-              <Item key={exp.id} exp={exp} last={i === experiences.length - 1} t={t} colon={colon} />
+              <ExperienceItem
+                key={exp.id}
+                exp={exp}
+                last={i === experiences.length - 1}
+                t={t}
+                colon={colon}
+              />
             ))}
           </ol>
         </Section>
@@ -452,7 +456,10 @@ export function ResumeView({
         <Section en="TEACHING" title={t.teaching}>
           <ul className="grid gap-3 sm:grid-cols-2">
             {data.teaching.map((item) => (
-              <li key={item.title} className={`${CARD} p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-sm md:p-5`}>
+              <li
+                key={item.title}
+                className={`${CARD} p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-sm md:p-5`}
+              >
                 <p className="text-2xl font-bold text-ink">{item.value}</p>
                 <h3 className="mt-1 text-sm font-bold text-ink">{item.title}</h3>
                 <p className="mt-1 text-sm leading-relaxed text-ink-soft">{item.desc}</p>
@@ -462,7 +469,9 @@ export function ResumeView({
         </Section>
 
         <Section en="EDUCATION" title={t.education}>
-          <p className="text-xs font-semibold tabular-nums text-ink-dim">{periodOf(education, t.present)}</p>
+          <p className="text-xs font-semibold tabular-nums text-ink-dim">
+            {periodOf(education, t.present)}
+          </p>
           <p className="mt-1 text-base font-bold text-ink">
             {education.school}
             <span className="ml-2 font-normal text-ink-soft">{education.dept}</span>
@@ -470,7 +479,9 @@ export function ResumeView({
           <ul className="mt-8 flex flex-col gap-5">
             {data.certificates.map((c) => (
               <li key={c.title}>
-                {c.date && <p className="text-xs font-semibold tabular-nums text-ink-dim">{c.date}</p>}
+                {c.date && (
+                  <p className="text-xs font-semibold tabular-nums text-ink-dim">{c.date}</p>
+                )}
                 <p className="mt-1 text-sm font-bold text-ink">{c.title}</p>
                 {c.desc && <p className="mt-0.5 text-sm text-ink-soft">{c.desc}</p>}
               </li>
