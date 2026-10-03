@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import type { ItemId } from "@/lib/items";
 
-/** 筆觸比 Lucide 預設的 2 細一點,跟手繪插畫比較搭 */
-const STROKE = 1.75;
+/** 筆觸跟 Lucide 預設一樣用 2,太細在手機上看起來會發虛 */
+const STROKE = 2;
 
 /** Lucide 沒有滑板,照它的規格(24×24、圓角端點、同筆觸)自己畫一個 */
 function SkateboardIcon(props: LucideProps) {

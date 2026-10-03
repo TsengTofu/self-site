@@ -1,49 +1,49 @@
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+"use client";
 
-/** 子頁按鈕:跟右上角狀態膠囊同一套外觀;滑過時微微浮起、箭頭往右上推,一看就知道會帶你去別頁 */
-const PAGE_LINK =
-  "group pointer-events-auto inline-flex items-center gap-1 rounded-full border border-ink-soft/20 bg-cream/90 py-1 pl-3 pr-2.5 text-xs font-medium text-ink shadow-sm backdrop-blur transition duration-200 ease-out hover:-translate-y-0.5 hover:bg-cream hover:shadow-md active:translate-y-0 active:scale-95";
-const PAGE_LINK_ARROW =
-  "size-3.5 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5";
+import Link from "next/link";
+import { Palette } from "lucide-react";
+import { useEffectivePhase } from "@/hooks/use-time-of-day";
+import { CONTROL_BASE, TONE_CLASS, TONE_TEXT, useControlTone } from "@/lib/control-tone";
+
+/** 圖示滑過時往上跳一下,一看就知道可以點 */
+const LINK_ICON = "size-4 transition-transform duration-200 ease-out group-hover:-translate-y-px group-hover:-rotate-6";
+
+/** 標題字色跟著時段換:夜晚牆面很暗,改用淺色字,其他時段牆面夠亮,用深色字 */
+const TITLE_COLOR = {
+  light: { eyebrow: "text-[#6d5843]", title: "text-[#33271c]" },
+  dark: { eyebrow: "text-[#d3c5b2]", title: "text-[#f5ede1]" },
+};
 
 /**
  * 場景左上角標題:常駐顯示,不再 hover 才展開
- * 左上角是淺色牆面,深色字直接放上去就讀得清楚,不加光暈也不加卡片底
- * 子頁做成按鈕,桌機手機都看得到
+ * 不加光暈也不加卡片底,字色跟著時段的牆面明暗切換
+ * 履歷改從場景裡的手機進去,這裡只留視覺製作歷程
  */
 export function SceneHeader() {
+  const tone = useControlTone();
+  const phase = useEffectivePhase();
+  const color = phase === "night" ? TITLE_COLOR.dark : TITLE_COLOR.light;
+  const link = `group pointer-events-auto ${CONTROL_BASE} ${TONE_CLASS[tone]} ${TONE_TEXT[tone]}`;
+
   return (
     <header
       className="rise-in pointer-events-none absolute left-4 top-4 z-20 select-none md:left-7 md:top-6"
       style={{ animationDelay: "0.45s" }}
     >
-      <p className="text-[10px] font-bold tracking-[0.35em] text-[#6d5843]">MY SPACE</p>
-      <h1 className="font-hand mt-0.5 text-2xl text-[#33271c] md:text-3xl">
+      <p className={`text-[10px] font-bold tracking-[0.35em] transition-colors duration-1000 ${color.eyebrow}`}>
+        MY SPACE
+      </p>
+      {/* Gowun Dodum 只有一種字重,加一點同色描邊讓它粗一些,字形不會走樣 */}
+      <h1
+        className={`font-hand mt-0.5 text-2xl transition-colors duration-1000 [-webkit-text-stroke:0.6px_currentColor] md:text-3xl ${color.title}`}
+      >
         나의 공간
       </h1>
 
-      {/* 手繪感的波浪底線 */}
-      <svg viewBox="0 0 220 10" className="-mt-0.5 h-2.5 w-32 text-[#d98f4e] md:w-36" aria-hidden>
-        <path
-          d="M3 6 Q 20 1 38 5 T 74 5 T 110 5 T 146 5 T 182 5 T 217 4"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          opacity="0.85"
-        />
-      </svg>
-      <p className="mt-1.5 text-[11px] font-semibold text-[#4a3a2c] md:text-xs">試著與空間互動吧！</p>
-
-      <nav aria-label="子頁面" className="mt-2.5 flex flex-wrap gap-2">
-        <Link href="/resume" className={PAGE_LINK}>
-          履歷
-          <ArrowUpRight className={PAGE_LINK_ARROW} strokeWidth={2} aria-hidden />
-        </Link>
-        <Link href="/making-of" className={PAGE_LINK}>
+      <nav aria-label="子頁面" className="mt-3 flex flex-wrap gap-2">
+        <Link href="/making-of" className={link}>
+          <Palette className={LINK_ICON} strokeWidth={2.1} aria-hidden />
           視覺製作歷程
-          <ArrowUpRight className={PAGE_LINK_ARROW} strokeWidth={2} aria-hidden />
         </Link>
       </nav>
     </header>

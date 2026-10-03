@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ITEMS, type ItemId } from "@/lib/items";
 import { useSceneStore } from "@/stores/scene-store";
 import { prefersReducedMotion } from "@/lib/motion";
+import { TOAST_BOTTOM } from "@/lib/toast";
 
 /** 第幾次點擊會換成 snark[0] / snark[1](其餘次數顯示一般 hint) */
 const SNARK_AT = [3, 10] as const;
@@ -56,10 +57,9 @@ export function ReactionToast() {
       ref={ref}
       role="status"
       aria-live="polite"
-      className="fixed bottom-24 left-1/2 z-40 -translate-x-1/2 rounded-full border border-white/10 bg-panel/95 px-5 py-2.5 text-sm text-white shadow-2xl backdrop-blur md:bottom-8"
+      className={`fixed left-1/2 z-40 w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-full border border-white/10 bg-panel/95 px-5 py-2.5 text-center text-sm text-white shadow-2xl backdrop-blur ${TOAST_BOTTOM}`}
     >
-      <span className="mr-1.5">{meta.emoji}</span>
-      {meta.label}:{message} ✨
+      {meta.label}：{message}
     </div>
   );
 }

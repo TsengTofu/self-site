@@ -1,8 +1,6 @@
 import { create } from "zustand";
 import { ITEM_OVERLAY, type ItemId, type OverlayKind } from "@/lib/items";
 
-export type PhoneApp = "home" | "profile" | "contact";
-
 /** 右上角狀態:auto = 跟著場景裡的女生;online / away = 手動固定 */
 export type PresenceMode = "auto" | "online" | "away";
 
@@ -21,8 +19,6 @@ export type PlayerMode = "hidden" | "expanded" | "mini";
 interface SceneState {
   /** 目前開啟的 overlay */
   overlay: OverlayKind | null;
-  /** 手機內目前開啟的 app */
-  phoneApp: PhoneApp;
   /** 觸發 overlay 的物件在視窗中的位置(動畫起點) */
   origin: DOMRect | null;
   /** 音樂播放器面板狀態 */
@@ -42,7 +38,6 @@ interface SceneState {
   openItem: (id: ItemId, rect?: DOMRect) => void;
   openOverlay: (kind: OverlayKind, rect?: DOMRect) => void;
   closeOverlay: () => void;
-  setPhoneApp: (app: PhoneApp) => void;
   /** 展開播放器;不重置 currentSongId(mini 播放中重新展開要繼續播) */
   expandPlayer: (rect?: DOMRect) => void;
   /** 收合成左下角 mini 膠囊 */
@@ -63,7 +58,6 @@ export const selectIsOnline = (s: SceneState) =>
 
 export const useSceneStore = create<SceneState>((set, get) => ({
   overlay: null,
-  phoneApp: "home",
   origin: null,
   playerMode: "hidden",
   currentSongId: null,
@@ -84,16 +78,11 @@ export const useSceneStore = create<SceneState>((set, get) => ({
       get().expandPlayer(rect);
       return;
     }
-    set({
-      overlay: target,
-      origin: rect ?? null,
-      phoneApp: target === "phone" ? "home" : get().phoneApp,
-    });
+    set({ overlay: target, origin: rect ?? null });
   },
 
   openOverlay: (kind, rect) => set({ overlay: kind, origin: rect ?? null }),
-  closeOverlay: () => set({ overlay: null, origin: null, phoneApp: "home" }),
-  setPhoneApp: (app) => set({ phoneApp: app }),
+  closeOverlay: () => set({ overlay: null, origin: null }),
   expandPlayer: (rect) => set({ playerMode: "expanded", playerOrigin: rect ?? null }),
   minimizePlayer: () => set({ playerMode: "mini" }),
   closePlayer: () => set({ playerMode: "hidden", currentSongId: null, playerOrigin: null }),

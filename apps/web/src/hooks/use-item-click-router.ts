@@ -1,17 +1,29 @@
 "use client";
 
 import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useSceneStore } from "@/stores/scene-store";
-import type { ItemId } from "@/lib/items";
+import { ITEM_LINK, type ItemId } from "@/lib/items";
+
+/** 換頁前等元素彈一下,不然點下去畫面直接跳走,感覺像沒點到 */
+const LINK_DELAY_MS = 180;
 
 /**
- * 桌面物件的點擊路由:單擊直接開對應的 overlay
+ * 桌面物件的點擊路由:單擊直接開對應的 overlay,ITEM_LINK 裡的物件改成換頁
  * 先廣播 scene:item-open 給場景(元素點擊小動畫、手機版捲動到該物件)
  */
 export function useItemClickRouter() {
-  // 只讀 store 的 getState,沒有依賴;useCallback 讓往下傳的 handler 不用每次 render 換新
-  return useCallback((id: ItemId, rect: DOMRect) => {
-    window.dispatchEvent(new CustomEvent<ItemId>("scene:item-open", { detail: id }));
-    useSceneStore.getState().openItem(id, rect);
-  }, []);
+  const router = useRouter();
+  return useCallback(
+    (id: ItemId, rect: DOMRect) => {
+      window.dispatchEvent(new CustomEvent<ItemId>("scene:item-open", { detail: id }));
+      const href = ITEM_LINK[id];
+      if (href) {
+        setTimeout(() => router.push(href), LINK_DELAY_MS);
+        return;
+      }
+      useSceneStore.getState().openItem(id, rect);
+    },
+    [router],
+  );
 }

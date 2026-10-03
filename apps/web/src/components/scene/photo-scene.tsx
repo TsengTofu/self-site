@@ -10,12 +10,13 @@ import {
   type MouseEvent,
 } from "react";
 import Image from "next/image";
-import { ITEMS, ITEM_OVERLAY, type ItemId } from "@/lib/items";
+import { ITEMS, ITEM_LINK, ITEM_OVERLAY, type ItemId } from "@/lib/items";
 import { useEffectivePhase, type DayPhase } from "@/hooks/use-time-of-day";
 import { useSceneStore, selectIsOnline } from "@/stores/scene-store";
 import { HOTSPOTS, IMAGE_W, IMAGE_H, hotspotBBox, type Hotspot } from "./hotspots";
 import { CatPeekaboo } from "./cat-peekaboo";
 import { ElementLayers, GIRL_STATES, type GirlState } from "./element-layers";
+import { LetterBadge } from "./letter-badge";
 import roomEmpty from "../../../public/scene/room-empty.jpg";
 import lightDawn from "../../../public/scene/light-dawn.png";
 import lightDay from "../../../public/scene/light-day.png";
@@ -57,6 +58,11 @@ const LIGHT_INTENSITY: Record<DayPhase, number> = {
   sunset: 1,
   night: 1,
 };
+
+/** 有提示點的熱區(會開畫面的物件);手機改用來信對話框,不在這裡 */
+const BEACON_SPOTS = HOTSPOTS.filter((spot) => ITEM_OVERLAY[spot.id] !== null);
+/** 提示點輪流閃:每隔這麼久換下一個,同一時間只有一個在擴散(要跟 globals.css 的週期對上) */
+const BEACON_GAP_S = 1.2;
 
 interface PhotoSceneProps extends SceneProps {
   /** build 期讀到的元素圖層檔名清單(見 public/scene/elements/README.md) */
@@ -240,11 +246,13 @@ export function PhotoScene({
           {HOTSPOTS.map((spot, i) => {
             const common = shapeProps(spot);
             // 只有「有功能」的熱區(ITEM_OVERLAY 非 null)才放圓圈提示,空物件不用騙人家可以點
-            const hasBeacon = ITEM_OVERLAY[spot.id] !== null;
+            const beaconOrder = BEACON_SPOTS.indexOf(spot);
+            const hasBeacon = beaconOrder >= 0;
+            const link = ITEM_LINK[spot.id];
             const showHint = hinting && hasBeacon;
             const bbox = hotspotBBox(spot);
-            const beaconX = bbox.x + bbox.w / 2;
-            const beaconY = bbox.y + bbox.h / 2;
+            const beaconX = bbox.x + bbox.w * (spot.beacon?.x ?? 0.5);
+            const beaconY = bbox.y + bbox.h * (spot.beacon?.y ?? 0.5);
             return (
               <g key={`${spot.id}-${i}`}>
                 {spot.rect && (
@@ -270,17 +278,26 @@ export function PhotoScene({
                     height={spot.screenRect.h}
                   />
                 )}
-                {/* 熱區圓圈提示(beacon):平常若隱若現,hover / focus / 首訪提示時亮起 */}
+                {/* 熱區圓圈提示(beacon):常駐小亮點,hover / focus / 首訪提示時更亮 */}
                 {hasBeacon && (
                   <g
                     className={`hotspot-beacon ${hoveredItem === spot.id ? "beacon-active" : ""} ${showHint ? "beacon-hint" : ""}`}
                     transform={`translate(${beaconX} ${beaconY})`}
                     pointerEvents="none"
-                    style={{ "--beacon-delay": `${i * 0.15}s` } as CSSProperties}
+                    style={{ "--beacon-delay": `${beaconOrder * BEACON_GAP_S}s` } as CSSProperties}
                   >
-                    <circle className="beacon-ring" r={12} />
-                    <circle className="beacon-dot" r={5} />
+                    <circle className="beacon-ring" r={5} />
+                    <circle className="beacon-dot" r={4.5} />
                   </g>
+                )}
+                {/* 換頁的物件(手機)改用來信對話框,尾巴指在物件上緣偏左 */}
+                {link && (
+                  <LetterBadge
+                    x={bbox.x + bbox.w * 0.2}
+                    y={bbox.y - 4}
+                    active={hoveredItem === spot.id}
+                    onClick={handleClick(spot.id)}
+                  />
                 )}
               </g>
             );

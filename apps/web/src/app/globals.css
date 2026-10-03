@@ -65,63 +65,107 @@ body {
   animation: item-wiggle 0.4s ease-in-out;
 }
 
-/* ---------- 熱區圓圈提示(beacon):平常若隱若現,hover/focus/首訪提示亮起 ---------- */
+/* ---------- 熱區圓圈提示(beacon):常駐的半透明小點,輪流擴散一圈細光圈 ---------- */
 .hotspot-beacon {
   pointer-events: none;
-  opacity: 0;
+  opacity: 0.8;
   transition: opacity 0.35s ease;
-  animation: beacon-breathe 3.2s ease-in-out infinite;
 }
+/* 小點半透明,加一圈淡棕細描邊,放在淺色牆面或窗景上也看得到 */
 .beacon-dot {
-  fill: #fff3d6;
+  fill: #fff6e2;
+  fill-opacity: 0.6;
+  stroke: rgba(107, 86, 71, 0.4);
+  stroke-width: 1;
+  filter: drop-shadow(0 0 3px rgba(255, 214, 150, 0.8));
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.25s ease;
 }
 .beacon-ring {
   fill: none;
   stroke: #fff3d6;
-  stroke-width: 2.5;
-  opacity: 0.7;
+  stroke-width: 1.5;
+  opacity: 0;
+  animation: beacon-ripple-idle 7.2s ease-out infinite;
+  animation-delay: var(--beacon-delay, 0s);
 }
-@keyframes beacon-breathe {
-  0%,
-  100% {
+/* 週期 7.2s、每個提示點錯開 1.2s(photo-scene 的 BEACON_GAP_S),同一時間只有一個在擴散 */
+@keyframes beacon-ripple-idle {
+  0% {
+    r: 5;
+    opacity: 0.9;
+  }
+  20% {
+    r: 15;
     opacity: 0;
   }
-  50% {
-    opacity: 0.3;
+  100% {
+    r: 15;
+    opacity: 0;
+  }
+}
+@keyframes beacon-ripple {
+  from {
+    r: 5;
+    opacity: 0.95;
+  }
+  to {
+    r: 17;
+    opacity: 0;
   }
 }
 .hotspot-beacon.beacon-active,
 .hotspot-beacon.beacon-hint {
-  animation: none;
   opacity: 1;
 }
 .beacon-active .beacon-dot,
 .beacon-hint .beacon-dot {
-  filter: drop-shadow(0 0 6px rgba(255, 220, 160, 0.9));
-}
-@keyframes beacon-ripple {
-  from {
-    r: 8;
-    opacity: 0.9;
-  }
-  to {
-    r: 22;
-    opacity: 0;
-  }
+  fill-opacity: 0.85;
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 5px rgba(255, 220, 160, 0.95));
 }
 .beacon-active .beacon-ring,
 .beacon-hint .beacon-ring {
-  animation: beacon-ripple 1.4s ease-out infinite;
-  animation-delay: var(--beacon-delay, 0s);
+  animation: beacon-ripple 1.3s ease-out infinite;
+  animation-delay: 0s;
+}
+/* 首訪提示時全部一起亮,但光圈依序錯開一點,像一波傳過去 */
+.beacon-hint .beacon-ring {
+  animation-delay: calc(var(--beacon-delay, 0s) * 0.18);
 }
 @media (prefers-reduced-motion: reduce) {
-  .hotspot-beacon {
-    animation: none;
-  }
+  .beacon-ring,
   .beacon-active .beacon-ring,
   .beacon-hint .beacon-ring {
     animation: none;
   }
+}
+
+/* ---------- 手機上方的來信對話框(scene/letter-badge) ---------- */
+.letter-body {
+  fill: #fffaf1;
+  stroke: rgba(107, 86, 71, 0.35);
+  stroke-width: 1.5;
+}
+.letter-float {
+  filter: drop-shadow(0 4px 6px rgba(60, 40, 20, 0.22));
+  animation: letter-float 2.8s ease-in-out infinite;
+}
+@keyframes letter-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+.letter-badge {
+  transition: transform 0.25s ease;
+}
+.letter-badge-active {
+  transform: scale(1.1);
 }
 
 /* ---------- 觸發點圖層插槽(element-layers) ---------- */
@@ -326,28 +370,6 @@ body {
   transform-box: fill-box;
   transform-origin: center bottom;
   animation: element-tap 0.35s ease-out;
-}
-
-/* ---------- 時段滑桿(nav/phase-slider)---------- */
-.phase-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 9999px;
-  background: var(--color-cream);
-  border: 2px solid var(--color-ink-soft);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
-  cursor: pointer;
-}
-.phase-range::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 9999px;
-  background: var(--color-cream);
-  border: 2px solid var(--color-ink-soft);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
-  cursor: pointer;
 }
 
 /* ---------- 通用小動畫 ---------- */

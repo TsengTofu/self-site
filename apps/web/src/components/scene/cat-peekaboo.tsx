@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { TOAST_BOTTOM } from "@/lib/toast";
 import { IMAGE_W, IMAGE_H } from "./hotspots";
-import { DECOR, GIRL_RECTS, elementSrc, type DecorName, type GirlState } from "./element-layers";
+import { ContactShadow, DECOR, GIRL_RECTS, elementSrc, type DecorName, type GirlState } from "./element-layers";
 
 /**
  * 找貓咪彩蛋:三花貓(豆漿)每次載入隨機出現在一個藏點,點到牠 → 跳一下,
@@ -47,8 +48,16 @@ const SPOTS: CatSpot[] = [
   // 6. 走路貓在矮櫃上
   { pose: "walk", x: 235, y: 600, w: 200, h: 172, hint: "在矮櫃上散步" },
   // 7. 走路貓正走出畫面左緣(沿矮櫃頂,身體已出框,只剩尾巴;唯一允許超出邊界的藏點)
-  { pose: "walk", x: -172, y: 602, w: 200, h: 172, hint: "走出畫面了(只剩尾巴)" },
+  { pose: "walk", x: -172, y: 602, w: 200, h: 172, hint: "走出畫面了（只剩尾巴）" },
 ];
+
+/** 每種姿勢的接觸陰影(以貓圖寬高的比例表示,圖的下緣就是腳底) */
+const POSE_SHADOW: Record<CatSpot["pose"], { cx: number; cy: number; rx: number; ry: number }> = {
+  sleep: { cx: 0.5, cy: 0.95, rx: 0.47, ry: 0.08 },
+  back: { cx: 0.5, cy: 0.965, rx: 0.42, ry: 0.045 },
+  stretch: { cx: 0.52, cy: 0.97, rx: 0.46, ry: 0.05 },
+  walk: { cx: 0.5, cy: 0.97, rx: 0.42, ry: 0.05 },
+};
 
 const STORAGE_KEY = "self-site:cat-finds";
 
@@ -87,12 +96,14 @@ export function CatPeekaboo({ hidden = false, present, girlState }: CatPeekabooP
     setFound(true);
     const n = Number(localStorage.getItem(STORAGE_KEY) ?? "0") + 1;
     localStorage.setItem(STORAGE_KEY, String(n));
-    setToast(n === 1 ? `找到貓咪了!牠正${spot?.hint} 🐈` : `又找到豆漿了 · 第 ${n} 次`);
+    setToast(n === 1 ? `找到貓咪了！牠正${spot?.hint}` : `又找到豆漿了，第 ${n} 次`);
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 2600);
   };
 
   if (spot === null) return null;
+
+  const shadow = POSE_SHADOW[spot.pose];
 
   // 「躲在後面」的遮擋物(同一張元素圖、同一個 DECOR rect,疊繪在貓上面)
   const cover = spot.coverWith
@@ -124,6 +135,13 @@ export function CatPeekaboo({ hidden = false, present, girlState }: CatPeekabooP
         >
           {/* 點擊判定範圍(透明,略大於貓身) */}
           <rect x={-8} y={-8} width={spot.w + 16} height={spot.h + 16} fill="transparent" />
+          {/* 陰影放在跳動的那層外面,貓跳起來時影子留在原地 */}
+          <ContactShadow
+            cx={spot.w * shadow.cx}
+            cy={spot.h * shadow.cy}
+            rx={spot.w * shadow.rx}
+            ry={spot.h * shadow.ry}
+          />
           <g className={found ? "cat-found" : "cat-peek"} pointerEvents="none">
             <image
               href={elementSrc(`cat-${spot.pose}`)}
@@ -165,7 +183,7 @@ export function CatPeekaboo({ hidden = false, present, girlState }: CatPeekabooP
       </svg>
 
       {toast && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-24 z-40 flex justify-center md:bottom-8">
+        <div className={`pointer-events-none fixed inset-x-0 z-40 flex justify-center ${TOAST_BOTTOM}`}>
           <div
             role="status"
             className="rounded-full border border-ink-soft/15 bg-cream/95 px-5 py-2.5 text-sm text-ink shadow-lg backdrop-blur"
