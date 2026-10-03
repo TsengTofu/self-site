@@ -1,12 +1,10 @@
 "use client";
 
-import { resume } from "@/data/resume";
 import { ItemIcon } from "@/components/item-icons";
+import { gmailComposeUrl } from "@/lib/links";
 import { FullPage } from "./full-page";
 
-const IDEA_MAIL = `https://mail.google.com/mail/?view=cm&fs=1&to=${resume.email}&su=${encodeURIComponent(
-  "滑板那格我有個點子！",
-)}`;
+const IDEA_MAIL = gmailComposeUrl("滑板那格我有個點子！");
 
 /** 滑板:還沒想到要放什麼,先做成一個徵求點子的彩蛋 */
 export function SkateboardOverlay() {
