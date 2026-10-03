@@ -41,11 +41,11 @@ export function PhaseBadge() {
   return (
     <BadgePill
       onClick={cycle}
-      title="場景時段 — 點擊切換:自動(跟著你的時區)→ 清晨 → 白天 → 夕陽 → 夜晚"
+      title={`場景時段（目前${mode === "auto" ? "自動" : "手動"}）— 點擊切換：自動（跟著你的時區）→ 清晨 → 白天 → 夕陽 → 夜晚`}
+      label={`場景時段：${info.label}（${mode === "auto" ? "自動" : "手動"}）`}
     >
       <span className="text-sm leading-none">{info.icon}</span>
       {info.label}
-      <span className="text-[10px] text-[#a08b74]">{mode === "auto" ? "自動" : "手動"}</span>
     </BadgePill>
   );
 }

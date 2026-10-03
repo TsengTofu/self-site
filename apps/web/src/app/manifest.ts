@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 /** PWA/加到主畫面的最低限度資訊;icon 512 走 app/icon.png 檔案慣例的網址 */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "On My Desk — Tofu Tseng",
-    short_name: "On My Desk",
+    name: "My Space — Tofu Tseng",
+    short_name: "My Space",
     description: "互動式桌面場景個人網站",
     start_url: "/",
     display: "standalone",

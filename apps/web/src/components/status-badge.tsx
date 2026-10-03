@@ -10,6 +10,7 @@ const NEXT_MODE: Record<PresenceMode, PresenceMode> = {
   away: "auto",
 };
 
+/** 模式說明只放在 title / aria-label,畫面上不再顯示「自動 / 手動」小字 */
 const MODE_LABEL: Record<PresenceMode, string> = {
   auto: "自動",
   online: "手動",
@@ -38,7 +39,11 @@ export function StatusBadge() {
   };
 
   return (
-    <BadgePill onClick={cycle} title="點擊切換:自動 → 上線 → 離開">
+    <BadgePill
+      onClick={cycle}
+      title={`目前${MODE_LABEL[mode]}・點擊切換：自動 → 上線 → 離開`}
+      label={`在線狀態：${online ? "上線" : "離開"}（${MODE_LABEL[mode]}）`}
+    >
       <span className="relative flex size-2.5">
         {online && (
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#5fae74] opacity-60" />
@@ -50,7 +55,6 @@ export function StatusBadge() {
         />
       </span>
       {online ? "上線" : "離開"}
-      <span className="text-[10px] text-[#a08b74]">{MODE_LABEL[mode]}</span>
     </BadgePill>
   );
 }
