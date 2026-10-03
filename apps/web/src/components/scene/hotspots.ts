@@ -12,6 +12,12 @@ import type { ItemId } from "@/lib/items";
 export const IMAGE_W = 1920;
 export const IMAGE_H = 1080;
 
+/** 底圖上的一個點(像素座標) */
+export interface Point {
+  x: number;
+  y: number;
+}
+
 /** 通用矩形(像素座標),bbox 計算與 rect 熱區共用同一個形狀。 */
 export interface Rect {
   x: number;
@@ -26,8 +32,10 @@ interface HotspotBase {
   screenRect?: Rect;
   /** 標記這個熱區同時是元素圖層插槽錨點(見 element-layers.tsx 的 ELEMENT_SLOTS) */
   slot?: true;
-  /** 提示點的位置(佔外接框寬高的比例),沒填就在正中央 */
-  beacon?: { x: number; y: number };
+  /** 提示點的位置(底圖像素座標),沒填就在外接框正中央 */
+  beacon?: Point;
+  /** hover 文字提示對準的點(底圖像素座標,提示框底部中央對著它),沒填就在外接框上緣正中央 */
+  tip?: Point;
 }
 
 /** 形狀二選一:矩形 rect 或多邊形 points(斜放物件);兩個都沒有 tsc 會擋,hotspotBBox 才不會算出 NaN */
@@ -43,6 +51,8 @@ export const HOTSPOTS: Hotspot[] = [
     id: "window",
     rect: { x: 648, y: 150, w: 520, h: 472 },
     screenRect: { x: 660, y: 185, w: 480, h: 390 },
+    // 文字提示往下貼著窗景上緣,不要飄在牆上
+    tip: { x: 908, y: 268 },
   },
   // 掛鉤上的白帽(保留觸發)
   { id: "doll", rect: { x: 505, y: 225, w: 90, h: 128 } },
@@ -51,7 +61,7 @@ export const HOTSPOTS: Hotspot[] = [
   // 桌上左側的音響 → 歌單(元素插槽)
   // 音響縮到原本的 80%(左下角固定),不再跟手機擠在一起,跟筆電的比例也比較像真的
   // 提示點放在音響頂面,不蓋到正面的字
-  { id: "musicPlayer", rect: { x: 760, y: 610, w: 112, h: 71 }, slot: true, beacon: { x: 0.5, y: 0.1 } },
+  { id: "musicPlayer", rect: { x: 760, y: 610, w: 112, h: 71 }, slot: true, beacon: { x: 816, y: 617 } },
   // 床尾的耳機 → 歌單(元素插槽;渲染順序在床之後,見 element-layers LAYERS)
   { id: "headphones", rect: { x: 1318, y: 852, w: 185, h: 125 }, slot: true },
   // 筆電(桌面中央)→ 專案(元素插槽)
@@ -61,15 +71,23 @@ export const HOTSPOTS: Hotspot[] = [
     rect: { x: 955, y: 512, w: 250, h: 176 },
     screenRect: { x: 963, y: 520, w: 165, h: 115 },
     slot: true,
-    // 螢幕正中央是時間,提示點改放在鍵盤上
-    beacon: { x: 0.5, y: 0.8 },
+    // 螢幕正中央是時間,提示點改放在鍵盤上;筆電是斜的,兩個提示都對齊螢幕中線,不用外接框中央
+    beacon: { x: 1052, y: 646 },
+    tip: { x: 1043, y: 512 },
   },
   // 手機(音響與筆電之間)→ Profile(元素插槽)
   // 整支放在桌面上,不再懸出桌緣(桌緣大約在 y 700)
   { id: "phone", rect: { x: 890, y: 646, w: 92, h: 50 }, slot: true },
   // 斜靠鏡子的長板 → 彩蛋。畫面由 element-layers 的 DECOR 渲染(板尾被床蓋住,
-  // 貼圖框與點擊範圍不同),這裡只是可點的板身多邊形,不掛 slot
-  { id: "skateboard", points: "1558,502 1660,525 1640,870 1520,845" },
+  // 貼圖框與點擊範圍不同),這裡只是可點的板身多邊形(沿著露出來的板身描,不含床蓋住的板尾),不掛 slot
+  // 兩個提示都對齊板子中間那條紅線
+  {
+    id: "skateboard",
+    points:
+      "1640,500 1672,525 1696,568 1676,640 1668,712 1658,765 1641,802 1607,812 1546,822 1556,740 1566,665 1580,610 1557,575 1560,552 1600,535",
+    beacon: { x: 1615, y: 662 },
+    tip: { x: 1636, y: 500 },
+  },
 
   // ⏸ 這張底圖沒有的物件 —— 圖上補了(或做成元素圖)再開回來:
   // { id: "album", rect: ... },      // 黑膠矮櫃(音樂入口仍有耳機/音響)
@@ -77,6 +95,20 @@ export const HOTSPOTS: Hotspot[] = [
   // { id: "bubbleTea", rect: ... },  // 馬克杯
   // { id: "notebook", rect: ..., slot: true }, // 筆記本(手寫句子 overlay 暫時沒入口)
 ];
+
+/** 提示點位置:有指定就用,沒有就在外接框正中央 */
+export function beaconPoint(spot: Hotspot): Point {
+  if (spot.beacon) return spot.beacon;
+  const b = hotspotBBox(spot);
+  return { x: b.x + b.w / 2, y: b.y + b.h / 2 };
+}
+
+/** 文字提示對準的點:有指定就用,沒有就在外接框上緣正中央 */
+export function tipPoint(spot: Hotspot): Point {
+  if (spot.tip) return spot.tip;
+  const b = hotspotBBox(spot);
+  return { x: b.x + b.w / 2, y: b.y };
+}
 
 /**
  * 熱區的外接框(bounding box)—— rect 熱區直接回傳 rect;

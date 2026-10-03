@@ -75,9 +75,8 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
         <MobileDock onItemClick={handleItemClick} />
       </div>
 
-      {/* 🧪 進場動畫提案用的遮罩(見 layout 的 INTRO_SCRIPT 與 globals.css 的 intro-*),
-          沒帶 ?introv 時 display:none,不影響畫面 */}
-      <div aria-hidden className="intro-lights" />
+      {/* 進場動畫的蓋板(見 layout 的 INTRO_SCRIPT 與 globals.css 的 intro-*),
+          只有 <html data-intro> 時才顯示 */}
       <div aria-hidden className="intro-title">
         <p className="font-hand text-4xl text-[#33271c] [-webkit-text-stroke:0.8px_currentColor] md:text-6xl">
           나의 공간

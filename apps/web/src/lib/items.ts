@@ -70,7 +70,7 @@ export const ITEMS: Record<ItemId, ItemMeta> = {
     id: "poster",
     label: "海報",
    
-    hint: "WHO'S THERE?BOYNEXTDOOR",
+    hint: "WHO'S THERE?",
     snark: ["盯著看也不會播 MV", "想看的話，耳機在床上"],
   },
   window: { id: "window", label: "海景", hint: "看向大海" },
