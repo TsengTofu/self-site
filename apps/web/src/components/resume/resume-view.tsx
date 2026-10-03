@@ -1,11 +1,8 @@
-"use client";
-
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Mail, MapPin } from "lucide-react";
-import { resume, periodOf, type Bullet, type Experience, type ResumeVersion } from "@/data/resume";
+import { resume, periodOf, type Bullet, type Experience } from "@/data/resume";
 import { gmailComposeUrl } from "@/lib/links";
-import { useMockVariant } from "@/lib/mock-variant";
 
 const GMAIL_COMPOSE = gmailComposeUrl("嗨 Tseng，看完你的履歷，想找你聊聊 👋");
 
@@ -147,9 +144,8 @@ function BulletList({ items }: { items: readonly Bullet[] }) {
   );
 }
 
-function TimelineItem({ exp, version, last }: { exp: Experience; version: ResumeVersion; last: boolean }) {
+function TimelineItem({ exp, last }: { exp: Experience; last: boolean }) {
   const current = !exp.end;
-  const bullets = exp[version];
   return (
     <li className="relative pb-12 pl-8 last:pb-0 md:pl-10">
       {/* 時間軸的線,最後一段不往下畫 */}
@@ -170,7 +166,7 @@ function TimelineItem({ exp, version, last }: { exp: Experience; version: Resume
       <h3 className="mt-1.5 text-lg font-bold text-ink md:text-xl">{exp.role}</h3>
       <p className="text-sm text-ink-soft">{exp.org}</p>
 
-      {version === "full" && exp.intro && <p className="mt-3 text-sm leading-relaxed text-ink-soft">{exp.intro}</p>}
+      {exp.intro && <p className="mt-3 text-sm leading-relaxed text-ink-soft">{exp.intro}</p>}
 
       {exp.metrics && (
         <dl className="mt-4 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
@@ -186,9 +182,9 @@ function TimelineItem({ exp, version, last }: { exp: Experience; version: Resume
         </dl>
       )}
 
-      {bullets && <BulletList items={bullets} />}
+      {exp.bullets && <BulletList items={exp.bullets} />}
 
-      {version === "full" && exp.groups && (
+      {exp.groups && (
         <div className="mt-5 flex flex-col gap-3">
           {exp.groups.map((g) => (
             <div key={g.title} className={`${CARD} p-4 md:p-5`}>
@@ -226,12 +222,10 @@ function TimelineItem({ exp, version, last }: { exp: Experience; version: Resume
 
 /**
  * 正式履歷:聯絡資訊放最上面,經歷用直式時間軸
- * 預設是精簡版,`?resumev=full` 看完整版(兩版比較完會留一版)
+ * 內容都在 data/resume.ts
  */
 export function ResumeView() {
-  const version: ResumeVersion = useMockVariant("resumev") === "full" ? "full" : "brief";
-  const experiences = resume.experiences.filter((e) => !e.only || e.only === version);
-  const { education } = resume;
+  const { experiences, education } = resume;
 
   return (
     <main className="min-h-dvh bg-cream text-ink print:bg-white">
@@ -247,7 +241,7 @@ export function ResumeView() {
               <span className="text-2xl font-medium text-ink-soft md:text-3xl">{resume.nameZh}</span>
             </h1>
             <p className="mt-4 text-base font-medium text-ink md:text-lg">{resume.headline}</p>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-soft md:text-[15px]">{resume.summary[version]}</p>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-soft md:text-[15px]">{resume.summary}</p>
           </div>
           <ContactCard />
         </section>
@@ -255,14 +249,14 @@ export function ResumeView() {
         <Section en="EXPERIENCE" zh="經歷">
           <ol>
             {experiences.map((exp, i) => (
-              <TimelineItem key={exp.id} exp={exp} version={version} last={i === experiences.length - 1} />
+              <TimelineItem key={exp.id} exp={exp} last={i === experiences.length - 1} />
             ))}
           </ol>
         </Section>
 
         <Section en="SKILLS" zh="技能">
           <div className="grid gap-3 sm:grid-cols-2">
-            {resume.skills[version].map((g) => (
+            {resume.skills.map((g) => (
               <div key={g.label} className={`${CARD} p-4`}>
                 <h3 className="text-xs font-bold text-ink">{g.label}</h3>
                 <ul className="mt-2.5 flex flex-wrap gap-1.5">
@@ -283,29 +277,27 @@ export function ResumeView() {
               <li key={t.title} className={`${CARD} p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-sm md:p-5`}>
                 <p className="text-2xl font-bold text-ink">{t.value}</p>
                 <h3 className="mt-1 text-sm font-bold text-ink">{t.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-ink-soft">{t.desc[version]}</p>
+                <p className="mt-1 text-sm leading-relaxed text-ink-soft">{t.desc}</p>
               </li>
             ))}
           </ul>
         </Section>
 
-        <Section en="EDUCATION" zh={version === "full" ? "學歷與證照" : "學歷"}>
+        <Section en="EDUCATION" zh="學歷與證照">
           <p className="text-xs font-semibold tabular-nums text-ink-dim">{periodOf(education)}</p>
           <p className="mt-1 text-base font-bold text-ink">
             {education.school}
             <span className="ml-2 font-normal text-ink-soft">{education.dept}</span>
           </p>
-          {version === "full" && (
-            <ul className="mt-8 flex flex-col gap-5">
-              {resume.certificates.map((c) => (
-                <li key={c.title}>
-                  {c.date && <p className="text-xs font-semibold tabular-nums text-ink-dim">{c.date}</p>}
-                  <p className="mt-1 text-sm font-bold text-ink">{c.title}</p>
-                  {c.desc && <p className="mt-0.5 text-sm text-ink-soft">{c.desc}</p>}
-                </li>
-              ))}
-            </ul>
-          )}
+          <ul className="mt-8 flex flex-col gap-5">
+            {resume.certificates.map((c) => (
+              <li key={c.title}>
+                {c.date && <p className="text-xs font-semibold tabular-nums text-ink-dim">{c.date}</p>}
+                <p className="mt-1 text-sm font-bold text-ink">{c.title}</p>
+                {c.desc && <p className="mt-0.5 text-sm text-ink-soft">{c.desc}</p>}
+              </li>
+            ))}
+          </ul>
         </Section>
 
         {/* 收尾 CTA */}
