@@ -38,7 +38,7 @@ export function SceneHeader() {
 
       <nav aria-label="子頁面" className="mt-2.5 flex flex-wrap gap-2">
         <Link href="/resume" className={PAGE_LINK}>
-          職涯時間軸
+          履歷
           <ArrowUpRight className={PAGE_LINK_ARROW} strokeWidth={2} aria-hidden />
         </Link>
         <Link href="/making-of" className={PAGE_LINK}>
