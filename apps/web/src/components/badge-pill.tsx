@@ -25,7 +25,7 @@ export function BadgePill({ onClick, title, children, pressed, label }: BadgePil
       title={title}
       aria-label={label}
       aria-pressed={pressed}
-      className="flex items-center gap-2 rounded-full border border-ink-soft/20 bg-cream/90 py-1.5 pl-3 pr-3.5 text-xs font-medium text-ink shadow-sm backdrop-blur transition hover:shadow-md"
+      className="flex items-center gap-2 rounded-full border border-ink-soft/20 bg-cream/90 py-1.5 pl-3 pr-3.5 text-xs font-medium text-ink shadow-sm backdrop-blur transition duration-200 ease-out hover:-translate-y-0.5 hover:bg-cream hover:shadow-md active:translate-y-0 active:scale-95"
     >
       {children}
     </button>

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
-/** 子頁按鈕:跟右上角狀態膠囊同一套外觀,一眼看得出可以點 */
+/** 子頁按鈕:跟右上角狀態膠囊同一套外觀;滑過時微微浮起、箭頭往右上推,一看就知道會帶你去別頁 */
 const PAGE_LINK =
-  "pointer-events-auto inline-flex items-center gap-1 rounded-full border border-ink-soft/20 bg-cream/90 py-1 pl-3 pr-2.5 text-xs font-medium text-ink shadow-sm backdrop-blur transition hover:bg-cream hover:shadow-md";
+  "group pointer-events-auto inline-flex items-center gap-1 rounded-full border border-ink-soft/20 bg-cream/90 py-1 pl-3 pr-2.5 text-xs font-medium text-ink shadow-sm backdrop-blur transition duration-200 ease-out hover:-translate-y-0.5 hover:bg-cream hover:shadow-md active:translate-y-0 active:scale-95";
+const PAGE_LINK_ARROW =
+  "size-3.5 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5";
 
 /**
  * 場景左上角標題:常駐顯示,不再 hover 才展開
@@ -37,11 +39,11 @@ export function SceneHeader() {
       <nav aria-label="子頁面" className="mt-2.5 flex flex-wrap gap-2">
         <Link href="/resume" className={PAGE_LINK}>
           職涯時間軸
-          <ArrowUpRight className="size-3.5" strokeWidth={2} aria-hidden />
+          <ArrowUpRight className={PAGE_LINK_ARROW} strokeWidth={2} aria-hidden />
         </Link>
         <Link href="/making-of" className={PAGE_LINK}>
           視覺製作歷程
-          <ArrowUpRight className="size-3.5" strokeWidth={2} aria-hidden />
+          <ArrowUpRight className={PAGE_LINK_ARROW} strokeWidth={2} aria-hidden />
         </Link>
       </nav>
     </header>

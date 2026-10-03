@@ -52,7 +52,7 @@ self-site/
 │           ├── lib/                  # items 註冊表、site（網域）、motion、gsap-setup
 │           └── stores/scene-store.ts # Zustand 場景狀態
 └── packages/
-    ├── ui/                           # Overlay（焦點陷阱）/ WindowFrame / CloseButton
+    ├── ui/                           # Overlay（焦點陷阱）/ CloseButton
     └── typescript-config/
 ```
 

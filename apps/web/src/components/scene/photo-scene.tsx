@@ -102,7 +102,9 @@ export function PhotoScene({
       const el = scrollRef.current;
       if (el && el.scrollWidth > el.clientWidth) {
         const spot = HOTSPOTS.find((s) => s.id === id);
-        if (spot) {
+        // 有鏡頭目標的物件(筆電、窗戶)交給鏡頭對焦,不另外捲動:
+        // 兩個同時跑的話,鏡頭量到的是捲動前的位置,拉近後會偏一大段
+        if (spot && !spot.screenRect) {
           const bbox = hotspotBBox(spot);
           const cx = ((bbox.x + bbox.w / 2) / IMAGE_W) * el.scrollWidth;
           el.scrollTo({ left: cx - el.clientWidth / 2, behavior: "smooth" });
