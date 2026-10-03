@@ -8,7 +8,7 @@ import { SITE_URL } from "@/lib/site";
  */
 const LAST_MODIFIED = {
   home: new Date("2026-08-01"),
-  resume: new Date("2026-07-26"),
+  resume: new Date("2026-10-03"),
   makingOf: new Date("2026-08-06"),
 };
 

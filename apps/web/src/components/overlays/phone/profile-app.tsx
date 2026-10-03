@@ -8,7 +8,7 @@ const FEATURED_SKILLS = profile.skills.slice(0, 6);
 
 /**
  * 手機裡的 Profile App — 摘要版:頭像/名字/title/tagline/精選技能 + 「完整履歷 →」。
- * 完整職涯時間軸搬去獨立頁面 /resume 發揚光大。內容來源:src/data/profile.ts
+ * 完整履歷在獨立頁面 /resume(內容來源 src/data/resume.ts),這裡的內容來源:src/data/profile.ts
  */
 export function ProfileApp() {
   return (
@@ -45,7 +45,7 @@ export function ProfileApp() {
         </ul>
       </section>
 
-      {/* 完整履歷:導去獨立的互動式時間軸頁面 */}
+      {/* 完整履歷:導去獨立的 /resume 頁 */}
       <a
         href="/resume"
         target="_blank"

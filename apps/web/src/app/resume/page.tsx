@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { ResumeView } from "@/components/resume/resume-view";
 import { shareMeta } from "@/lib/site";
 
-const TITLE = "職涯時間軸 — Tofu Tseng";
-const DESCRIPTION = "與其自我介紹，不如帶你走一遍我的職涯時間軸。";
+const TITLE = "履歷 — Tseng Fu Chun 曾輔君";
+const DESCRIPTION = "前端工程師｜AI 導入・流程建立・團隊賦能。約 7 年經驗，React、TypeScript、Next.js 與 B2B SaaS 平台。";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   ...shareMeta(TITLE, DESCRIPTION, "profile"),
 };
 
-/** 互動式履歷：獨立頁面，用時間軸切換帶你認識我（代替自我介紹）。 */
+/** 正式履歷：聯絡資訊、直式時間軸、技能、教學與學歷 */
 export default function ResumePage() {
   return <ResumeView />;
 }
