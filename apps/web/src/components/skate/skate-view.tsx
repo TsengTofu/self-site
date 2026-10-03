@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, Camera } from "lucide-react";
 import type { SkateContent } from "@/data/skate";
 import { gmailComposeUrl } from "@/lib/links";
+import { HeaderSwitch } from "@/components/site-header";
 
 /** 噴漆字型(頁面用 next/font 載入,變數叫 --font-spray) */
 const SPRAY = "font-[family-name:var(--font-spray)]";
@@ -27,18 +28,20 @@ export function SkateView({ data }: { data: SkateContent }) {
   return (
     <main className="min-h-dvh overflow-hidden bg-[#161514] text-[#f5f1ea] [background-image:radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:4px_4px]">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8">
-        <header className="flex items-center justify-between py-5">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/20 px-3.5 py-1.5 text-sm font-medium transition hover:-translate-y-0.5 hover:bg-white/10 active:translate-y-0"
-          >
-            <ArrowLeft className="size-4" aria-hidden />
-            回到房間
-          </Link>
-          <span aria-hidden className={`${SPRAY} text-xl text-[#b6f24a]`}>
-            SKATE
-          </span>
-        </header>
+        <HeaderSwitch current="skateboard" tone="dark">
+          <header className="flex items-center justify-between py-5">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/20 px-3.5 py-1.5 text-sm font-medium transition hover:-translate-y-0.5 hover:bg-white/10 active:translate-y-0"
+            >
+              <ArrowLeft className="size-4" aria-hidden />
+              回到房間
+            </Link>
+            <span aria-hidden className={`${SPRAY} text-xl text-[#b6f24a]`}>
+              SKATE
+            </span>
+          </header>
+        </HeaderSwitch>
 
         <section className="relative py-14 md:py-24">
           {/* 背後兩團噴漆的光暈 */}

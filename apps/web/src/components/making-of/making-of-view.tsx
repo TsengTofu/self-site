@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
+import { HeaderSwitch } from "@/components/site-header";
 import { House } from "lucide-react";
 import { RAIL } from "@/data/making-of-v2";
 import { setupGsapTickerFallback } from "@/lib/gsap-setup";
@@ -36,7 +37,8 @@ export function MakingOfView() {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) setActive(Number((entry.target as HTMLElement).dataset.scrollPanel));
+          if (entry.isIntersecting)
+            setActive(Number((entry.target as HTMLElement).dataset.scrollPanel));
         }
       },
       { root, threshold: 0.5 },
@@ -51,7 +53,9 @@ export function MakingOfView() {
   }, []);
 
   const jumpTo = (index: number) => {
-    const section = scrollerRef.current?.querySelector<HTMLElement>(`[data-scroll-panel="${index}"]`);
+    const section = scrollerRef.current?.querySelector<HTMLElement>(
+      `[data-scroll-panel="${index}"]`,
+    );
     section?.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
   };
   const jumpToHash = (hash: string) => {
@@ -77,20 +81,30 @@ export function MakingOfView() {
           className="relative flex min-h-dvh snap-start snap-always flex-col justify-center"
           style={{ background: PANEL_BG[panel.key] }}
         >
-          <DeckPanel panelKey={panel.key} reduced={reduced} onJump={jumpToHash} labActive={active === i} />
+          <DeckPanel
+            panelKey={panel.key}
+            reduced={reduced}
+            onJump={jumpToHash}
+            labActive={active === i}
+          />
         </section>
       ))}
 
       {/* 左上:回到場景 */}
-      <nav aria-label="其他頁面" className="fixed left-4 top-4 z-20 flex gap-2 md:left-6 md:top-5">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-[#f6f0e4]/90 px-3 py-1.5 text-xs font-medium text-[#3e3226] shadow-sm backdrop-blur transition hover:-translate-y-0.5"
+      <HeaderSwitch current="making-of" floating>
+        <nav
+          aria-label="其他頁面"
+          className="fixed left-4 top-4 z-20 flex gap-2 md:left-6 md:top-5"
         >
-          <House className="size-3.5" aria-hidden />
-          回到場景
-        </Link>
-      </nav>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-[#f6f0e4]/90 px-3 py-1.5 text-xs font-medium text-[#3e3226] shadow-sm backdrop-blur transition hover:-translate-y-0.5"
+          >
+            <House className="size-3.5" aria-hidden />
+            回到場景
+          </Link>
+        </nav>
+      </HeaderSwitch>
 
       {/* 右側頁碼點:目前這頁拉長亮起,點了直接跳過去 */}
       <nav
