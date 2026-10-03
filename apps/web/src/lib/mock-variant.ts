@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 
 /**
  * 🧪 MOCK 專用：讀網址參數切換設計提案。
- * - `?btnv=glass|wall|ink` 左上、右上按鈕的配色（見 lib/control-tone）
+ * - `?btnv=glass|wall|ink` 右上選單按鈕的配色（見 lib/control-tone）
+ * - `?introv=fade|layers|lights|title` 首頁進場動畫（見 layout 的 INTRO_SCRIPT，不走這支 hook）
  *
  * 沒帶參數 = 正式現狀，畫面零改變。
  * 使用者選定方案後：固化選中的版本，並把此檔與所有標了「MOCK」的分支一併移除。

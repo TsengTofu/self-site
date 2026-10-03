@@ -47,13 +47,8 @@ export function PhaseBadge() {
   };
 
   return (
-    <BadgePill
-      onClick={cycle}
-      title={`場景時段（目前${mode === "auto" ? "自動" : "手動"}）— 點擊切換：自動（跟著你的時區）→ 清晨 → 白天 → 夕陽 → 夜晚`}
-      label={`場景時段：${label}（${mode === "auto" ? "自動" : "手動"}）`}
-    >
-      <Icon className="size-4" strokeWidth={2.1} aria-hidden />
-      {label}
+    <BadgePill onClick={cycle} label={`${label}（${mode === "auto" ? "跟著你的時區" : "手動"}）・點一下切換`}>
+      <Icon className="size-[18px]" strokeWidth={2.1} aria-hidden />
     </BadgePill>
   );
 }

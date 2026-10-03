@@ -16,7 +16,7 @@ import { useSceneStore, selectIsOnline } from "@/stores/scene-store";
 import { HOTSPOTS, IMAGE_W, IMAGE_H, hotspotBBox, type Hotspot } from "./hotspots";
 import { CatPeekaboo } from "./cat-peekaboo";
 import { ElementLayers, GIRL_STATES, type GirlState } from "./element-layers";
-import { LetterBadge } from "./letter-badge";
+import { LetterBadge, letterBadgeBox } from "./letter-badge";
 import roomEmpty from "../../../public/scene/room-empty.jpg";
 import lightDawn from "../../../public/scene/light-dawn.png";
 import lightDay from "../../../public/scene/light-day.png";
@@ -59,6 +59,10 @@ const LIGHT_INTENSITY: Record<DayPhase, number> = {
   night: 1,
 };
 
+/** 換頁的物件(手機):不放提示點,改畫來信對話框 */
+const LINK_SPOTS = HOTSPOTS.filter((spot) => ITEM_LINK[spot.id]);
+/** 來信對話框尾巴指的位置:物件上緣偏左 */
+const letterAnchor = (bbox: { x: number; y: number; w: number }) => ({ x: bbox.x + bbox.w * 0.2, y: bbox.y - 4 });
 /** 有提示點的熱區(會開畫面的物件);手機改用來信對話框,不在這裡 */
 const BEACON_SPOTS = HOTSPOTS.filter((spot) => ITEM_OVERLAY[spot.id] !== null);
 /** 提示點輪流閃:每隔這麼久換下一個,同一時間只有一個在擴散(要跟 globals.css 的週期對上) */
@@ -222,6 +226,22 @@ export function PhotoScene({
           girlState={girlState}
         />
 
+        {/* 換頁物件(手機)的來信對話框:在打光層下面,夜晚會跟場景一起變暗;
+            只負責畫,點擊範圍在最上面的熱區那層 */}
+        <svg
+          viewBox={`0 0 ${IMAGE_W} ${IMAGE_H}`}
+          preserveAspectRatio="xMidYMid slice"
+          className="pointer-events-none absolute inset-0 h-full w-full"
+          aria-hidden
+        >
+          {LINK_SPOTS.map((spot) => {
+            const bbox = hotspotBBox(spot);
+            return (
+              <LetterBadge key={spot.id} {...letterAnchor(bbox)} active={hoveredItem === spot.id} />
+            );
+          })}
+        </svg>
+
         {/* 時段打光層(預熱後四張全掛載,跟著 phase 淡變;預熱前只掛當前時段) */}
         {(warm ? (Object.keys(PHASE_LIGHTS) as DayPhase[]) : [phase]).map((p) => (
           <Image
@@ -248,9 +268,10 @@ export function PhotoScene({
             // 只有「有功能」的熱區(ITEM_OVERLAY 非 null)才放圓圈提示,空物件不用騙人家可以點
             const beaconOrder = BEACON_SPOTS.indexOf(spot);
             const hasBeacon = beaconOrder >= 0;
-            const link = ITEM_LINK[spot.id];
             const showHint = hinting && hasBeacon;
             const bbox = hotspotBBox(spot);
+            const anchor = letterAnchor(bbox);
+            const linkBox = ITEM_LINK[spot.id] ? letterBadgeBox(anchor.x, anchor.y) : null;
             const beaconX = bbox.x + bbox.w * (spot.beacon?.x ?? 0.5);
             const beaconY = bbox.y + bbox.h * (spot.beacon?.y ?? 0.5);
             return (
@@ -266,6 +287,21 @@ export function PhotoScene({
                   />
                 )}
                 {spot.points && <polygon {...common} points={spot.points} />}
+                {/* 來信對話框的點擊範圍:對話框畫在打光層下面,點擊要在這層才不會被窗戶熱區擋住 */}
+                {linkBox && (
+                  <rect
+                    aria-hidden
+                    x={linkBox.x}
+                    y={linkBox.y}
+                    width={linkBox.w}
+                    height={linkBox.h}
+                    fill="transparent"
+                    className="cursor-pointer"
+                    onClick={handleClick(spot.id)}
+                    onMouseEnter={() => setHoveredItem(spot.id)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                  />
+                )}
                 {/* 鏡頭縮放目標:透明、不吃事件,只給鏡頭算位置 */}
                 {spot.screenRect && (
                   <rect
@@ -290,15 +326,6 @@ export function PhotoScene({
                     <circle className="beacon-dot" r={4.5} />
                   </g>
                 )}
-                {/* 換頁的物件(手機)改用來信對話框,尾巴指在物件上緣偏左 */}
-                {link && (
-                  <LetterBadge
-                    x={bbox.x + bbox.w * 0.2}
-                    y={bbox.y - 4}
-                    active={hoveredItem === spot.id}
-                    onClick={handleClick(spot.id)}
-                  />
-                )}
               </g>
             );
           })}
@@ -306,8 +333,8 @@ export function PhotoScene({
 
       </div>
 
-      {/* Hover 提示(桌機) */}
-      {tooltip && !overlay && (
+      {/* Hover 提示(桌機);換頁的物件(手機)已經有來信對話框,不再重複 */}
+      {tooltip && !overlay && !ITEM_LINK[tooltip.id] && (
         <div
           className="pointer-events-none fixed z-30 hidden -translate-x-1/2 -translate-y-full rounded-full border border-white/10 bg-[#141824]/95 px-3.5 py-1.5 text-xs text-white shadow-xl md:block"
           style={{ left: tooltip.x, top: tooltip.y - 10 }}

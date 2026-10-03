@@ -35,9 +35,7 @@ export type Hotspot = HotspotBase &
   ({ rect: Rect; points?: never } | { points: string; rect?: never });
 
 export const HOTSPOTS: Hotspot[] = [
-  // 左牆兩個相框(上藍綠下酒紅)→ 海報群
-  { id: "poster", rect: { x: 97, y: 120, w: 185, h: 240 } },
-  { id: "poster", rect: { x: 95, y: 365, w: 200, h: 228 } },
+  // 左牆兩個相框(上藍綠下酒紅)先不開放點擊,保留給之後的其他用途
   // 右牆 BOYNEXTDOOR 海報 → 海報群
   { id: "poster", rect: { x: 1305, y: 220, w: 235, h: 278 } },
   // 海景窗(下緣讓給窗台上的音響,它排後面優先)
@@ -52,7 +50,8 @@ export const HOTSPOTS: Hotspot[] = [
   { id: "backpack", rect: { x: 355, y: 205, w: 166, h: 315 }, slot: true },
   // 桌上左側的音響 → 歌單(元素插槽)
   // 音響縮到原本的 80%(左下角固定),不再跟手機擠在一起,跟筆電的比例也比較像真的
-  { id: "musicPlayer", rect: { x: 760, y: 610, w: 112, h: 71 }, slot: true },
+  // 提示點放在音響頂面,不蓋到正面的字
+  { id: "musicPlayer", rect: { x: 760, y: 610, w: 112, h: 71 }, slot: true, beacon: { x: 0.5, y: 0.1 } },
   // 床尾的耳機 → 歌單(元素插槽;渲染順序在床之後,見 element-layers LAYERS)
   { id: "headphones", rect: { x: 1318, y: 852, w: 185, h: 125 }, slot: true },
   // 筆電(桌面中央)→ 專案(元素插槽)

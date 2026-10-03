@@ -142,12 +142,22 @@ body {
   }
 }
 
-/* ---------- 手機上方的來信對話框(scene/letter-badge) ---------- */
-.letter-body {
-  fill: #fffaf1;
-  stroke: rgba(107, 86, 71, 0.35);
-  stroke-width: 1.5;
+/* ---------- 右上角選單(top-menu):展開時按鈕依序往下滑出 ---------- */
+@keyframes menu-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
+.menu-item-in {
+  animation: menu-item-in 0.2s ease-out both;
+}
+
+/* ---------- 手機上方的來信對話框(scene/letter-badge),顏色寫在元件的 SVG 屬性上 ---------- */
 .letter-float {
   filter: drop-shadow(0 4px 6px rgba(60, 40, 20, 0.22));
   animation: letter-float 2.8s ease-in-out infinite;
@@ -414,7 +424,8 @@ body {
   animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* 全螢幕 overlay(電腦專案、海景):鏡頭推近到一半就淡入蓋住,關閉時淡出 */
+/* 全頁畫面(overlays/full-page、海景、播放器):鏡頭有推近的(電腦、海景)推到一半才淡入蓋住,
+   其他直接淡入(cover-in-now);關閉時淡出 */
 @keyframes cover-in {
   from {
     opacity: 0;
@@ -425,6 +436,9 @@ body {
 }
 .cover-in {
   animation: cover-in 0.35s ease-out 0.3s both;
+}
+.cover-in-now {
+  animation: cover-in 0.3s ease-out both;
 }
 @keyframes cover-out {
   from {
@@ -455,6 +469,114 @@ body {
 }
 .twinkle {
   animation: twinkle 2.6s ease-in-out infinite;
+}
+
+/* ---------- 🧪 首頁進場動畫提案(?introv=,見 layout 的 INTRO_SCRIPT) ----------
+   四種都只動 opacity / transform,交給 GPU 合成,不會一直重畫 */
+
+/* fade:整個場景從稍微放大的狀態淡入、慢慢推回原位 */
+@keyframes intro-fade {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+html[data-intro="fade"] .intro-scene {
+  animation: intro-fade 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* layers:空房間先淡入,家具一件一件由下往上長出來,人物最後 */
+@keyframes intro-base {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+html[data-intro="layers"] .intro-scene {
+  animation: intro-base 0.5s ease-out both;
+}
+html[data-intro="layers"] .intro-layer {
+  transform-box: fill-box;
+  animation: intro-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: var(--intro-delay, 0s);
+}
+
+/* lights:一開始房間暗著,光從窗邊書桌那裡擴散開來,像開燈 */
+.intro-lights,
+.intro-title {
+  display: none;
+  pointer-events: none;
+}
+@keyframes intro-lights {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(5);
+  }
+}
+html[data-intro="lights"] .intro-lights {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  display: block;
+  background: radial-gradient(circle at 52% 55%, transparent 0, transparent 10%, rgba(20, 24, 34, 0.94) 34%);
+  transform-origin: 52% 55%;
+  animation: intro-lights 1.8s cubic-bezier(0.65, 0, 0.35, 1) 0.15s both;
+}
+
+/* title:先在奶油色畫面中央出現「나의 공간」,再整片淡出露出房間 */
+@keyframes intro-title-out {
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes intro-title-text {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    letter-spacing: 0.3em;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    letter-spacing: 0.02em;
+  }
+}
+html[data-intro="title"] .intro-title {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: var(--color-cream);
+  animation: intro-title-out 0.7s ease-in 1.3s both;
+}
+html[data-intro="title"] .intro-title p {
+  animation: intro-title-text 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 }
 
 /* ---------- 無障礙:減少動態 ---------- */

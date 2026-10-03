@@ -1,37 +1,45 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { CONTROL_BASE, TONE_CLASS, TONE_TEXT, useControlTone } from "@/lib/control-tone";
+import { ROUND_BASE, TONE_CLASS, TONE_TEXT, useControlTone } from "@/lib/control-tone";
 
 interface BadgePillProps {
   onClick: () => void;
-  title: string;
+  /** 讀屏念的完整說明,也是滑過時左邊冒出的文字 */
+  label: string;
   children: ReactNode;
   /** 二態開關才給(aria-pressed);循環切換模式的不用 */
   pressed?: boolean;
-  /** 讀屏念的完整說明(畫面上只顯示圖示與主文字時,把模式等資訊放這裡) */
-  label?: string;
-  /** 換掉預設的文字顏色(例如上線綠、離開橘) */
-  textClassName?: string;
 }
 
 /**
- * 右上角狀態膠囊的共用外觀 —— 在線狀態 / 時段兩顆共用同一套視覺
- * 定位交給呼叫端的容器(desk-experience.tsx 用一個 flex column 包起來),
- * 這裡只負責膠囊本身的樣式。
+ * 右上選單裡的圓形按鈕:畫面上只有圖示,說明放在 aria-label,
+ * 桌機滑過時在左邊冒出一小段文字
  */
-export function BadgePill({ onClick, title, children, pressed, label, textClassName }: BadgePillProps) {
+export function BadgePill({ onClick, label, children, pressed }: BadgePillProps) {
   const tone = useControlTone();
   return (
     <button
       type="button"
       onClick={onClick}
-      title={title}
       aria-label={label}
       aria-pressed={pressed}
-      className={`${CONTROL_BASE} ${TONE_CLASS[tone]} ${textClassName ?? TONE_TEXT[tone]}`}
+      className={`group ${ROUND_BASE} ${TONE_CLASS[tone]} ${TONE_TEXT[tone]}`}
     >
       {children}
+      <HoverLabel>{label}</HoverLabel>
     </button>
+  );
+}
+
+/** 滑過按鈕時,左邊冒出的文字說明(觸控裝置沒有 hover,就靠 aria-label) */
+export function HoverLabel({ children }: { children: ReactNode }) {
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute right-full mr-2 whitespace-nowrap rounded-full bg-[#3a2e24]/90 px-2.5 py-1 text-xs font-medium text-cream opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+    >
+      {children}
+    </span>
   );
 }
