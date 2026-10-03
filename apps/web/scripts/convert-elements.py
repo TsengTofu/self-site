@@ -22,9 +22,9 @@ SRC_DIR = os.path.join(ROOT, "assets", "scene", "elements")
 OUT_DIR = os.path.join(ROOT, "public", "scene", "elements")
 
 # 源檔解析度不到 2× 的元素(檔名不含副檔名):轉檔時先放大 2 倍再存
-# 床的原稿只有 1448 寬,貼圖框卻有 1258,Retina 上等於被瀏覽器硬拉 2 倍
-# 之後拿到真正 2× 的源檔,把名字從這裡拿掉就好
-UPSCALE_2X = {"bed"}
+# 床已換成真正 2× 的源檔所以拿掉了;其他還沒補到 2× 的(cabinet、girl-*、cat-sleep/back/stretch)
+# 等站主補圖,補圖前想先頂一下可以把名字加進來
+UPSCALE_2X: set[str] = set()
 
 # 放大 2 倍後輪廓的半透明過渡帶也跟著變兩倍寬,alpha 陡度乘回 2 才是原生 2× 該有的邊
 # 只適合邊緣是硬邊的去背圖;帶柔和陰影的元素不要放進 UPSCALE_2X
