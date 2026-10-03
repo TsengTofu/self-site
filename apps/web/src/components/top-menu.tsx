@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
-import { Menu, Music, Music2, Palette, X } from "lucide-react";
+import { Menu, Music, Palette, X } from "lucide-react";
 import { StatusBadge } from "@/components/status-badge";
 import { PhaseBadge } from "@/components/phase-badge";
 import { BadgePill, HoverLabel } from "@/components/badge-pill";
@@ -10,6 +10,7 @@ import { EqBars } from "@/components/eq-bars";
 import { useStartMusic } from "@/components/music-player";
 import { ROUND_BASE, TONE_CLASS, TONE_TEXT, useControlTone } from "@/lib/control-tone";
 import { useSceneStore, selectIsOnline } from "@/stores/scene-store";
+import { useEffectivePhase } from "@/hooks/use-time-of-day";
 
 /**
  * 右上角的收合選單:平常只有一顆圓鈕,點開往下展開
@@ -46,7 +47,10 @@ export function TopMenu() {
   const round = `group ${ROUND_BASE} ${TONE_CLASS[tone]} ${TONE_TEXT[tone]}`;
 
   return (
-    <div ref={rootRef} className="fixed right-4 top-4 z-20 flex flex-col items-end gap-2 md:right-8 md:top-8">
+    <div
+      ref={rootRef}
+      className="fixed right-4 top-4 z-20 flex flex-col items-end gap-2 md:right-8 md:top-8"
+    >
       <button
         type="button"
         aria-label={open ? "收起選單" : "打開選單"}
@@ -83,7 +87,11 @@ export function TopMenu() {
             onClick={playing ? closePlayer : startMusic}
             label={playing ? "關掉音樂" : "播放音樂"}
           >
-            {playing ? <EqBars height={12} className="bg-current" /> : <Music className="size-[18px]" strokeWidth={2.1} aria-hidden />}
+            {playing ? (
+              <EqBars height={12} className="bg-current" />
+            ) : (
+              <Music className="size-[18px]" strokeWidth={2.1} aria-hidden />
+            )}
           </BadgePill>,
           <Link key="making-of" href="/making-of" aria-label="視覺製作歷程" className={round}>
             <Palette className="size-[18px]" strokeWidth={2.1} aria-hidden />
@@ -99,24 +107,31 @@ export function TopMenu() {
   );
 }
 
-/** 三顆音符的起點、飄的方向與錯開的時間(圓鈕在右上角,所以往左上飄) */
+/** 三顆音符的字、起點、飄的方向與錯開的時間(圓鈕在右上角,所以往左上飄) */
 const NOTES = [
-  { Icon: Music, left: -10, top: 14, dx: -16, delay: 0 },
-  { Icon: Music2, left: -2, top: 26, dx: -22, delay: 0.8 },
-  { Icon: Music, left: -16, top: 30, dx: -12, delay: 1.6 },
+  { glyph: "♪", left: -10, top: 12, dx: -16, delay: 0 },
+  { glyph: "♫", left: -2, top: 24, dx: -22, delay: 0.8 },
+  { glyph: "♪", left: -16, top: 28, dx: -12, delay: 1.6 },
 ];
 
-/** 播音樂時圓鈕旁邊飄出的音符,只是裝飾 */
+/**
+ * 播音樂時圓鈕旁邊飄出的音符,只是裝飾
+ * 用純文字,不加底色和陰影;顏色跟著時段,夜晚背景暗就換淺色
+ */
 function FloatingNotes() {
+  const night = useEffectivePhase() === "night";
   return (
     <span aria-hidden className="pointer-events-none absolute inset-0">
-      {NOTES.map(({ Icon, left, top, dx, delay }, i) => (
-        <Icon
+      {NOTES.map(({ glyph, left, top, dx, delay }, i) => (
+        <span
           key={i}
-          className="note-float absolute size-3.5 fill-[#f6c98f] text-[#c9893f] drop-shadow-[0_1px_1px_rgba(40,25,10,0.35)]"
-          strokeWidth={2.2}
-          style={{ left, top, "--note-dx": `${dx}px`, "--note-delay": `${delay}s` } as CSSProperties}
-        />
+          className={`note-float absolute text-sm font-bold leading-none ${night ? "text-cream/90" : "text-ink-soft"}`}
+          style={
+            { left, top, "--note-dx": `${dx}px`, "--note-delay": `${delay}s` } as CSSProperties
+          }
+        >
+          {glyph}
+        </span>
       ))}
     </span>
   );
