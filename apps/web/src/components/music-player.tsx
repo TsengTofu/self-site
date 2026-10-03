@@ -3,7 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { Maximize2, Music, Pause, Play, SkipBack, SkipForward, Square, X } from "lucide-react";
+import {
+  Captions,
+  Maximize2,
+  Music,
+  Pause,
+  Play,
+  Shuffle,
+  SkipBack,
+  SkipForward,
+  Square,
+  X,
+} from "lucide-react";
 import { songCover, songs } from "@/data/music";
 import { useSceneStore } from "@/stores/scene-store";
 import { prefersReducedMotion } from "@/lib/motion";
@@ -27,15 +38,25 @@ function sendCommand(iframe: HTMLIFrameElement | null, func: string, args: unkno
 /**
  * 預設不要字幕:YouTube 會依觀看者自己的偏好自動開字幕,網址參數關不掉,
  * 只能等播放器載入後叫它卸下字幕模組;字幕模組開播後才載入,所以分幾次送
+ * 每次送之前再問一次 stillOff,中途打開歌詞就不會被關掉
  */
 const CAPTIONS_OFF_DELAYS = [800, 2000, 4000];
-function hideCaptions(iframe: HTMLIFrameElement | null) {
+function hideCaptions(iframe: HTMLIFrameElement | null, stillOff: () => boolean) {
   CAPTIONS_OFF_DELAYS.forEach((ms) =>
     window.setTimeout(() => {
+      if (!stillOff()) return;
       sendCommand(iframe, "unloadModule", ["captions"]);
       sendCommand(iframe, "unloadModule", ["cc"]);
     }, ms),
   );
+}
+
+/**
+ * 歌詞 = 官方 MV 自己的字幕(跟著影片同步,語言由 YouTube 依觀看者設定挑)
+ * 不從歌詞網站抄歌詞放進網站:歌詞有著作權
+ */
+function showCaptions(iframe: HTMLIFrameElement | null) {
+  sendCommand(iframe, "loadModule", ["captions"]);
 }
 
 /**
@@ -99,6 +120,9 @@ export function MusicPlayer() {
   const minimizePlayer = useSceneStore((s) => s.minimizePlayer);
   const closePlayer = useSceneStore((s) => s.closePlayer);
   const playSong = useSceneStore((s) => s.playSong);
+  const skipSong = useSceneStore((s) => s.skipSong);
+  const shuffle = useSceneStore((s) => s.shuffle);
+  const toggleShuffle = useSceneStore((s) => s.toggleShuffle);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -109,6 +133,13 @@ export function MusicPlayer() {
   const [ytState, setYtState] = useState<{ songId: string; state: number } | null>(null);
   // 自動播放被擋下、卡在還沒開始的那一首
   const [stuckSongId, setStuckSongId] = useState<string | null>(null);
+  // 歌詞開關;計時器與訊息處理拿的是 ref,才讀得到最新的值
+  const [lyrics, setLyrics] = useState(false);
+  const lyricsRef = useRef(lyrics);
+  useEffect(() => {
+    lyricsRef.current = lyrics;
+  }, [lyrics]);
+  const captionsOff = () => !lyricsRef.current;
 
   const song = songs.find((s) => s.id === currentSongId) ?? null;
   const expanded = playerMode === "expanded";
@@ -142,10 +173,14 @@ export function MusicPlayer() {
     else closePlayer();
   };
 
-  /** 換到前一首(-1)或下一首(1),頭尾相接 */
-  const skip = (step: 1 | -1) => {
-    const i = songs.findIndex((s) => s.id === currentSongId);
-    playSong(songs[(i + step + songs.length) % songs.length]!.id);
+  const toggleLyrics = () => {
+    if (lyrics) {
+      sendCommand(iframeRef.current, "unloadModule", ["captions"]);
+      sendCommand(iframeRef.current, "unloadModule", ["cc"]);
+    } else {
+      showCaptions(iframeRef.current);
+    }
+    setLyrics(!lyrics);
   };
 
   // 聽 YouTube 回報的狀態;同一個狀態重複回報不算,才不會一直重新計時
@@ -166,8 +201,13 @@ export function MusicPlayer() {
       } else {
         setStuckSongId(null);
       }
-      // 字幕模組開播才載入,手機點了才播的話,載入時的那幾次早就送完了,所以開播時再關一次
-      if (state === 1) hideCaptions(iframeRef.current);
+      // 字幕模組開播才載入,手機點了才播的話,載入時的那幾次早就送完了,所以開播時再處理一次
+      if (state === 1) {
+        if (lyricsRef.current) showCaptions(iframeRef.current);
+        else hideCaptions(iframeRef.current, () => !lyricsRef.current);
+      }
+      // 播完自動接下一首(隨機播放時隨機挑)
+      if (state === 0) useSceneStore.getState().skipSong(1);
     };
     window.addEventListener("message", onMessage);
     return () => {
@@ -227,6 +267,22 @@ export function MusicPlayer() {
               <h2 className="text-base font-bold md:text-lg">我在聽什麼</h2>
             </div>
             <span className="hidden text-xs text-white/40 lg:inline">按 Esc 也能關閉</span>
+            {canPlay && (
+              // 歌詞 = 官方 MV 的字幕,打開後會顯示在影片下緣
+              <button
+                type="button"
+                aria-pressed={lyrics}
+                onClick={toggleLyrics}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition active:scale-95 ${
+                  lyrics
+                    ? "border-[#f6c98f]/60 bg-[#f6c98f]/15 text-[#f6c98f]"
+                    : "border-white/15 bg-white/10 hover:bg-white/20"
+                }`}
+              >
+                <Captions className="size-4" aria-hidden />
+                歌詞
+              </button>
+            )}
             <button
               type="button"
               onClick={dismiss}
@@ -271,7 +327,7 @@ export function MusicPlayer() {
               ref={iframeRef}
               onLoad={(e) => {
                 listenToPlayer(e.currentTarget, song.id);
-                hideCaptions(e.currentTarget);
+                hideCaptions(e.currentTarget, captionsOff);
               }}
               className={`h-full w-full ${needsTap ? "" : "pointer-events-none"}`}
               src={embedUrl(song.youtubeVideoId)}
@@ -286,12 +342,15 @@ export function MusicPlayer() {
         {expanded && (
           <div className="shrink-0 border-t border-white/10 px-4 py-3 md:flex md:items-center md:gap-8 md:px-8">
             <div className="flex items-center gap-3 md:shrink-0">
-              <MusicDisc
-                image={song ? songCover(song) : null}
-                coverColor={song?.coverColor}
-                size={11}
-                spinning={playing}
-              />
+              {/* 手機寬度不夠放光碟,讓位給控制鈕 */}
+              <span className="hidden sm:block">
+                <MusicDisc
+                  image={song ? songCover(song) : null}
+                  coverColor={song?.coverColor}
+                  size={11}
+                  spinning={playing}
+                />
+              </span>
               <div className="min-w-0 flex-1 md:w-44 md:flex-none">
                 <p className="truncate text-sm font-bold">{song?.title ?? "還沒選歌"}</p>
                 {needsTap ? (
@@ -305,8 +364,17 @@ export function MusicPlayer() {
               <div className="flex items-center gap-0.5">
                 <button
                   type="button"
+                  aria-label="隨機播放"
+                  aria-pressed={shuffle}
+                  onClick={toggleShuffle}
+                  className={`${ROUND_BUTTON} ${shuffle ? "bg-white/10 !text-[#f6c98f]" : ""}`}
+                >
+                  <Shuffle className="size-[18px]" aria-hidden />
+                </button>
+                <button
+                  type="button"
                   aria-label="上一首"
-                  onClick={() => skip(-1)}
+                  onClick={() => skipSong(-1)}
                   className={ROUND_BUTTON}
                 >
                   <SkipBack className="size-[18px] fill-current" aria-hidden />
@@ -324,7 +392,7 @@ export function MusicPlayer() {
                 <button
                   type="button"
                   aria-label="下一首"
-                  onClick={() => skip(1)}
+                  onClick={() => skipSong(1)}
                   className={ROUND_BUTTON}
                 >
                   <SkipForward className="size-[18px] fill-current" aria-hidden />
@@ -410,7 +478,7 @@ export function MusicPlayer() {
             <button
               type="button"
               aria-label="下一首"
-              onClick={() => skip(1)}
+              onClick={() => skipSong(1)}
               className={MINI_BUTTON}
             >
               <SkipForward className="size-3.5 fill-current" aria-hidden />

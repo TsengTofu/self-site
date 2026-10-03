@@ -157,6 +157,31 @@ body {
   animation: menu-item-in 0.2s ease-out both;
 }
 
+/* 播音樂時,選單圓鈕旁邊飄出音符:往左上飄、邊飄邊淡出,三顆輪流 */
+@keyframes note-float {
+  0% {
+    opacity: 0;
+    transform: translate(0, 4px) rotate(-8deg) scale(0.7);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--note-dx, -14px), -22px) rotate(10deg) scale(1);
+  }
+}
+.note-float {
+  animation: note-float 2.4s ease-out infinite;
+  animation-delay: var(--note-delay, 0s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .note-float {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
 /* ---------- 手機上方的來信對話框(scene/letter-badge),顏色寫在元件的 SVG 屬性上 ---------- */
 .letter-float {
   filter: drop-shadow(0 4px 6px rgba(60, 40, 20, 0.22));
