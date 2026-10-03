@@ -67,7 +67,7 @@ export const HOTSPOTS: Hotspot[] = [
   },
   // 手機(音響與筆電之間)→ Profile(元素插槽)
   // 整支放在桌面上,不再懸出桌緣(桌緣大約在 y 700)
-  { id: "phone", rect: { x: 878, y: 646, w: 92, h: 50 }, slot: true },
+  { id: "phone", rect: { x: 890, y: 646, w: 92, h: 50 }, slot: true },
   // 斜靠鏡子的長板 → 彩蛋。畫面由 element-layers 的 DECOR 渲染(板尾被床蓋住,
   // 貼圖框與點擊範圍不同),這裡只是可點的板身多邊形,不掛 slot
   { id: "skateboard", points: "1558,502 1660,525 1640,870 1520,845" },

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { TOAST_BOTTOM } from "@/lib/toast";
 import { IMAGE_W, IMAGE_H } from "./hotspots";
 import { ContactShadow, DECOR, GIRL_RECTS, elementSrc, type DecorName, type GirlState } from "./element-layers";
 
@@ -47,7 +48,7 @@ const SPOTS: CatSpot[] = [
   // 6. 走路貓在矮櫃上
   { pose: "walk", x: 235, y: 600, w: 200, h: 172, hint: "在矮櫃上散步" },
   // 7. 走路貓正走出畫面左緣(沿矮櫃頂,身體已出框,只剩尾巴;唯一允許超出邊界的藏點)
-  { pose: "walk", x: -172, y: 602, w: 200, h: 172, hint: "走出畫面了(只剩尾巴)" },
+  { pose: "walk", x: -172, y: 602, w: 200, h: 172, hint: "走出畫面了（只剩尾巴）" },
 ];
 
 /** 每種姿勢的接觸陰影(以貓圖寬高的比例表示,圖的下緣就是腳底) */
@@ -95,7 +96,7 @@ export function CatPeekaboo({ hidden = false, present, girlState }: CatPeekabooP
     setFound(true);
     const n = Number(localStorage.getItem(STORAGE_KEY) ?? "0") + 1;
     localStorage.setItem(STORAGE_KEY, String(n));
-    setToast(n === 1 ? `找到貓咪了!牠正${spot?.hint} 🐈` : `又找到豆漿了 · 第 ${n} 次`);
+    setToast(n === 1 ? `找到貓咪了！牠正${spot?.hint}` : `又找到豆漿了，第 ${n} 次`);
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 2600);
   };
@@ -182,7 +183,7 @@ export function CatPeekaboo({ hidden = false, present, girlState }: CatPeekabooP
       </svg>
 
       {toast && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-24 z-40 flex justify-center md:bottom-8">
+        <div className={`pointer-events-none fixed inset-x-0 z-40 flex justify-center ${TOAST_BOTTOM}`}>
           <div
             role="status"
             className="rounded-full border border-ink-soft/15 bg-cream/95 px-5 py-2.5 text-sm text-ink shadow-lg backdrop-blur"

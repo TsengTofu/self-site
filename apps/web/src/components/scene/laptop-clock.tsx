@@ -27,7 +27,8 @@ const subscribe = (onChange: () => void) => {
 const getMinute = () => Math.floor(Date.now() / 60_000);
 const getServerMinute = () => null;
 
-const WEEKDAY = new Intl.DateTimeFormat("zh-TW", { weekday: "long" });
+/** 日期用英文:Saturday, October 3 */
+const DATE_FORMAT = new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric" });
 
 /**
  * 筆電螢幕的預設畫面:像鎖定畫面一樣顯示現在的日期和時間
@@ -57,24 +58,24 @@ export function LaptopClock({ rect }: { rect: Rect }) {
   const time = now
     ? `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
     : "";
-  const date = now ? `${now.getMonth() + 1}月${now.getDate()}日 ${WEEKDAY.format(now)}` : "";
+  const date = now ? DATE_FORMAT.format(now) : "";
 
   return (
     <g aria-hidden>
       <defs>
-        <linearGradient id="laptop-wallpaper" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#9fb6f2" />
-          <stop offset="0.55" stopColor="#c9b6e4" />
-          <stop offset="1" stopColor="#f0b9cb" />
+        {/* 深藍底,上亮下暗一點,像真的螢幕 */}
+        <linearGradient id="laptop-wallpaper" x1="0" y1="0" x2="0.35" y2="1">
+          <stop offset="0" stopColor="#2c3b5e" />
+          <stop offset="1" stopColor="#18213a" />
         </linearGradient>
       </defs>
       <polygon points={points} fill="url(#laptop-wallpaper)" />
       {now && (
         <g transform={`matrix(${matrix})`} className="font-sans" fill="#fff">
-          <text x={BOX_W / 2} y={23} textAnchor="middle" fontSize={5.6} opacity={0.92}>
+          <text x={BOX_W / 2} y={20} textAnchor="middle" fontSize={5.4} opacity={0.85} letterSpacing={0.2}>
             {date}
           </text>
-          <text x={BOX_W / 2} y={45} textAnchor="middle" fontSize={21} fontWeight={600}>
+          <text x={BOX_W / 2} y={47} textAnchor="middle" fontSize={27} fontWeight={600}>
             {time}
           </text>
         </g>

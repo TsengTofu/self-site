@@ -130,18 +130,12 @@ export function PhotoScene({
     }
   }, [present]);
 
-  // 手機:預設把畫面捲到圖片中央(書桌區);dock 的「首頁」按鈕會發 scene:home 捲回來
+  // 手機:預設把畫面捲到圖片中央(書桌區)
   useEffect(() => {
     const el = scrollRef.current;
     if (el && el.scrollWidth > el.clientWidth) {
       el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
     }
-    const goHome = () => {
-      const box = scrollRef.current;
-      if (box) box.scrollTo({ left: (box.scrollWidth - box.clientWidth) / 2, behavior: "smooth" });
-    };
-    window.addEventListener("scene:home", goHome);
-    return () => window.removeEventListener("scene:home", goHome);
   }, []);
 
   const handleClick = (id: ItemId) => (e: MouseEvent<SVGElement>) => {

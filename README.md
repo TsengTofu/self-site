@@ -5,6 +5,7 @@
 三個頁面：
 
 - `/` — 手繪海景房場景：分層元素、四時段光影、人物三態、找貓咪彩蛋
+  - 物件網址：`/projects`、`/profile`、`/music`、`/books`、`/notes`、`/ocean`、`/skateboard`，進來會自動打開對應的物件（對照表在 `lib/item-routes.ts`）
 - `/resume` — 正式履歷（直式時間軸，內容在 `data/resume.ts`）
 - `/making-of` — 視覺風格製作歷程（總覽 + 可點擊時間軸，兩畫面左右切換）
 
@@ -42,11 +43,10 @@ self-site/
 │           │   ├── overlays/         # 各物件的視窗（手機/電腦/書/筆記本/滑板/海景）
 │           │   ├── resume/           # /resume 頁
 │           │   ├── making-of/        # /making-of 頁
-│           │   ├── nav/              # 🧪 導覽提案（?navv=list|sheet，選版後固化）
 │           │   ├── desk-experience.tsx   # 首頁總指揮：鏡頭、點擊路由、overlay
 │           │   ├── music-player.tsx      # 音樂 Player（展開選歌 / 左下 mini）
-│           │   ├── mobile-dock.tsx       # 手機版底部 dock
-│           │   └── scene-header.tsx      # 左上標題（hover/觸控展開子頁連結）
+│           │   ├── mobile-dock.tsx       # 手機版底部 dock（按下浮起 + 說明泡泡，寬度不夠可左右滑）
+│           │   └── scene-header.tsx      # 左上標題與子頁按鈕
 │           ├── data/                 # ✏️ 內容（履歷/專案/書/句子/歌/製作歷程）
 │           ├── hooks/                # 在座循環、鏡頭、時段…
 │           ├── lib/                  # items 註冊表、site（網域）、motion、gsap-setup
@@ -75,11 +75,10 @@ self-site/
 
 1. **網域**：部署時設定環境變數 `NEXT_PUBLIC_SITE_URL`（lib/site.ts 會讀）
 2. `data/music.ts` — 三首歌的 `youtubeVideoId` 還是空的（播放器目前是示範模式）
-3. `data/profile.ts` — Medium 連結是佔位網址
-4. `data/projects.ts` — self-site 的 `demoUrl` 部署後換成正式網址
-5. `public/making-of/` — /making-of 的過程圖還有幾格沒補（`asset.src` 為 null 的那些；規格見 data/making-of.ts 檔頭）
-6. **og.jpg / app/icon.png 素材過時**：分別是舊版房間圖與橘貓（現在的豆漿是三花），想換再提供新圖
-7. 導覽選版：`?navv=list|sheet` 兩案 vs 原始版，選定後固化並刪 mock-variant.ts
+3. `data/projects.ts` — self-site 的 `demoUrl` 部署後換成正式網址
+4. `public/making-of/` — /making-of 的過程圖還有幾格沒補（`asset.src` 為 null 的那些；規格見 data/making-of.ts 檔頭）
+5. **og.jpg 素材過時**：還是舊版房間圖與橘貓（icon 已換成三花），想換再提供新圖
+6. 按鈕配色選版：`?btnv=glass|wall|ink` 三案 vs 現行奶油色，選定後固化並刪 mock-variant.ts、lib/control-tone.ts
 
 ## 要換成自己的內容
 

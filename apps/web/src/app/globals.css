@@ -68,12 +68,13 @@ body {
 /* ---------- 熱區圓圈提示(beacon):常駐的小亮點 + 定時擴散的光圈,hover/focus/首訪提示時更亮更快 ---------- */
 .hotspot-beacon {
   pointer-events: none;
-  opacity: 0.95;
+  opacity: 0.8;
   transition: opacity 0.35s ease;
 }
-/* 亮點加一圈淡棕描邊,放在淺色牆面或窗景上也看得到 */
+/* 亮點半透明,加一圈淡棕描邊,放在淺色牆面或窗景上也看得到 */
 .beacon-dot {
   fill: #fff6e2;
+  fill-opacity: 0.6;
   stroke: rgba(107, 86, 71, 0.45);
   stroke-width: 1.5;
   filter: drop-shadow(0 0 5px rgba(255, 214, 150, 0.85));
@@ -120,6 +121,7 @@ body {
 }
 .beacon-active .beacon-dot,
 .beacon-hint .beacon-dot {
+  fill-opacity: 0.85;
   transform: scale(1.25);
   filter: drop-shadow(0 0 8px rgba(255, 220, 160, 0.95));
 }
@@ -338,28 +340,6 @@ body {
   transform-box: fill-box;
   transform-origin: center bottom;
   animation: element-tap 0.35s ease-out;
-}
-
-/* ---------- 時段滑桿(nav/phase-slider)---------- */
-.phase-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 9999px;
-  background: var(--color-cream);
-  border: 2px solid var(--color-ink-soft);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
-  cursor: pointer;
-}
-.phase-range::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 9999px;
-  background: var(--color-cream);
-  border: 2px solid var(--color-ink-soft);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
-  cursor: pointer;
 }
 
 /* ---------- 通用小動畫 ---------- */

@@ -18,8 +18,7 @@ import { useSceneCamera } from "@/hooks/use-scene-camera";
 import { useItemClickRouter } from "@/hooks/use-item-click-router";
 import { useHotspotHint } from "@/hooks/use-hotspot-hint";
 import { useTitleEgg } from "@/hooks/use-title-egg";
-import { useMockVariant } from "@/lib/mock-variant";
-import { OrbitNav, type OrbitShape } from "@/components/nav/orbit-nav";
+import { useItemRoute } from "@/hooks/use-item-route";
 
 setupGsapTickerFallback();
 
@@ -40,13 +39,9 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
   usePresenceCycle();
   useSceneCamera(stageRef);
   useTitleEgg();
+  useItemRoute();
   const handleItemClick = useItemClickRouter();
   const { hinting } = useHotspotHint();
-  // 🧪 MOCK:導覽提案切換(?navv=list|sheet),無參數 / 0 = 原始版(右上角 + dock)
-  const navv = useMockVariant("navv");
-  const orbitShape = (["list", "sheet"] as const).includes(navv as OrbitShape)
-    ? (navv as OrbitShape)
-    : null;
 
   /* ---------- 點到未實作物件時搖一下 ---------- */
   useEffect(() => {
@@ -73,22 +68,12 @@ export function DeskExperience({ availableElements }: DeskExperienceProps) {
 
         <SceneHeader />
 
-      {/* 🧪 MOCK 導覽提案(?navv=)
-          未帶參數 / navv=0 → 原始版:右上角兩顆藥丸 + 手機底部 dock(保留)
-          navv=list|sheet → 圓形導覽鈕(收合時一顆圓,點開展開物件 + 設定),
-                            手機與桌機共用;上線改純顯示 */}
-      {orbitShape ? (
-        <OrbitNav onItemClick={handleItemClick} shape={orbitShape} />
-      ) : (
-        <>
-          {/* 右上角狀態膠囊:在線 / 時段,共用一個容器定位 */}
-          <div className="fixed right-4 top-4 z-20 flex flex-col items-end gap-2 md:right-8 md:top-8">
-            <StatusBadge />
-            <PhaseBadge />
-          </div>
-          <MobileDock onItemClick={handleItemClick} />
-        </>
-      )}
+        {/* 右上角狀態膠囊:在線 / 時段,共用一個容器定位 */}
+        <div className="fixed right-4 top-4 z-20 flex flex-col items-end gap-2 md:right-8 md:top-8">
+          <StatusBadge />
+          <PhaseBadge />
+        </div>
+        <MobileDock onItemClick={handleItemClick} />
       </div>
 
       <OverlayRoot />

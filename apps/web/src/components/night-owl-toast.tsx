@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { TOAST_BOTTOM } from "@/lib/toast";
 
 const SESSION_KEY = "self-site:night-owl";
 const SHOW_DELAY_MS = 4000;
@@ -35,12 +36,12 @@ export function NightOwlToast() {
   if (!visible) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-24 z-40 flex justify-center md:bottom-8">
+    <div className={`pointer-events-none fixed inset-x-0 z-40 flex justify-center ${TOAST_BOTTOM}`}>
       <div
         role="status"
         className="rounded-full border border-ink-soft/15 bg-cream/95 px-5 py-2.5 text-sm text-ink shadow-lg backdrop-blur"
       >
-        這個時間還醒著,你也是夜貓子吧 🌙
+        這個時間還醒著，你也是夜貓子吧
       </div>
     </div>
   );
