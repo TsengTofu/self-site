@@ -7,6 +7,10 @@ const H = 36;
 /** 尾巴的高度 */
 const TAIL = 10;
 
+/** 白底與描邊直接寫在 SVG 屬性上:SVG 沒給顏色時預設是黑色,
+ *  寫在 CSS class 裡的話,樣式沒載到就會變成黑底 */
+const BODY = { fill: "#fffaf1", stroke: "rgba(107, 86, 71, 0.35)", strokeWidth: 1.5 } as const;
+
 interface LetterBadgeProps {
   /** 尾巴尖端指到的位置(手機上方) */
   x: number;
@@ -30,10 +34,10 @@ export function LetterBadge({ x, y, active, onClick }: LetterBadgeProps) {
   return (
     <g aria-hidden className="letter-float cursor-pointer" onClick={onClick}>
       <g className={`letter-badge ${active ? "letter-badge-active" : ""}`} style={{ transformOrigin: `${x}px ${y}px` }}>
-        <rect x={left} y={top} width={W} height={H} rx={H / 2} className="letter-body" />
-        <path d={tail} className="letter-body" />
+        <rect x={left} y={top} width={W} height={H} rx={H / 2} {...BODY} />
+        <path d={tail} {...BODY} />
         {/* 蓋掉尾巴和本體接縫的那段描邊 */}
-        <rect x={x - 6} y={top + H - 3} width={12} height={3} fill="#fffaf1" />
+        <rect x={x - 6} y={top + H - 3} width={12} height={3} fill={BODY.fill} />
         <Mail x={left + 13} y={top + (H - 18) / 2} width={18} height={18} strokeWidth={2} className="text-[#b5677f]" />
         <text x={left + 38} y={top + H / 2 + 5.5} fontSize={15} fontWeight={700} fill="#4a3c30" className="font-sans">
           履歷
