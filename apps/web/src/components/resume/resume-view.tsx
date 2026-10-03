@@ -16,6 +16,7 @@ import {
   type SkillGroup,
 } from "@/data/resume";
 import { gmailComposeUrl } from "@/lib/links";
+import { HeaderSwitch } from "@/components/site-header";
 import { MetricIconView, SkillLogo } from "./resume-icons";
 import { RoleBlock } from "./role-block";
 
@@ -418,7 +419,9 @@ export function ResumeView({
   return (
     <main lang={RESUME_LANGS[lang].htmlLang} className="min-h-dvh bg-cream text-ink print:bg-white">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8">
-        <TopBar profile={profile} lang={lang} t={t} />
+        <HeaderSwitch current="resume" actions={<LangSwitch lang={lang} label={t.language} />}>
+          <TopBar profile={profile} lang={lang} t={t} />
+        </HeaderSwitch>
 
         {/* Hero:名字、職稱、摘要 + 聯絡卡 */}
         <section className="grid gap-8 pb-12 pt-6 md:grid-cols-[minmax(0,1fr)_300px] md:gap-12 md:pb-16 md:pt-10">
