@@ -18,11 +18,25 @@ import { BAR_BUTTON } from "@/components/overlays/full-page";
  * enablejsapi 讓我們自己的按鈕可以用 postMessage 叫它暫停/繼續
  */
 const embedUrl = (videoId: string) =>
-  `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&controls=0&disablekb=1&fs=0&iv_load_policy=3&enablejsapi=1`;
+  `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&controls=0&disablekb=1&fs=0&iv_load_policy=3&cc_load_policy=0&enablejsapi=1`;
 
-/** 對 YouTube iframe 下指令(pauseVideo / playVideo),不用另外載 YouTube 的 API 腳本 */
-function sendCommand(iframe: HTMLIFrameElement | null, func: "pauseVideo" | "playVideo") {
-  iframe?.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args: [] }), "*");
+/** 對 YouTube iframe 下指令,不用另外載 YouTube 的 API 腳本 */
+function sendCommand(iframe: HTMLIFrameElement | null, func: string, args: unknown[] = []) {
+  iframe?.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args }), "*");
+}
+
+/**
+ * 預設不要字幕:YouTube 會依觀看者自己的偏好自動開字幕,網址參數關不掉,
+ * 只能等播放器載入後叫它卸下字幕模組;字幕模組開播後才載入,所以分幾次送
+ */
+const CAPTIONS_OFF_DELAYS = [800, 2000, 4000];
+function hideCaptions(iframe: HTMLIFrameElement | null) {
+  CAPTIONS_OFF_DELAYS.forEach((ms) =>
+    window.setTimeout(() => {
+      sendCommand(iframe, "unloadModule", ["captions"]);
+      sendCommand(iframe, "unloadModule", ["cc"]);
+    }, ms),
+  );
 }
 
 /** mini 卡片上的小圓鈕 */
@@ -186,6 +200,7 @@ export function MusicPlayer() {
             <iframe
               key={song.id}
               ref={iframeRef}
+              onLoad={(e) => hideCaptions(e.currentTarget)}
               className="pointer-events-none h-full w-full"
               src={embedUrl(song.youtubeVideoId)}
               title={`${song.artist} — ${song.title}`}
