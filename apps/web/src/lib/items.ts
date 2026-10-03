@@ -29,7 +29,7 @@ export interface ItemMeta {
 }
 
 export const ITEMS: Record<ItemId, ItemMeta> = {
-  phone: { id: "phone", label: "手機", emoji: "📱", hint: "點一下看 Profile,點兩下設鬧鐘" },
+  phone: { id: "phone", label: "手機", emoji: "📱", hint: "看看我的 Profile" },
   laptop: { id: "laptop", label: "電腦", emoji: "💻", hint: "看看我的專案" },
   headphones: { id: "headphones", label: "耳機", emoji: "🎧", hint: "打開我的播放器" },
   musicPlayer: { id: "musicPlayer", label: "音響", emoji: "🔊", hint: "打開我的播放器" },

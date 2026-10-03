@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 /**
- * 封裝右上角三顆 badge 重複的「還原上次手動設定」邏輯:
+ * 封裝右上角 badge 重複的「還原上次手動設定」邏輯:
  * 掛載時讀一次 localStorage,交給 `restore` 判斷這個字串合不合法、要不要套用
  * (合法就在 `restore` 裡呼叫對應的 store setter)。
  *

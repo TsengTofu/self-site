@@ -2,9 +2,9 @@
 
 import { useRef, useState, type MouseEvent } from "react";
 import Image from "next/image";
-import { useSceneStore } from "@/stores/scene-store";
 import { useEffectivePhase, type DayPhase } from "@/hooks/use-time-of-day";
 import { useModalFocus } from "@self-site/ui/use-modal-focus";
+import { useCoverExit } from "@/hooks/use-cover-exit";
 
 /**
  * 窗外那片海 —— 底圖是從使用者的窗景原圖把玻璃那塊裁下來、反透視拉正的
@@ -73,14 +73,14 @@ interface Ripple {
 }
 
 export function OceanOverlay() {
-  const closeOverlay = useSceneStore((s) => s.closeOverlay);
+  const { leaving, leave } = useCoverExit();
   const phase = useEffectivePhase();
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const nextId = useRef(0);
   const stageRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
-  useModalFocus(true, rootRef, closeOverlay);
+  useModalFocus(true, rootRef, leave);
 
   // 點擊位置換算回圖片座標:圖是 cover 鋪滿,所以要照「被裁掉的邊」補回來
   const addRipple = (e: MouseEvent<HTMLDivElement>) => {
@@ -104,8 +104,8 @@ export function OceanOverlay() {
       role="dialog"
       aria-modal="true"
       aria-label="海景"
-      className="rise-in fixed inset-0 z-50 overflow-hidden"
-      style={{ animationDelay: "0.5s", backgroundColor: BASE_COLOR[phase] }}
+      className={`${leaving ? "cover-out" : "rise-in"} fixed inset-0 z-50 overflow-hidden`}
+      style={{ animationDelay: leaving ? "0s" : "0.5s", backgroundColor: BASE_COLOR[phase] }}
     >
       {/* 推鏡層:底圖與活元素一起緩慢漂移,畫面才不會像定格照片 */}
       <div ref={stageRef} className="ov-drift absolute inset-0 cursor-pointer" onClick={addRipple}>
@@ -210,12 +210,12 @@ export function OceanOverlay() {
       {/* 提示 + 關閉 */}
       <div className="pointer-events-none absolute inset-x-0 bottom-6 flex flex-col items-center gap-1 text-center">
         <p className="text-sm text-white/90 drop-shadow">點點海面 · 看著浪發呆一下</p>
-        <p className="text-xs text-white/70 drop-shadow">按 ESC 回到房間</p>
+        <p className="hidden text-xs text-white/70 drop-shadow md:block">按 ESC 回到房間</p>
       </div>
       <button
         type="button"
         aria-label="回到房間"
-        onClick={closeOverlay}
+        onClick={leave}
         className="absolute right-5 top-5 grid size-10 place-items-center rounded-full bg-black/25 text-lg text-white/90 backdrop-blur transition hover:bg-black/40"
       >
         ✕

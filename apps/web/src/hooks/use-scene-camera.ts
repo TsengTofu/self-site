@@ -31,6 +31,19 @@ function zoomSelectorFor(overlay: string | null) {
 export function useSceneCamera(stageRef: RefObject<HTMLDivElement | null>) {
   const overlay = useSceneStore((s) => s.overlay);
 
+  // 全螢幕 overlay 關閉前會先發這個事件(見 hooks/use-cover-exit.ts):
+  // 鏡頭瞬間歸位,等 overlay 淡出時看到的已經是原尺寸的清楚場景
+  useEffect(() => {
+    const onReset = () => {
+      const stage = stageRef.current;
+      if (!stage) return;
+      gsap.killTweensOf(stage);
+      gsap.set(stage, { scale: 1, x: 0, y: 0 });
+    };
+    window.addEventListener("scene:camera-reset", onReset);
+    return () => window.removeEventListener("scene:camera-reset", onReset);
+  }, [stageRef]);
+
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
