@@ -1,102 +1,23 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowUpRight, ChevronDown, Mail, MapPin } from "lucide-react";
 import {
-  siApacheecharts,
-  siClaude,
-  siCommitlint,
-  siD3,
-  siGitlab,
-  siGnuprivacyguard,
-  siJavascript,
-  siJest,
-  siModelcontextprotocol,
-  siNextdotjs,
-  siReact,
-  siReacthookform,
-  siSass,
-  siShadcnui,
-  siStorybook,
-  siTailwindcss,
-  siTanstack,
-  siTestinglibrary,
-  siTurborepo,
-  siTypescript,
-  siVuedotjs,
-  siZod,
-  type SimpleIcon,
-} from "simple-icons";
-import { periodOf, type Bullet, type Experience, type Resume, type SkillGroup } from "@/data/resume";
+  RESUME_LANGS,
+  RESUME_UI,
+  periodOf,
+  type Bullet,
+  type Experience,
+  type Metric,
+  type Profile,
+  type Resume,
+  type ResumeCopy,
+  type ResumeLang,
+  type Skill,
+  type SkillGroup,
+} from "@/data/resume";
 import { gmailComposeUrl } from "@/lib/links";
-
-export type ResumeLang = "zh" | "en" | "ko";
-
-/** 介面上的固定文字(履歷內容在 data/resume*.ts) */
-const UI = {
-  zh: {
-    home: "回到空間",
-    makingOf: "製作歷程",
-    chat: "一起聊聊",
-    mail: "寫信給我",
-    contact: "聯絡方式",
-    pages: "其他頁面",
-    language: "切換語言",
-    experience: "經歷",
-    skills: "技能",
-    teaching: "教學與社群",
-    education: "學歷與證照",
-    present: "現在",
-    more: "看完整經歷",
-    less: "收起",
-    updated: "最後更新 2026/10",
-    subject: "嗨 Tseng，看完你的履歷，想找你聊聊",
-  },
-  en: {
-    home: "Back to my space",
-    makingOf: "Making of",
-    chat: "Let's talk",
-    mail: "Email me",
-    contact: "Contact",
-    pages: "Other pages",
-    language: "Switch language",
-    experience: "Experience",
-    skills: "Skills",
-    teaching: "Teaching & community",
-    education: "Education & certificates",
-    present: "Present",
-    more: "Show full details",
-    less: "Show less",
-    updated: "Last updated Oct 2026",
-    subject: "Hi Tseng, I read your resume and would love to chat",
-  },
-  ko: {
-    home: "내 공간으로",
-    makingOf: "제작 과정",
-    chat: "이야기 나눠요",
-    mail: "메일 보내기",
-    contact: "연락처",
-    pages: "다른 페이지",
-    language: "언어 바꾸기",
-    experience: "경력",
-    skills: "기술",
-    teaching: "교육·커뮤니티",
-    education: "학력·자격",
-    present: "현재",
-    more: "전체 경력 보기",
-    less: "접기",
-    updated: "최종 업데이트 2026/10",
-    subject: "Tseng 님, 이력서를 보고 연락드려요",
-  },
-} as const;
-
-/** 每種語言的網址、切換鈕上的字、html lang */
-const LANGS: Record<ResumeLang, { href: string; text: string; htmlLang: string }> = {
-  zh: { href: "/resume", text: "中文", htmlLang: "zh-Hant" },
-  en: { href: "/resume/en", text: "EN", htmlLang: "en" },
-  ko: { href: "/resume/ko", text: "한국어", htmlLang: "ko" },
-};
-
-type Copy = (typeof UI)[ResumeLang];
+import { MetricIconView, SkillLogo } from "./resume-icons";
+import { RoleBlock } from "./role-block";
 
 /** 按鈕滑過時微微浮起,按下回彈 */
 const LIFT = "transition duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]";
@@ -104,54 +25,12 @@ const ARROW = "size-4 transition-transform duration-200 ease-out group-hover:-tr
 const CARD = "rounded-2xl border border-ink-soft/10 bg-white/60";
 const CHIP = "rounded-full bg-ink-soft/[0.07] px-2.5 py-1 text-[11px] font-medium text-ink-soft";
 
-/**
- * 技能標籤前面的官方 Logo(Simple Icons 的單色圖示,統一用文字色,滑過才換品牌色)
- * 用「開頭符合」比對,順序有差:React Hook Form 要排在 React 前面
- * 沒有官方 Logo 的(Zustand、Semi Design、release-it…)就只顯示文字
- */
-const SKILL_LOGOS: [prefix: string, icon: SimpleIcon][] = [
-  ["React Hook Form", siReacthookform],
-  ["React Testing Library", siTestinglibrary],
-  ["React", siReact],
-  ["TypeScript", siTypescript],
-  ["Next.js", siNextdotjs],
-  ["Vue", siVuedotjs],
-  ["JavaScript", siJavascript],
-  ["TanStack", siTanstack],
-  ["Zod", siZod],
-  ["Shadcn", siShadcnui],
-  ["Tailwind", siTailwindcss],
-  ["SCSS", siSass],
-  ["Storybook", siStorybook],
-  ["Jest", siJest],
-  ["Turborepo", siTurborepo],
-  ["Git", siGitlab],
-  ["commitlint", siCommitlint],
-  ["GPG", siGnuprivacyguard],
-  ["Claude Code", siClaude],
-  ["MCP", siModelcontextprotocol],
-  ["D3", siD3],
-  ["ECharts", siApacheecharts],
-];
-
-const logoFor = (item: string) => SKILL_LOGOS.find(([prefix]) => item.startsWith(prefix))?.[1];
-
 /** 技能標籤:有官方 Logo 的放在文字前面 */
-function SkillChip({ item }: { item: string }) {
-  const logo = logoFor(item);
+function SkillChip({ skill }: { skill: Skill }) {
   return (
     <span className={`group/chip inline-flex items-center gap-1.5 ${CHIP}`}>
-      {logo && (
-        <svg
-          viewBox="0 0 24 24"
-          aria-hidden
-          className="size-3.5 shrink-0 fill-current transition-colors group-hover/chip:[color:var(--brand)]"
-          style={{ "--brand": `#${logo.hex}` } as CSSProperties}
-        >
-          <path d={logo.path} />
-        </svg>
-      )}
-      {item}
+      <SkillLogo slug={skill.logo} />
+      {skill.name}
     </span>
   );
 }
@@ -174,7 +53,7 @@ function MediumMark() {
 }
 
 /** 頂部列:左邊是其他頁面,右邊是聯絡與語言切換;名字不放這裡,hero 已經有了 */
-function TopBar({ data, lang, t }: { data: Resume; lang: ResumeLang; t: Copy }) {
+function TopBar({ profile, lang, t }: { profile: Profile; lang: ResumeLang; t: ResumeCopy }) {
   const link = "transition hover:text-ink";
   return (
     <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-5 print:hidden">
@@ -185,7 +64,7 @@ function TopBar({ data, lang, t }: { data: Resume; lang: ResumeLang; t: Copy }) 
         <Link href="/making-of" className={link}>
           {t.makingOf}
         </Link>
-        <a href={data.medium.url} target="_blank" rel="noreferrer" className={link}>
+        <a href={profile.contacts.medium.url} target="_blank" rel="noreferrer" className={link}>
           Medium
         </a>
       </nav>
@@ -209,26 +88,27 @@ function TopBar({ data, lang, t }: { data: Resume; lang: ResumeLang; t: Copy }) 
 function LangSwitch({ lang, label }: { lang: ResumeLang; label: string }) {
   return (
     <nav aria-label={label} className="flex rounded-full border border-ink-soft/20 bg-white/60 p-0.5 text-xs font-medium">
-      {(Object.keys(LANGS) as ResumeLang[]).map((key) => (
+      {(Object.keys(RESUME_LANGS) as ResumeLang[]).map((key) => (
         <Link
           key={key}
-          href={LANGS[key].href}
-          hrefLang={LANGS[key].htmlLang}
+          href={RESUME_LANGS[key].href}
+          hrefLang={RESUME_LANGS[key].htmlLang}
           aria-current={key === lang ? "page" : undefined}
           className={`rounded-full px-3 py-1.5 transition ${key === lang ? "bg-ink text-cream" : "text-ink-soft hover:text-ink"}`}
         >
-          {LANGS[key].text}
+          {RESUME_LANGS[key].text}
         </Link>
       ))}
     </nav>
   );
 }
 
-function ContactCard({ data, t }: { data: Resume; t: Copy }) {
+function ContactCard({ profile, t }: { profile: Profile; t: ResumeCopy }) {
+  const { email, github, medium } = profile.contacts;
   const rows = [
-    { label: "Email", value: data.email, href: `mailto:${data.email}`, icon: <Mail className="size-4" /> },
-    { label: "GitHub", value: data.github.label, href: data.github.url, icon: <GitHubMark /> },
-    { label: "Medium", value: data.medium.label, href: data.medium.url, icon: <MediumMark /> },
+    { label: "Email", value: email, href: `mailto:${email}`, icon: <Mail className="size-4" /> },
+    { label: "GitHub", value: github.label, href: github.url, icon: <GitHubMark /> },
+    { label: "Medium", value: medium.label, href: medium.url, icon: <MediumMark /> },
   ];
   return (
     <aside
@@ -260,7 +140,7 @@ function ContactCard({ data, t }: { data: Resume; t: Copy }) {
       </ul>
       <p className="mt-2 flex items-center gap-1.5 px-2 text-xs text-ink-dim">
         <MapPin className="size-3.5" />
-        {data.location}
+        {profile.location}
       </p>
       <a
         href={gmailComposeUrl(t.subject)}
@@ -275,11 +155,26 @@ function ContactCard({ data, t }: { data: Resume; t: Copy }) {
   );
 }
 
-function Section({ en, title, children }: { en: string; title: string; children: ReactNode }) {
+function Section({
+  en,
+  title,
+  stacked = false,
+  children,
+}: {
+  en: string;
+  title: string;
+  /** 標題放在上面整排(左欄要留給內容用的時候) */
+  stacked?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <section className="grid gap-5 border-t border-ink-soft/15 py-12 md:grid-cols-[150px_minmax(0,1fr)] md:gap-10 md:py-16">
+    <section
+      className={`grid gap-5 border-t border-ink-soft/15 py-12 md:gap-10 md:py-16 ${
+        stacked ? "" : "md:grid-cols-[150px_minmax(0,1fr)]"
+      }`}
+    >
       {/* 桌機版標題貼在左欄,捲動時跟著走 */}
-      <div className="md:sticky md:top-8 md:self-start">
+      <div className={stacked ? "" : "md:sticky md:top-8 md:self-start"}>
         <p className="text-[11px] font-bold tracking-[0.3em] text-ink-dim">{en}</p>
         <h2 className="mt-1 text-xl font-bold text-ink md:text-2xl">{title}</h2>
       </div>
@@ -291,8 +186,7 @@ function Section({ en, title, children }: { en: string; title: string; children:
 function BulletList({ items, colon }: { items: readonly Bullet[]; colon: string }) {
   return (
     <ul className="mt-4 flex flex-col gap-2.5">
-      {items.map((b) => {
-        const [label, text] = typeof b === "string" ? [null, b] : b;
+      {items.map(({ label, text }) => {
         return (
           <li key={text} className="flex gap-2.5 text-sm leading-relaxed text-ink-soft">
             <span aria-hidden className="mt-[0.6em] size-1.5 shrink-0 rounded-full bg-accent" />
@@ -312,52 +206,76 @@ function BulletList({ items, colon }: { items: readonly Bullet[]; colon: string 
   );
 }
 
-function TimelineItem({ exp, last, t, colon }: { exp: Experience; last: boolean; t: Copy; colon: string }) {
-  const current = !exp.end;
-  const hasMore = Boolean(exp.intro || exp.bullets?.length || exp.groups?.length || exp.link);
+/** 數字卡片:左上角一個圖示(或插圖),下面是數字與說明 */
+function MetricCards({ metrics }: { metrics: readonly Metric[] }) {
   return (
-    <li className="relative pb-12 pl-8 last:pb-0 md:pl-10">
-      {/* 時間軸的線,最後一段不往下畫 */}
-      {!last && <span aria-hidden className="absolute -bottom-1 left-[7px] top-6 w-px bg-ink-soft/20" />}
-      <span
-        aria-hidden
-        className={`absolute left-0 top-0.5 size-[15px] rounded-full border-2 ${
-          current ? "border-accent bg-accent ring-4 ring-accent/20" : "border-ink-soft/35 bg-cream"
-        }`}
-      />
+    <dl className="mt-4 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+      {metrics.map((m) => (
+        <div
+          key={m.label}
+          className={`${CARD} flex flex-col px-3.5 py-3 transition duration-200 hover:-translate-y-0.5 hover:shadow-sm`}
+        >
+          {m.image ? (
+            // eslint-disable-next-line @next/next/no-img-element -- 插圖網址由資料決定,可能是外部圖床
+            <img src={m.image} alt="" className="mb-2 h-12 w-auto self-start object-contain" />
+          ) : (
+            <span
+              aria-hidden
+              className="mb-2.5 grid size-9 place-items-center rounded-xl bg-accent/10 text-accent"
+            >
+              <MetricIconView name={m.icon} className="size-[18px]" />
+            </span>
+          )}
+          <dd className="text-lg font-bold text-ink md:text-xl">{m.value}</dd>
+          <dt className="mt-0.5 text-[11px] leading-snug text-ink-dim">{m.label}</dt>
+        </div>
+      ))}
+    </dl>
+  );
+}
 
-      <p className="flex flex-wrap items-center gap-2 text-xs font-semibold tabular-nums text-ink-dim">
+function StackChips({ stack }: { stack: readonly string[] }) {
+  return (
+    <ul className="mt-2.5 flex flex-wrap gap-1.5">
+      {stack.map((s) => (
+        <li key={s} className={CHIP}>
+          {s}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** 期間、職稱、公司;收合時整塊變灰 */
+function RoleHeader({ exp, t }: { exp: Experience; t: ResumeCopy }) {
+  const current = !exp.end;
+  const dim = "group-data-[open=false]/role:text-ink-dim/70";
+  return (
+    <>
+      <span className={`flex flex-wrap items-center gap-2 text-xs font-semibold tabular-nums text-ink-dim ${dim}`}>
         {periodOf(exp, t.present)}
         {current && (
-          <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold tracking-wider text-white">NOW</span>
+          <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold tracking-wider text-white">
+            NOW
+          </span>
         )}
-      </p>
-      <h3 className="mt-1.5 text-lg font-bold text-ink md:text-xl">{exp.role}</h3>
-      <p className="text-sm text-ink-soft">{exp.org}</p>
-      {/* 技術標籤緊跟在職稱下面,一眼看出這份工作用什麼 */}
-      <ul className="mt-2.5 flex flex-wrap gap-1.5">
-        {exp.stack.map((s) => (
-          <li key={s} className={CHIP}>
-            {s}
-          </li>
-        ))}
-      </ul>
+      </span>
+      <span
+        className={`mt-1.5 block text-lg font-bold text-ink transition-colors group-hover/btn:text-ink md:text-xl ${dim}`}
+      >
+        {exp.role}
+      </span>
+      <span className={`block text-sm font-normal text-ink-soft ${dim}`}>{exp.org}</span>
+    </>
+  );
+}
 
-      {exp.metrics && (
-        <dl className="mt-4 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
-          {exp.metrics.map((m) => (
-            <div
-              key={m.label}
-              className={`${CARD} flex flex-col-reverse px-3.5 py-3 transition duration-200 hover:-translate-y-0.5 hover:shadow-sm`}
-            >
-              <dt className="mt-0.5 text-[11px] leading-snug text-ink-dim">{m.label}</dt>
-              <dd className="text-lg font-bold text-ink md:text-xl">{m.value}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
-
-      {/* 收合時只看最重要的亮點 */}
+/** 展開後的內容:數字卡片、亮點,再往下是「看完整經歷」 */
+function RoleBody({ exp, t, colon }: { exp: Experience; t: ResumeCopy; colon: string }) {
+  const hasMore = Boolean(exp.intro || exp.bullets?.length || exp.groups?.length || exp.link);
+  return (
+    <>
+      {exp.metrics && <MetricCards metrics={exp.metrics} />}
       <BulletList items={exp.highlights} colon={colon} />
 
       {hasMore && (
@@ -399,6 +317,60 @@ function TimelineItem({ exp, last, t, colon }: { exp: Experience; last: boolean;
           </div>
         </details>
       )}
+    </>
+  );
+}
+
+/** 時間軸上的圓點:現職實心,其他空心;收合時更淡 */
+function RoleDot({ current }: { current: boolean }) {
+  return (
+    <span
+      aria-hidden
+      className={`absolute left-0 top-0.5 size-[15px] rounded-full border-2 transition-colors ${
+        current
+          ? "border-accent bg-accent ring-4 ring-accent/20"
+          : "border-ink-soft/45 bg-cream group-data-[open=false]/role:border-ink-soft/20 group-data-[open=false]/role:bg-cream-dim"
+      }`}
+    />
+  );
+}
+
+/** 版型一:直式時間軸,技能標籤跟內容都在職稱下面 */
+function TimelineItem({ exp, last, t, colon }: { exp: Experience; last: boolean; t: ResumeCopy; colon: string }) {
+  return (
+    <li className="relative pb-10 pl-8 last:pb-0 md:pl-10">
+      {/* 時間軸的線,最後一段不往下畫 */}
+      {!last && <span aria-hidden className="absolute -bottom-1 left-[7px] top-6 w-px bg-ink-soft/20" />}
+      <RoleBlock
+        collapsible={!exp.featured}
+        dot={<RoleDot current={!exp.end} />}
+        header={<RoleHeader exp={exp} t={t} />}
+      >
+        {/* 技術標籤緊跟在職稱下面,一眼看出這份工作用什麼 */}
+        <StackChips stack={exp.stack} />
+        <RoleBody exp={exp} t={t} colon={colon} />
+      </RoleBlock>
+    </li>
+  );
+}
+
+/** 版型二:左欄放期間、職稱與重點技能,右欄只放描述跟數字卡片 */
+function SplitItem({ exp, last, t, colon }: { exp: Experience; last: boolean; t: ResumeCopy; colon: string }) {
+  return (
+    <li className="relative pb-10 last:pb-0">
+      {!last && <span aria-hidden className="absolute -bottom-1 left-[7px] top-6 w-px bg-ink-soft/20" />}
+      <RoleBlock
+        collapsible={!exp.featured}
+        className="grid gap-x-10 md:grid-cols-[240px_minmax(0,1fr)]"
+        // 左欄捲動時貼著,圓點會沿著線往下走;右欄第一個區塊跟職稱對齊
+        leftClassName="relative pl-8 md:sticky md:top-8 md:self-start"
+        bodyClassName="pl-8 md:pl-0 md:[&>*:first-child]:mt-0"
+        dot={<RoleDot current={!exp.end} />}
+        header={<RoleHeader exp={exp} t={t} />}
+        aside={<StackChips stack={exp.stack} />}
+      >
+        <RoleBody exp={exp} t={t} colon={colon} />
+      </RoleBlock>
     </li>
   );
 }
@@ -411,8 +383,8 @@ function SkillsSpec({ groups }: { groups: readonly SkillGroup[] }) {
         <div key={g.id} className="grid gap-2 py-3.5 sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-6">
           <dt className="text-sm font-bold text-ink sm:pt-1">{g.label}</dt>
           <dd className="flex flex-wrap gap-1.5">
-            {g.items.map((item) => (
-              <SkillChip key={item} item={item} />
+            {g.items.map((skill) => (
+              <SkillChip key={skill.name} skill={skill} />
             ))}
           </dd>
         </div>
@@ -421,38 +393,51 @@ function SkillsSpec({ groups }: { groups: readonly SkillGroup[] }) {
   );
 }
 
+/** 經歷的排版:timeline = 直式時間軸(預設);split = 左欄職稱與技能、右欄描述與卡片 */
+export type ExperienceLayout = "timeline" | "split";
+
 /**
- * 正式履歷:聯絡資訊放最上面,經歷用直式時間軸(收合時只看亮點)
- * 中文、英文、韓文共用這個版型,內容在 data/resume.ts、resume.en.ts、resume.ko.ts
+ * 正式履歷:聯絡資訊放最上面,接著經歷、技能、教學與學歷
+ * 畫面只吃傳進來的資料(來源見 data/resume/index.ts 的 getResume),不寫死任何內容
+ * 重點經歷(featured)一直展開,其他的先收合成灰色,點了才打開
  */
-export function ResumeView({ data, lang }: { data: Resume; lang: ResumeLang }) {
-  const t = UI[lang];
+export function ResumeView({
+  data,
+  lang,
+  layout = "timeline",
+}: {
+  data: Resume;
+  lang: ResumeLang;
+  layout?: ExperienceLayout;
+}) {
+  const t = RESUME_UI[lang];
   const colon = lang === "zh" ? "：" : ": ";
-  const { experiences, education } = data;
+  const { profile, experiences, education } = data;
+  const Item = layout === "split" ? SplitItem : TimelineItem;
 
   return (
-    <main lang={LANGS[lang].htmlLang} className="min-h-dvh bg-cream text-ink print:bg-white">
+    <main lang={RESUME_LANGS[lang].htmlLang} className="min-h-dvh bg-cream text-ink print:bg-white">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8">
-        <TopBar data={data} lang={lang} t={t} />
+        <TopBar profile={profile} lang={lang} t={t} />
 
         {/* Hero:名字、職稱、摘要 + 聯絡卡 */}
         <section className="grid gap-8 pb-12 pt-6 md:grid-cols-[minmax(0,1fr)_300px] md:gap-12 md:pb-16 md:pt-10">
           <div className="rise-in">
             {/* 中英文名字同樣大小 */}
             <h1 className="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-4xl font-bold tracking-tight text-ink md:text-6xl">
-              <span>{data.nameEn}</span>
-              <span>{data.nameZh}</span>
+              <span>{profile.nameEn}</span>
+              <span>{profile.nameZh}</span>
             </h1>
-            <p className="mt-4 text-base font-medium text-ink md:text-lg">{data.headline}</p>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-soft md:text-[15px]">{data.summary}</p>
+            <p className="mt-4 text-base font-medium text-ink md:text-lg">{profile.headline}</p>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-soft md:text-[15px]">{profile.summary}</p>
           </div>
-          <ContactCard data={data} t={t} />
+          <ContactCard profile={profile} t={t} />
         </section>
 
-        <Section en="EXPERIENCE" title={t.experience}>
+        <Section en="EXPERIENCE" title={t.experience} stacked={layout === "split"}>
           <ol>
             {experiences.map((exp, i) => (
-              <TimelineItem key={exp.id} exp={exp} last={i === experiences.length - 1} t={t} colon={colon} />
+              <Item key={exp.id} exp={exp} last={i === experiences.length - 1} t={t} colon={colon} />
             ))}
           </ol>
         </Section>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ResumeView } from "@/components/resume/resume-view";
-import { resume } from "@/data/resume";
+import { getResume } from "@/data/resume";
 import { shareMeta } from "@/lib/site";
 
 const TITLE = "履歷 — Tseng Fu Chun 曾輔君";
@@ -14,6 +14,6 @@ export const metadata: Metadata = {
 };
 
 /** 正式履歷(中文):聯絡資訊、直式時間軸、技能、教學與學歷;右上角可切英文 */
-export default function ResumePage() {
-  return <ResumeView data={resume} lang="zh" />;
+export default async function ResumePage() {
+  return <ResumeView data={await getResume("zh")} lang="zh" />;
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ResumeView } from "@/components/resume/resume-view";
-import { resumeEn } from "@/data/resume.en";
+import { getResume } from "@/data/resume";
 import { shareMeta } from "@/lib/site";
 
 const TITLE = "Resume — Tseng Fu Chun";
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   ...shareMeta(TITLE, DESCRIPTION, "profile"),
 };
 
-/** 正式履歷(英文):版型跟中文版共用,內容在 data/resume.en.ts */
-export default function ResumeEnPage() {
-  return <ResumeView data={resumeEn} lang="en" />;
+/** 正式履歷(英文):版型跟中文版共用,內容在 data/resume/en.json */
+export default async function ResumeEnPage() {
+  return <ResumeView data={await getResume("en")} lang="en" />;
 }
