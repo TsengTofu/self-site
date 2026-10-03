@@ -10,7 +10,7 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  alternates: { canonical: "/resume/en", languages: { "zh-Hant": "/resume", en: "/resume/en" } },
+  alternates: { canonical: "/resume/en", languages: { "zh-Hant": "/resume", en: "/resume/en", ko: "/resume/ko" } },
   ...shareMeta(TITLE, DESCRIPTION, "profile"),
 };
 

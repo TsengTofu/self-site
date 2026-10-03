@@ -1,25 +1,35 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
+import { ArrowUpRight, ChevronDown, Mail, MapPin } from "lucide-react";
 import {
-  ArrowUpRight,
-  BarChart3,
-  ChevronDown,
-  Code2,
-  Database,
-  FlaskConical,
-  Languages,
-  Mail,
-  MapPin,
-  Palette,
-  Sparkles,
-  Users,
-  Wrench,
-  type LucideIcon,
-} from "lucide-react";
+  siApacheecharts,
+  siClaude,
+  siCommitlint,
+  siD3,
+  siGitlab,
+  siGnuprivacyguard,
+  siJavascript,
+  siJest,
+  siModelcontextprotocol,
+  siNextdotjs,
+  siReact,
+  siReacthookform,
+  siSass,
+  siShadcnui,
+  siStorybook,
+  siTailwindcss,
+  siTanstack,
+  siTestinglibrary,
+  siTurborepo,
+  siTypescript,
+  siVuedotjs,
+  siZod,
+  type SimpleIcon,
+} from "simple-icons";
 import { periodOf, type Bullet, type Experience, type Resume, type SkillGroup } from "@/data/resume";
 import { gmailComposeUrl } from "@/lib/links";
 
-export type ResumeLang = "zh" | "en";
+export type ResumeLang = "zh" | "en" | "ko";
 
 /** 介面上的固定文字(履歷內容在 data/resume*.ts) */
 const UI = {
@@ -38,8 +48,6 @@ const UI = {
     present: "現在",
     more: "看完整經歷",
     less: "收起",
-    skillsA: "試用版本 A：規格表",
-    skillsB: "試用版本 B：Bento 卡片",
     updated: "最後更新 2026/10",
     subject: "嗨 Tseng，看完你的履歷，想找你聊聊",
   },
@@ -58,12 +66,35 @@ const UI = {
     present: "Present",
     more: "Show full details",
     less: "Show less",
-    skillsA: "Draft A: spec sheet",
-    skillsB: "Draft B: bento cards",
     updated: "Last updated Oct 2026",
     subject: "Hi Tseng, I read your resume and would love to chat",
   },
+  ko: {
+    home: "내 공간으로",
+    makingOf: "제작 과정",
+    chat: "이야기 나눠요",
+    mail: "메일 보내기",
+    contact: "연락처",
+    pages: "다른 페이지",
+    language: "언어 바꾸기",
+    experience: "경력",
+    skills: "기술",
+    teaching: "교육·커뮤니티",
+    education: "학력·자격",
+    present: "현재",
+    more: "전체 경력 보기",
+    less: "접기",
+    updated: "최종 업데이트 2026/10",
+    subject: "Tseng 님, 이력서를 보고 연락드려요",
+  },
 } as const;
+
+/** 每種語言的網址、切換鈕上的字、html lang */
+const LANGS: Record<ResumeLang, { href: string; text: string; htmlLang: string }> = {
+  zh: { href: "/resume", text: "中文", htmlLang: "zh-Hant" },
+  en: { href: "/resume/en", text: "EN", htmlLang: "en" },
+  ko: { href: "/resume/ko", text: "한국어", htmlLang: "ko" },
+};
 
 type Copy = (typeof UI)[ResumeLang];
 
@@ -73,18 +104,57 @@ const ARROW = "size-4 transition-transform duration-200 ease-out group-hover:-tr
 const CARD = "rounded-2xl border border-ink-soft/10 bg-white/60";
 const CHIP = "rounded-full bg-ink-soft/[0.07] px-2.5 py-1 text-[11px] font-medium text-ink-soft";
 
-/** 技能分組的圖示(Bento 版用) */
-const SKILL_ICON: Record<SkillGroup["id"], LucideIcon> = {
-  framework: Code2,
-  data: Database,
-  style: Palette,
-  test: FlaskConical,
-  tooling: Wrench,
-  ai: Sparkles,
-  collab: Users,
-  viz: BarChart3,
-  lang: Languages,
-};
+/**
+ * 技能標籤前面的官方 Logo(Simple Icons 的單色圖示,統一用文字色,滑過才換品牌色)
+ * 用「開頭符合」比對,順序有差:React Hook Form 要排在 React 前面
+ * 沒有官方 Logo 的(Zustand、Semi Design、release-it…)就只顯示文字
+ */
+const SKILL_LOGOS: [prefix: string, icon: SimpleIcon][] = [
+  ["React Hook Form", siReacthookform],
+  ["React Testing Library", siTestinglibrary],
+  ["React", siReact],
+  ["TypeScript", siTypescript],
+  ["Next.js", siNextdotjs],
+  ["Vue", siVuedotjs],
+  ["JavaScript", siJavascript],
+  ["TanStack", siTanstack],
+  ["Zod", siZod],
+  ["Shadcn", siShadcnui],
+  ["Tailwind", siTailwindcss],
+  ["SCSS", siSass],
+  ["Storybook", siStorybook],
+  ["Jest", siJest],
+  ["Turborepo", siTurborepo],
+  ["Git", siGitlab],
+  ["commitlint", siCommitlint],
+  ["GPG", siGnuprivacyguard],
+  ["Claude Code", siClaude],
+  ["MCP", siModelcontextprotocol],
+  ["D3", siD3],
+  ["ECharts", siApacheecharts],
+];
+
+const logoFor = (item: string) => SKILL_LOGOS.find(([prefix]) => item.startsWith(prefix))?.[1];
+
+/** 技能標籤:有官方 Logo 的放在文字前面 */
+function SkillChip({ item }: { item: string }) {
+  const logo = logoFor(item);
+  return (
+    <span className={`group/chip inline-flex items-center gap-1.5 ${CHIP}`}>
+      {logo && (
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden
+          className="size-3.5 shrink-0 fill-current transition-colors group-hover/chip:[color:var(--brand)]"
+          style={{ "--brand": `#${logo.hex}` } as CSSProperties}
+        >
+          <path d={logo.path} />
+        </svg>
+      )}
+      {item}
+    </span>
+  );
+}
 
 /** lucide 1.x 拿掉了品牌圖示,GitHub 與 Medium 自己畫 */
 function GitHubMark() {
@@ -135,25 +205,19 @@ function TopBar({ data, lang, t }: { data: Resume; lang: ResumeLang; t: Copy }) 
   );
 }
 
-/** 右上角的語言切換:中文 /resume、英文 /resume/en */
+/** 右上角的語言切換:中文 /resume、英文 /resume/en、韓文 /resume/ko */
 function LangSwitch({ lang, label }: { lang: ResumeLang; label: string }) {
-  const options = [
-    { lang: "zh", href: "/resume", text: "中文" },
-    { lang: "en", href: "/resume/en", text: "EN" },
-  ] as const;
   return (
     <nav aria-label={label} className="flex rounded-full border border-ink-soft/20 bg-white/60 p-0.5 text-xs font-medium">
-      {options.map((o) => (
+      {(Object.keys(LANGS) as ResumeLang[]).map((key) => (
         <Link
-          key={o.lang}
-          href={o.href}
-          hrefLang={o.lang === "zh" ? "zh-Hant" : "en"}
-          aria-current={o.lang === lang ? "page" : undefined}
-          className={`rounded-full px-3 py-1.5 transition ${
-            o.lang === lang ? "bg-ink text-cream" : "text-ink-soft hover:text-ink"
-          }`}
+          key={key}
+          href={LANGS[key].href}
+          hrefLang={LANGS[key].htmlLang}
+          aria-current={key === lang ? "page" : undefined}
+          className={`rounded-full px-3 py-1.5 transition ${key === lang ? "bg-ink text-cream" : "text-ink-soft hover:text-ink"}`}
         >
-          {o.text}
+          {LANGS[key].text}
         </Link>
       ))}
     </nav>
@@ -339,18 +403,16 @@ function TimelineItem({ exp, last, t, colon }: { exp: Experience; last: boolean;
   );
 }
 
-/** 🧪 技能版本 A:規格表 —— 左邊類別、右邊標籤,一行一類,像產品規格 */
+/** 技能:規格表 —— 左邊類別、右邊標籤(有官方 Logo 的放在前面),一行一類,像產品規格 */
 function SkillsSpec({ groups }: { groups: readonly SkillGroup[] }) {
   return (
     <dl className="divide-y divide-ink-soft/10 border-y border-ink-soft/10">
       {groups.map((g) => (
         <div key={g.id} className="grid gap-2 py-3.5 sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-6">
-          <dt className="text-sm font-bold text-ink">{g.label}</dt>
+          <dt className="text-sm font-bold text-ink sm:pt-1">{g.label}</dt>
           <dd className="flex flex-wrap gap-1.5">
             {g.items.map((item) => (
-              <span key={item} className={CHIP}>
-                {item}
-              </span>
+              <SkillChip key={item} item={item} />
             ))}
           </dd>
         </div>
@@ -359,68 +421,9 @@ function SkillsSpec({ groups }: { groups: readonly SkillGroup[] }) {
   );
 }
 
-/** Bento 的排法:重點類別佔兩格,三欄剛好排滿四列(AI 工程與協作是想強調的兩塊) */
-const BENTO_ORDER: { id: SkillGroup["id"]; wide?: true }[] = [
-  { id: "ai", wide: true },
-  { id: "framework" },
-  { id: "data" },
-  { id: "style" },
-  { id: "test" },
-  { id: "tooling", wide: true },
-  { id: "viz" },
-  { id: "collab", wide: true },
-  { id: "lang" },
-];
-
-/** 🧪 技能版本 B:Bento 卡片 —— 每類一張卡配圖示,重點類別放大 */
-function SkillsBento({ groups }: { groups: readonly SkillGroup[] }) {
-  const byId = new Map(groups.map((g) => [g.id, g]));
-  return (
-    <ul className="grid grid-flow-dense gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {BENTO_ORDER.map(({ id, wide }) => {
-        const g = byId.get(id);
-        if (!g) return null;
-        const Icon = SKILL_ICON[g.id];
-        const featured = g.id === "ai" || g.id === "collab";
-        return (
-          <li
-            key={g.id}
-            className={`${CARD} p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-sm ${wide ? "sm:col-span-2" : ""} ${
-              featured ? "border-accent/30 bg-gradient-to-br from-white/80 to-accent/10" : ""
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <span className={`grid size-8 place-items-center rounded-xl ${featured ? "bg-accent/15 text-accent" : "bg-ink-soft/[0.07] text-ink-soft"}`}>
-                <Icon className="size-4" strokeWidth={2} aria-hidden />
-              </span>
-              <h3 className="text-sm font-bold text-ink">{g.label}</h3>
-            </div>
-            <ul className="mt-3 flex flex-wrap gap-1.5">
-              {g.items.map((item) => (
-                <li key={item} className={CHIP}>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-/** 兩版技能並排給站主比較時的小標籤,選定後拿掉 */
-function DraftLabel({ children }: { children: ReactNode }) {
-  return (
-    <p className="mb-3 inline-flex rounded-full border border-dashed border-ink-soft/30 px-2.5 py-0.5 text-[11px] text-ink-dim">
-      {children}
-    </p>
-  );
-}
-
 /**
  * 正式履歷:聯絡資訊放最上面,經歷用直式時間軸(收合時只看亮點)
- * 中文與英文共用這個版型,內容在 data/resume.ts 與 data/resume.en.ts
+ * 中文、英文、韓文共用這個版型,內容在 data/resume.ts、resume.en.ts、resume.ko.ts
  */
 export function ResumeView({ data, lang }: { data: Resume; lang: ResumeLang }) {
   const t = UI[lang];
@@ -428,7 +431,7 @@ export function ResumeView({ data, lang }: { data: Resume; lang: ResumeLang }) {
   const { experiences, education } = data;
 
   return (
-    <main lang={lang === "zh" ? "zh-Hant" : "en"} className="min-h-dvh bg-cream text-ink print:bg-white">
+    <main lang={LANGS[lang].htmlLang} className="min-h-dvh bg-cream text-ink print:bg-white">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8">
         <TopBar data={data} lang={lang} t={t} />
 
@@ -455,12 +458,7 @@ export function ResumeView({ data, lang }: { data: Resume; lang: ResumeLang }) {
         </Section>
 
         <Section en="SKILLS" title={t.skills}>
-          <DraftLabel>{t.skillsA}</DraftLabel>
           <SkillsSpec groups={data.skills} />
-          <div className="mt-10">
-            <DraftLabel>{t.skillsB}</DraftLabel>
-            <SkillsBento groups={data.skills} />
-          </div>
         </Section>
 
         <Section en="TEACHING" title={t.teaching}>

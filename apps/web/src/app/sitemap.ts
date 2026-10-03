@@ -33,6 +33,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
+      url: `${SITE_URL}/resume/ko`,
+      lastModified: LAST_MODIFIED.resume,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${SITE_URL}/making-of`,
       lastModified: LAST_MODIFIED.makingOf,
       changeFrequency: "monthly",

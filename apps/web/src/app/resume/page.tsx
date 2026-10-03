@@ -9,7 +9,7 @@ const DESCRIPTION = "前端工程師｜AI 導入・流程建立・團隊賦能�
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  alternates: { canonical: "/resume", languages: { "zh-Hant": "/resume", en: "/resume/en" } },
+  alternates: { canonical: "/resume", languages: { "zh-Hant": "/resume", en: "/resume/en", ko: "/resume/ko" } },
   ...shareMeta(TITLE, DESCRIPTION, "profile"),
 };
 
