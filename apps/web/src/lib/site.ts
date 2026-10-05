@@ -22,7 +22,7 @@ export const OG_IMAGE = {
   url: "/og.jpg",
   width: 1200,
   height: 630,
-  alt: "手繪海景房的書桌場景 — Tofu Tseng 的個人網站",
+  alt: "手繪的海景房間，女生坐在地上摸貓，窗外是海 — Tofu Tseng 的個人網站",
 };
 
 /**
